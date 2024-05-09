@@ -1,0 +1,1 @@
+# A Deployment is a Kubernetes object that manages a set of identical pods, ensuring that a specified number of replicas of the pod are running at any given time.

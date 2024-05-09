@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: frontend-nginxapp
+  namespace: dev3  #add name space to tell it which name space to use
+  labels:
+    app: frontend-nginxapp
+    tier: frontend
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend-nginxapp
+
+  template: 
+    metadata:
+      labels: 
+        app: frontend-nginxapp
+        tier: frontend
+
+    spec: 
+      containers: 
+        - name: frontend-nginxapp
+          image: stacksimplify/kube-frontend-nginx:1.0.0
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service 
+metadata:
+  name: frontend-nginxapp-loadbalancer-service
+  namespace: dev3  #add name space to tell it which name space to use
+  labels:
+    app: frontend-nginxapp
+    tier: frontend
+
+spec:
+  type: LoadBalancer # ClusterIp, # NodePort
+  selector:
+    app: frontend-nginxapp
+  ports: 
+    - name: http
+      port: 80 # Service Port
+      targetPort: 80 # Container Port
+
+# kubectl apply -f 03-frontend-deployment.yml

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginxdeployment
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginxdeployment
+    spec:
+      containers:
+      - name: nginxdeployment
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+
+# https://www.youtube.com/watch?v=7kpm01EKY6A&ab_channel=MichaelLevan
+# https://dev.to/thenjdevopsguy/getting-started-with-kustomize-for-kubernetes-32nh

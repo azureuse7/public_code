@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev6
+---
+# Limte range 
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-cpu-mem-limit-range
+  namespace: dev6
+spec:
+  limits:
+    - default: # this section defines default limits
+        cpu: "500m"  # If not specified default limit is 1 vCPU per container     
+        memory: "512Mi" # If not specified the Container's memory limit is set to 512Mi, which is the default memory limit for the namespace.
+      defaultRequest:
+        cpu: "300m" # If not specified default it will take from whatever specified in limits.default.cpu      
+        memory: "256Mi" # If not specified default it will take from whatever specified in limits.default.memory
+      type: Container 
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1-nginx-deployment
+  labels:
+    app: app1-nginx
+  namespace: dev6
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app1-nginx
+  template:
+    metadata:
+      labels:
+        app: app1-nginx
+    spec:
+      containers:
+        - name: app1-nginx
+          image: stacksimplify/kube-nginxapp1:1.0.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1-nginx-service
+  labels:
+    app: app1-nginx
+  namespace: dev6    
+spec:
+  type: LoadBalancer
+  selector:
+    app: app1-nginx
+  ports:
+    - port: 80
+      targetPort: 80
+
+# Kubernetes Namespaces - LimitRange - Declarative using YAML
+# Step-04: Create k8s objects & Test
+
+# kubectl apply -f kube-manifests/
+
+# kubectl get pods -n dev3 
+
+# # View Pod Specification (CPU & Memory)
+# kubectl get pod <pod-name> -o yaml -n dev3
+
+# # Get & Describe Limits
+# kubectl get limits -n dev3
+# kubectl describe limits default-cpu-mem-limit-range -n dev3
+
+# # List Services
+# kubectl get svc -n dev3
+
+# # Access Application
+# http://<Public-IP-from-List-Services-Output>/app1/index.html
+
+# Step-05: Clean-Up
+# Delete all k8s objects created as part of this section
+# # Delete All
+# kubectl delete -f kube-manifests/

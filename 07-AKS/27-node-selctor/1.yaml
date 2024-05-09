@@ -1,0 +1,20 @@
+# Create a cluste with 3 nodes 
+# add a label on one node, example k label node <node name> disktype=ssh
+# create pod with below 
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    env: test
+
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    disktype: ssd # now pod should be deployed on ssd nod that we created earlier 
+

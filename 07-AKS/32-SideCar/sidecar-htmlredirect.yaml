@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-sidecar
+spec:
+
+  containers:
+  - name: main-container
+    image: iam7hills/dockerdemo:nginxdemos
+    ports:
+      - containerPort: 8080
+    imagePullPolicy: Always
+    
+    volumeMounts:
+    - name: shared-html
+      mountPath: /usr/share/nginx/html
+  - name: sidecar-container
+    image: busybox
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo 'index.html generated from sidecar' > /usr/share/nginx/html/index.html; sleep 30; done"]
+    volumeMounts:
+    - name: shared-html
+      mountPath: /usr/share/nginx/html

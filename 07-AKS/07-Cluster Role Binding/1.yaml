@@ -1,0 +1,54 @@
+# "namespace" omitted since ClusterRoles are not namespaced
+# A Role sets permissions within a particular namespace while a ClusterRole is a non-namespaced resource.
+# So one is restricted to a namespace, the other is not. Simple enough.
+# A Binding grants permissions defined in a Role or ClusterRole to a user or set of users.
+# These are called Subjects and include ServiceAccounts, Users, or Groups.
+# A RoleBinding grants permissions to a role in its namespace while a ClusterRoleBinding grants cluster-wide access.
+
+# So for example:
+
+# ClusterRole + ClusterRoleBinding = All Namespaces
+# ClusterRole + RoleBindings = Particular Namespaces
+# Role + RoleBinding = Same Namespace
+
+# https://travis.media/clusterrolebinding-with-service-account-all-namespaces/
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: aks-cluster-readonly-role
+rules:
+- apiGroups: ["", "extensions", "apps"]
+  resources: ["*"]
+  verbs: ["get", "list", "watch"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: aks-cluster-readonly-rolebinding
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aks-cluster-readonly-role
+
+subjects:
+- kind: Group
+  #name: groupObjectId # Your Azure AD Group Object ID: aksreadonly
+  name: "e8f709f7-4029-4fdb-b786-d0af29445fc9"  
+  apiGroup: rbac.authorization.k8s.io
+
+
+
+
+# Step-02: Create AD Group, Role Assignment and User
+# # Get Azure AKS Cluster Id
+# AKS_CLUSTER_ID=$(az aks show --resource-group aks-rg3 --name aksdemo3 --query id -o tsv)
+# echo $AKS_CLUSTER_ID
+
+# # Create Azure AD Group
+# AKS_READONLY_GROUP_ID=$(az ad group create --display-name aksreadonly --mail-nickname aksreadonly --query objectId -o tsv)    
+# echo $AKS_READONLY_GROUP_ID
+
+# # Create Role Assignment
