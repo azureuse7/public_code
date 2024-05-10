@@ -16,8 +16,29 @@ Instead of static IP address-based assignments, Services use selectors (or label
 - ClusterIP exposes the service on an internal IP only. This makes the service reachable only from within the cluster. This is the default type.
 
 - NodePort exposes the service on each node’s IP at a specific port. 
+ This value exposes the service externally. It assigns each node a static port that responds to that service. When accessed through nodeIp:port, the node automatically redirects the request to an internal service of the ClusterIP type. This service then forwards the request to the applications.
+
+<img src="images/1.png">
+<img src="images/2.png">
+
 
 - LoadBalancer exposes the service externally using a cloud provider’s load balancer. This is often used when the cloud provider’s load balancer is supported by Kubernetes, as it automates their configuration.
+
+Load Balancer Service:
+
+LoadBalancer: This value exposes the service externally by using Azure's load-balancing solution. When created, this resource spins up an Azure Load Balancer resource within your Azure subscription. Also, this type automatically creates a NodePort service to which the load balancer's traffic is redirected and a ClusterIP service to forward it internally.
+
+To access our application outside of Azure k8s cluster we can use Kubernetes Load Balancer service
+
+Ports
+
+port: Port on which node port service listens in Kubernetes cluster internally
+
+targetPort: We define container port here on which our application is running.
+
+<img src="images/3b.png">
+<img src="images/4.png">
+<img src="images/5.png">
 
 - ExternalName will just map a CNAME record in DNS. No proxying of any kind is established. This is commonly used to create a service within Kubernetes to represent an external datastore like a database that runs externally to Kubernetes. One potential use case would be using AWS RDS as the production database, and a MySQL container for the testing environment.
 

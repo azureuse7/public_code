@@ -6,9 +6,13 @@
 
 - Login back as a Root user and grant S3 as below to the user. 
 
+<img src="images/1.png">
+
 - Log in back as IAM and notice, that you have full access to S3
 
 - Group: Create a group
+
+<img src="images/2.png">
 
 - Add the user to the Group
 

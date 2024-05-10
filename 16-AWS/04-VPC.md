@@ -60,5 +60,5 @@ https://docs.aws.amazon.com/vpc/latest/userguide/vpc-example-private-subnets-nat
 
 ![image](https://github.com/iam-veeramalla/aws-devops-zero-to-hero/assets/43399466/89d8316e-7b70-4821-a6bf-67d1dcc4d2fb)
 
-
+<img src="images/3.png">
 
