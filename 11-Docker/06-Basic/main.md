@@ -1,7 +1,5 @@
 ## List and Remove Docker Images
 
-How to List and Remove Docker Images
-
 You can use the image ls command to list all the images
 
 ```bash
@@ -36,8 +34,6 @@ docker container logs notes-db
 ## What is a Container?
 
 A container is an abstraction at the application layer that packages code and dependencies together. Instead of virtualizing the entire physical machine, containers virtualize the host operating system only.
-
-You may consider containers to be the next generation of virtual machines.
 
 Just like virtual machines, containers are completely isolated environments from the host system as well as from each other. 
 

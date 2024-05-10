@@ -1,8 +1,6 @@
 # How to Perform Multi-Staged Builds in Docker
 
-In development mode the npm run serve command starts a development server that serves the application to the user. That server not only serves the files but also provides the hot reload feature.
 
-In production mode, the npm run build command compiles all your JavaScript code into some static HTML, CSS, and JavaScript files. To run these files you don't need node or any other runtime dependencies. All you need is a server like nginx for example.
 
 To create an image where the application runs in production mode, you can take the following steps:
 

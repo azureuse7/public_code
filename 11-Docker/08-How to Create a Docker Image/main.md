@@ -42,9 +42,6 @@ docker image build .
 ```
 
 
-docker image build is the command for building the image. The daemon finds any file named Dockerfile within the context.
-
-The . at the end sets the context for this build. The context means the directory accessible by the daemon during the build process.
 
 Now to run a container using this image, you can use the container run command coupled with the image ID that you received as the result of the build process. In my case the id is 3199372aa3fc evident by the Successfully built 3199372aa3fc line in the previous code block.
 ```bash
