@@ -1,29 +1,26 @@
 # EKS
 
-
 # Access Keys (for Programmatic Access):
 
-If you selected "Programmatic access" during user creation, you will receive access keys (Access Key ID and Secret Access Key).
+- If you selected "Programmatic access" during user creation, you will receive access keys (Access Key ID and Secret Access Key).
 
-Store these access keys securely, as they will be used to authenticate API requests made to AWS services.
+- Store these access keys securely, as they will be used to authenticate API requests made to AWS services.
 
-2.2 Configuring the AWS CLI and kubectl
+# Configuring the AWS CLI, Eksctl and kubectl
  
-
-# Installing the AWS CLI:
 
 - Configuring AWS CLI Credentials:
 
 - Open a terminal or command prompt and run the following command:
-
-
-
+```t
 aws configure
-Enter the access key ID and secret access key of the IAM user you created earlier.
+```
 
-Choose a default region and output format for AWS CLI commands.
+- Enter the access key ID and secret access key of the IAM user you created earlier. You can get the access key from Security credentails in AWS under user name
 
-Installing kubectl:
+- Choose a default region and output format for AWS CLI commands.
+
+# Installing kubectl:
 
 Configuring kubectl for EKS and Eksctl
 
@@ -34,35 +31,37 @@ In the AWS Management Console, go to the EKS service and select your cluster.
 Click on the "Config" button and follow the instructions to update your kubeconfig file. Alternatively, you can use the AWS CLI to update the kubeconfig file:
 
 
-
+```t
 aws eks update-kubeconfig --name your-cluster-name
+```
+
 Verify the configuration by running a kubectl command against your EKS cluster:
 
-
+```t
 
 kubectl get nodes
- 
+```
 
 # Create Fargate profile
 
-
+```t
 eksctl create fargateprofile \
     --cluster demo-cluster \
     --region us-east-1 \
     --name alb-sample-app \
     --namespace game-2048
 Once this is done 
-
+```
 <img src="images/5.png">
  
 
-Deploy the deployment, service and Ingress
+# Deploy the deployment, service and Ingress
  
 
-
+```t
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/examples/2048/2048_full.yaml
- 
+```
 
 - Notice no external IP 
 
@@ -76,45 +75,48 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-bala
 
 # commands to configure IAM OIDC provider
 
-
+```t
 export cluster_name=demo-cluster
 
 
 oidc_id=$(aws eks describe-cluster --name $cluster_name --query "cluster.identity.oidc.issuer" --output text | cut -d '/' -f 5) 
- 
+
+```
 
  
 
 <img src="images/6.png">
  
 
-Check if there is an IAM OIDC provider configured already
-aws iam list-open-id-connect-providers | grep $oidc_id | cut -d "/" -f4\n
+# Check if there is an IAM OIDC provider configured already
+- aws iam list-open-id-connect-providers | grep $oidc_id | cut -d "/" -f4\n
 
-If not, run the below command
+- If not, run the below command
 
 
-
+```t
 eksctl utils associate-iam-oidc-provider --cluster $cluster_name --approve
- 
+```
 
 # How to setup alb add on
 
 - Download IAM policy
 
-
+```t
 curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json
 
-- Create IAM Policy
+```
 
+- Create IAM Policy
+```t
 
 aws iam create-policy \
     --policy-name AWSLoadBalancerControllerIAMPolicy \
     --policy-document file://iam_policy.json
-
+```
 - Create IAM Role
 
-
+```t
 eksctl create iamserviceaccount \
   --cluster=<your-cluster-name> \
   --namespace=kube-system \
@@ -122,21 +124,21 @@ eksctl create iamserviceaccount \
   --role-name AmazonEKSLoadBalancerControllerRole \
   --attach-policy-arn=arn:aws:iam::<your-aws-account-id>:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve
+```
 
-
-- Deploy ALB controller
+# Deploy ALB controller
 Add helm repo
-
+```t
 
 helm repo add eks https://aws.github.io/eks-charts
+```
+- Update the repo
 
-Update the repo
-
-
+```t
 helm repo update eks
-
+```
 Install
-
+```t
 
 
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller \            
@@ -146,12 +148,14 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --set serviceAccount.name=aws-load-balancer-controller \
   --set region=<region> \
   --set vpcId=<your-vpc-id>
+```
 Verify that the deployments are running.
 
+```t
 
 
 kubectl get deployment -n kube-system aws-load-balancer-controller
- 
+```
 
 # 2.3 Preparing Networking and Security Groups for EKS
 Before launching an EKS cluster, you need to prepare the networking and security groups to ensure proper communication and security within the cluster:

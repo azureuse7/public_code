@@ -1,7 +1,6 @@
 # How to Create Executable Docker Images
 
 
-To begin with, open up the directory where you've cloned the repository that came with this book. The code for the rmbyext application resides inside the sub-directory with the same name.
 
 #  In my opinion it should be like something like this:
 

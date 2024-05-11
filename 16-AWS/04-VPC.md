@@ -1,5 +1,24 @@
 # VPC
 
+https://aws.plainenglish.io/aws-vpc-refresher-40ac90196ea8
+
+- If someone wants to access an application in VPC from the Internet, examplew he wants to tecah 172.2.16.1
+
+- VPC will have a network range
+
+- Within VPC there will be a subnet
+
+- Traffic will need to pass via internet gateway
+
+- Internet --> Public subnet ->> Load balancer.
+  
+- How will LB know where to go --> Route tables define the path.
+
+- Security Group sets before the subnet, it can block or accept the request
+
+
+
+
 To connect your VPC to the internet or other networks, you can set up gateways or routers. These act as entry and exit points for traffic going in and out of your VPC.
 
 

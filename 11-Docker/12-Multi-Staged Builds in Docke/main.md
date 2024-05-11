@@ -1,7 +1,6 @@
 # How to Perform Multi-Staged Builds in Docker
 
 
-
 To create an image where the application runs in production mode, you can take the following steps:
 
 - Use node as the base image and build the application.
