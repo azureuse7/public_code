@@ -147,11 +147,11 @@ And here is the trusty default response page from NGINX. You can visit the offic
 # How to Optimize Docker Images
 
 The image we built very unoptimized. To prove my point let's have a look at the size of the image using the image ls command:
-
+```bash
 docker image ls
-
-# REPOSITORY         TAG       IMAGE ID       CREATED          SIZE
-# custom-nginx       built     1f3aaf40bb54   16 minutes ago   343MB
+```
+REPOSITORY         TAG       IMAGE ID       CREATED          SIZE
+custom-nginx       built     1f3aaf40bb54   16 minutes ago   343MB
 ```bash
 docker image pull nginx:stable
 
