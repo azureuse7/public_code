@@ -150,8 +150,8 @@ The image we built very unoptimized. To prove my point let's have a look at the 
 ```bash
 docker image ls
 ```
-REPOSITORY         TAG       IMAGE ID       CREATED          SIZE
-custom-nginx       built     1f3aaf40bb54   16 minutes ago   343MB
+- REPOSITORY         TAG       IMAGE ID       CREATED          SIZE
+- custom-nginx       built     1f3aaf40bb54   16 minutes ago   343MB
 ```bash
 docker image pull nginx:stable
 
