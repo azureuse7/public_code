@@ -1,14 +1,10 @@
-# Local connection to GitHub
+# Local (laptop) connection to GitHub
 To connect to GitHub with SSH from Windows, follow these steps:
 
 - Open PowerShell
-
 - Run the "ssh-keygen" command to create SSH keys
-
 - Copy the value of the SSH public key
-
 - Save the public key in your GitHub account settings
-
 - Perform a Git clone operation using your repo’s SSH URL
 
 # Create SSH Keys for GitHub
@@ -54,7 +50,7 @@ To obtain a secure, GitHub SSH Windows connection, you must register the public 
 
 
 # Azure-DevOps connection to GitHub repositories
-Build GitHub repositories - Azure Pipelines 
+Build GitHub repositories - Azure Pipelines. 
 
 To create a PAT, visit Personal access tokens in your GitHub settings. The required permissions are repo, admin:repo_hook, read:user, and user:email. These are the same permissions required when using OAuth above. Copy the generated PAT to the clipboard and paste it into a new GitHub service connection in your Azure DevOps project settings. For future recall, name the service connection after your GitHub username. It will be available in your Azure DevOps project for later use when creating pipelines.
 
@@ -64,6 +60,7 @@ Azure-DevOps connection to Azure
 # https://www.youtube.com/watch?v=06wxMtSt_0g&t=367s
 
 # Service connection 
+
 - What is service connection, 
 "service connection" refers to a secure and managed way to connect to external services or resources from Azure Pipelines, Azure DevOps, or Azure Automation to azure basically its a connection.
 
@@ -77,13 +74,14 @@ To create a service conection you need the below
 - tentant id 
 
 
-# authicate method used by Service connection we use Service Principle 
+# Authicate method used by Service connection we use Service Principle 
 - what is service principle
 
-It will use the app ID and aap secret to connect to azure subscpition 
+It will use the app ID and aap secret to connect to azure subscpition. 
 
 
-# create an app-registration
+# Create an app-registration
+- Once ceated 
 - app regsitration needs api permssions check them 
 - Secrets --> this is where we generate our secrets --> create a new secret 
 - copy the value and this is the "service principle key". SO in the service connection copy the secret into service principle key
@@ -93,7 +91,7 @@ One very important thing,  the application must have correct roles example owner
 
 
 
-
+# authenticate Azure DevOps with GitHub
 To authenticate Azure DevOps with GitHub, you typically use a combination of service connections and service principals. Here's a general guide on how to set this up:
 
 Create a GitHub Personal Access Token:
