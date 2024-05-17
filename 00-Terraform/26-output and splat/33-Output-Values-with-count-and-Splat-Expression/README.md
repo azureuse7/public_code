@@ -1,6 +1,6 @@
 ---
 title: Terraform Output Values with Splat Expression
-description: Learn about Terraform Output Values with Splat Expression
+
 ---
 
 ## Step-01: Introduction

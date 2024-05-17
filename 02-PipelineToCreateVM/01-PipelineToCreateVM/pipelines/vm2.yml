@@ -1,0 +1,125 @@
+jobs:
+  - job: Storage_Account_Provision
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: AzurePowerShell@5
+      inputs:
+        azureSubscription: $(SVC_CONNECTION)
+        scriptPath: $(System.DefaultWorkingDirectory)/gautam_scripts/gautam_storage.ps1
+        scriptArguments:
+          -rgName $(RESOURCE_GROUP_NAME) `
+          -storageAccountName $(STORAGE_NAME) `
+          -containerName $(CONTAINER_NAME) `
+          -location $(LOCATION)
+        azurePowerShellVersion: latestVersion
+        pwsh: true
+
+
+  - job: Deploy_Virtual_Machines
+  - deployment: VirtualMachines
+    displayName: Virtual Machines
+    environment: ${{ parameters.gautam_Envioremnt }}
+    continueOnError: false
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+
+          # - task: InstallSSHKey@0
+            # inputs:
+            #   knownHostsEntry: ''
+            #   sshPublicKey: ''
+            #   sshKeySecureFile: ''
+  
+
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+            displayName: "Install Terraform"
+            inputs:
+              terraformVersion: $(TF_VERSION)   
+      
+
+          - task: AzureCLI@2
+            displayName: "Terraform Init"
+            inputs:
+              addSpnToEnvironment: true
+              azureSubscription: $(SVC_CONNECTION)
+              failOnStandardError: true
+              scriptLocation: inlineScript
+              scriptType: bash
+              workingDirectory: $(System.DefaultWorkingDirectory)/gautam_code/vm/
+              inlineScript: |
+
+                echo  $(SUBSCRIPTION)
+                TERRAFORM_BACKEND_SUBSCRIPTION_ID=$(az account show --subscription $(SUBSCRIPTION) --query id --output tsv)
+                subId=$(az account show --subscription $(SUBSCRIPTION) --query id --output tsv)
+                
+                export ARM_ACCESS_KEY=$ACCOUNT_KEY
+                echo "##vso[task.setvariable variable=ARM_ACCESS_KEY]$ACCOUNT_KEY"
+
+                export ARM_CLIENT_ID=$servicePrincipalId
+                echo "##vso[task.setvariable variable=ARM_CLIENT_ID]$servicePrincipalId"
+
+                export ARM_CLIENT_SECRET=$servicePrincipalKey
+                echo "##vso[task.setvariable variable=ARM_CLIENT_SECRET]$servicePrincipalKey"
+
+                export ARM_SUBSCRIPTION_ID=$subId
+                echo "##vso[task.setvariable variable=ARM_SUBSCRIPTION_ID]$subId"
+
+                export ARM_TENANT_ID=$(TENANT_ID)
+                echo "##vso[task.setvariable variable=ARM_TENANT_ID]$(TENANT_ID)"
+
+                terraform init \
+                -reconfigure \
+                -backend-config="resource_group_name=gautam" \
+                -backend-config="storage_account_name=gautamthakur" \
+                -backend-config="subscription_id=$TERRAFORM_BACKEND_SUBSCRIPTION_ID" \
+                -backend-config="container_name=tfstate" \
+                -backend-config="key=gautamthakur.tfstte" \
+                -backend-config=use_azuread_auth=true \
+                -backend-config="access_key=$(sa01-azdo-accesskey)" 
+
+
+          - task: AzureCLI@2
+            displayName: "Terraform Plan"
+            inputs:
+              addSpnToEnvironment: true
+              azureSubscription: $(SVC_CONNECTION)
+              failOnStandardError: true
+              scriptLocation: inlineScript
+              scriptType: bash
+              workingDirectory: '$(System.DefaultWorkingDirectory)/gautam_code/vm'
+
+              inlineScript: |
+                az account set --subscription $(SUBSCRIPTION)
+                TERRAFORM_BACKEND_SUBSCRIPTION_ID=$(az account show --subscription $(SUBSCRIPTION) --query id --output tsv)
+                subId=$(az account show --subscription $(SUBSCRIPTION) --query id --output tsv)
+
+                terraform plan  \
+                -input=false \
+                -out=tfplan
+
+
+
+
+          - task: AzureCLI@2
+
+            displayName: "Terraform Apply"
+            condition: |
+              and
+              (
+                succeeded(),
+                eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+                ne('${{ parameters.planDeploy }}', true),
+                ne(variables['Build.Reason'], 'PullRequest')
+              )
+            inputs:
+              addSpnToEnvironment: true
+              azureSubscription: $(SVC_CONNECTION)
+              failOnStandardError: true
+              scriptLocation: inlineScript
+              scriptType: bash
+              inlineScript: |
+                cd gautam_code/vm
+                terraform apply tfplan

@@ -1,0 +1,64 @@
+# A pull request trigger
+pr: none
+      
+
+#A push trigger
+trigger:                  
+  branches:
+    include:
+    - master
+
+# which pool to use for a job of the pipeline                          
+pool:
+  vmImage: ubuntu-latest
+
+#The parameters list specifies the runtime parameters passed to a pipeline.
+parameters:               
+
+- name: planDeploy         #Required as first parameter
+  displayName: "Plan Only" #Human-readable name for the parameter.
+  type: boolean            #Parameter type. Required.
+  default: false           #Default value if none is specified.
+
+- name: deployDev
+  displayName: "Deploy to DEV"
+  type: boolean
+  default: true
+
+- name: deployNpd
+  displayName: "Deploy to no-prod"
+  type: boolean
+  default: false
+  
+#Define variables to use in your pipeline.
+variables:               
+  SVC_CONNECTION: "gggagan1"  # The service connection 
+  Envioremnt : "gautam"
+
+
+#Stages are a collection of related jobs.
+stages:                   
+- stage: dev
+  condition: eq(${{ parameters.deployDev }}, true)
+  variables:
+  - template: variables.yml
+  
+  jobs:
+  - template: vm2.yml
+    parameters:
+      gautam_Envioremnt: ${{ variables.Envioremnt }}
+      planDeploy: ${{ parameters.planDeploy}}
+      environment: Dev
+      svcConnection: ${{ variables.SUBSCRIPTION }}
+      subscriptionName: $(SUBSCRIPTION)
+
+
+- stage: nonprod
+  condition: eq(${{ parameters.deployNpd }}, true)
+  variables:
+  - template: variables2.yml
+  jobs:
+      - template: vm2.yml
+        parameters:
+              TF_BACKEND_STORAGE_NAME: ${{ variables.STORAGE_NAME }}
+              gautam_Envioremnt: ${{ variables.Envioremnt }}

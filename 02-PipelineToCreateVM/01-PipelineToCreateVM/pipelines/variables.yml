@@ -1,0 +1,20 @@
+variables:
+  ENVIRONMENT: gautam
+  SUBSCRIPTION: "Pay-As-You-Go"
+  TENANT_ID: "a9a2d5a7-17e6-463b-9fc5-b057b14e6aa5"
+  SVC_CONNECTION: "gggagan1"
+  
+  # variables for the storage account 
+  RESOURCE_GROUP_NAME: "gautam-state"
+  CONTAINER_NAME: "tfstate"
+  STORAGE_NAME: "gt6backstorage"
+  LOCATION: "uksouth"
+
+
+  TF_STATE_NAME: "gautamthakur.tfstte"
+  TF_BACKEND_RESOURCE_GROUP_NAME: "gautam"
+  TF_VERSION: "1.1.9"
+  VAULT_NAME: "gautam-vault"
+  TF_BACKEND_CONTAINER_NAME: "tfstate"
+  TF_BACKEND_STORAGE_NAME: "gautam"
+
