@@ -50,7 +50,7 @@ To obtain a secure, GitHub SSH Windows connection, you must register the public 
 
 
 # Azure-DevOps connection to GitHub repositories
-Build GitHub repositories - Azure Pipelines. 
+Build GitHub repositories - Azure Pipelines.. 
 
 To create a PAT, visit Personal access tokens in your GitHub settings. The required permissions are repo, admin:repo_hook, read:user, and user:email. These are the same permissions required when using OAuth above. Copy the generated PAT to the clipboard and paste it into a new GitHub service connection in your Azure DevOps project settings. For future recall, name the service connection after your GitHub username. It will be available in your Azure DevOps project for later use when creating pipelines.
 
