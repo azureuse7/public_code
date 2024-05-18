@@ -30,7 +30,7 @@ while given_list[i] > 0: # first check element in given list that is 5,
     i += 1 # incremnet i with 1
 print(total3)
 
-answer 17
+# answer 17
 
 #################################################################
 
@@ -48,11 +48,11 @@ while given_list[i] > 0:
     print(total)
 
 
-error 
+# error 
 
 
 #################################################################
-what if there is no negative example 
+# what if there is no negative example 
 
 
 given_list2 = [5, 4 , 4 , 4 , 3, -2 , -3 , -5]
@@ -112,17 +112,17 @@ for i in range(len(a)): # 0, 1, 2
         print(a[i])
 		
 		
-		apple
+# apple
 
-banana
+# banana
 
-banana
+# banana
 
-republic
+# republic
 
-republic
+# republic
 
-republic
+# republic
 #################################################################
 
 
@@ -156,7 +156,7 @@ while given_list[j] < 0:
 
 #################################################################
 
-Dictionaries In Python
+# Dictionaries In Python
 d = {}
 #d = {"George": 24, "Tom": 32}   could also write so it has some predefind value
 

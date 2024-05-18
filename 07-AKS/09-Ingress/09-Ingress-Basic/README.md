@@ -116,3 +116,70 @@ kubectl logs -f <pod-name> -n ingress-basic
 kubectl delete -f kube-manifests/
 ```
 
+Ingress:
+
+So generally we have the below setup: 
+
+<img src="images/1.png">
+
+
+
+One is fine but what if we had more examples:
+<img src="images/2.png">
+
+
+This is not good. we can use Ingress
+<img src="images/3.png">
+
+<img src="images/4.png">
+
+So how does it tie up:
+<img src="images/5.png">
+
+
+Deployment--> Label      → app -> app1-nginx 
+
+Service.       --> Selector--> app → app1-nginx
+
+Ingress: 
+
+- Annotation:
+
+- path:
+
+- Service: Its tells which service to use i.e. app1-nginx-clusterip-service
+
+So in short Ingress tell:
+
+what my path here,  its /
+
+Route  to service, here the service is  app1-nginx-clusterip-service
+
+The service knows which deployment to go to:  here its app1-nginx 
+
+We define an ingress rule that forwards the request based on one name and DNS maps name with IP 
+
+This is how the Service will know where to forward the request to which pod
+
+Now the question comes if  a Pod has two containers how does it know which port to forward 
+
+<img src="images/6.png">
+
+
+
+This is done using the Target port as below
+
+<img src="images/7.png">
+
+
+
+It will look at label and then the target port example 3000 here
+
+As below:
+
+path / goes to -->
+
+path /track-joker goes to →
+
+<img src="images/8.png">
+<img src="images/9.png">
