@@ -1,8 +1,6 @@
 Example a VM wants to have access to a stoarge account 
 
-Create a manged idenity 
 
-<img src="images/30.png">
 
 Create a VM 
 
