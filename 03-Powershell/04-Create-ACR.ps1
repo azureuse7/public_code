@@ -1,4 +1,4 @@
-# New-AzResourceGroup -Name rg-dev-uks-85009b-registry -Location Uksouth
+# New-AzResourceGroup -Name rg-dev-uks-gautam-registry -Location Uksouth
 
 #  Check if ACR exists
 $acr = az acr check-name -n thakur1 | convertfrom-json

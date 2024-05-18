@@ -15,9 +15,9 @@ def greet(name):
 greet('Steve') # calling function with argument
 greet(123) # calling function with argument
 
-Output:
-Hello Steve
-Hello 123
+# Output:
+# Hello Steve
+# Hello 123
  
 #######################################################
 
@@ -25,8 +25,8 @@ def my_function(sana, bikram):
     print(sana + " " + bikram)
 my_function("love", "you")
 
-output:
-love you
+# output:
+# love you
 
 #######################################################
 
