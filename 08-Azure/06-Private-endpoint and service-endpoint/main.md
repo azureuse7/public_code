@@ -21,4 +21,15 @@ Traffic is still directed against the public endpoint of the storage account but
 The PaaS service now gets a virtual network interface inside the subnet and traffic from the VM to the storage account is now directed against the private IP address.
 
 
-# Private Endpoints
+
+Create  a private endpoint attach to stoarge account 
+<img src="images/5.png">
+
+Confirm its attached 
+<img src="images/6.png">
+
+Check the VNET and its connectd
+<img src="images/7.png">
+
+Confirm its the Network interface that is attached to stoarge account 
+<img src="images/8.png">
