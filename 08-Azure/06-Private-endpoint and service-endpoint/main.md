@@ -15,6 +15,15 @@ By default all traffic goes against the public endpoint of the storage account. 
 
 Traffic is still directed against the public endpoint of the storage account but the source IP has changed to the private IP of the VM. In fact, the traffic is also using the VNET and Subnet as source in the network dataframe.
 
+Create a subnet and enable service endpoint 
+<img src="images/10.png">
+
+Add that subnet to the stoarge account 
+<img src="images/11.png">
+
+
+Now communication can be done from subnet to stoarge account with out goig ove the interent
+
 # Private Endpoints
 <img src="images/1.png">
 
@@ -33,3 +42,10 @@ Check the VNET and its connectd
 
 Confirm its the Network interface that is attached to stoarge account 
 <img src="images/8.png">
+
+
+
+
+
+
+https://learn.microsoft.com/en-us/azure/private-link/private-link-faq#what-is-the-difference-between-service-endpoints-and-private-endpoints-
