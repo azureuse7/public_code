@@ -31,8 +31,11 @@ The PaaS service now gets a virtual network interface inside the subnet and traf
 
 
 
-Create  a private endpoint attach to stoarge account 
+Create  a private endpoint  
 <img src="images/5.png">
+
+attach to stoarge account
+<img src="images/15.png">
 
 Confirm its attached 
 <img src="images/6.png">
@@ -49,3 +52,5 @@ Confirm its the Network interface that is attached to stoarge account
 
 
 https://learn.microsoft.com/en-us/azure/private-link/private-link-faq#what-is-the-difference-between-service-endpoints-and-private-endpoints-
+
+https://www.youtube.com/watch?v=qkeZO0K58Po
