@@ -77,53 +77,18 @@ print(element)
 
 
 #################################################################
-
-given_list2 = [5, 4 ., 4 , 4 , 3, -2 , -3 , -5 )
-total5 = 0 
-i = 0
-while True:
-total5 += given_list2[i]
-i += 1
-if given_list2[i] <= 0:
-break 
-print(total5)
-
-17
-
-#################################################################
+#
 
 a = ["apple", "banana", "republic"]
 for element in a:
     print(element)
 	
-apple
-banana
-republic
-
-#################################################################
-
-
-
-for i in range(len(a)): # 0, 1, 2
-    for j in range(i + 1):
-        # i = 0 -> j = 0
-        # i = 1 -> j = 0, 1
-        # i = 2 -> j = 0, 1, 2
-        print(a[i])
-		
-		
 # apple
-
 # banana
-
-# banana
-
 # republic
 
-# republic
-
-# republic
 #################################################################
+
 
 
 # Can you compute the sum of all multiples
@@ -152,225 +117,11 @@ while given_list[j] < 0:
     print(total2)
 
 
--17
+# -7
+# -12
+# -15
+# -17
 
-#################################################################
-
-# Dictionaries In Python
-d = {}
-#d = {"George": 24, "Tom": 32}   could also write so it has some predefind value
-
-d["George"] = 24
-d["Tom"] = 32
-d["Jenny"] = 16
-
-print(d["George"])
-
-print(d["George"])
-24
-
-print(d["Tom"])
-32
-
-print(d["Alice"])
-KeyError                                  Traceback (most recent call last)
-<ipython-input-6-e722e03f8739> in <module>()
-----> 1 print(d["Alice"])
-
-KeyError: 'Alice'
--------------
-print(d["Jenny"])
-16
-
-d["Jenny"] = 20
-
-print(d["Jenny"])
-20
-
-# keys are commonly strings or numbers
-d[10] = 100
-
-print(d[10])
-100
-#################################################################
-
-# how to iterate over key-value pairs?
-for key, value in d.items():
-    print("key:")
-    print(key)
-    print("value:")
-    print(value)
-    print("")
-	
-	key:
-
-George
-
-value:
-
-24
-
-
-
-key:
-
-Tom
-
-value:
-
-32
-
-
-
-key:
-
-Jenny
-
-value:
-
-20
-
-
-
-key:
-
-10
-
-value:
-
-100
-
-#################################################################
-class Robot:
-
-
-   def introduce_self(self):  # function
-     print("My name is " + self.name)  # this in Java
-
-
-r1 = Robot()  # objects
-r1.name = "Tom"
-r1.color = "red"
-r1.weight = 30
-
-r2 = Robot()
-r2.name = "Jerry"
-r2.color = "blue"
-r2.weight = 40
-
-
-
-r1.introduce_self()
-r2.introduce_self()
-
-
-r1.name get from self.name 
-
-class Robot:
-    def __init__(self, name, color, weight):
-        self.name = name
-        self.color = color
-        self.weight = weight
-
-    def introduce_self(self):
-       print("My name is " + self.name)
-
-
-#################################################################
-
-r1 = Robot("Tom", "red", 30)
-r2 = Robot("Jerry", "blue", 40)
-
-r1.introduce_self()
-r2.introduce_self()
-
-2
-	
-mesage = "Hello Python Crash Course reader!"
-print(mesage)
-
-
-
-name = "ada lovelace"
-print(name.title())
-
-name = "Ada Lovelace"
-print(name.upper())
-print(name.lower())
-
-
-first_name = "gautam"
-last_name = "thakur"
-fullname = first_name+ " "+ last_name
-print(fullname)
-
-
-
-first_name = "gautam"
-last_name = "thakur"
-fullname = first_name+ " "+ last_name
-print("hello, "+ fullname.title()+ "!")
-
-
-:
-first_name = "gautam"
-last_name = "thakur"
-fullname = first_name+ " "+ last_name
-message = "hello, "+ fullname.title()+ "!"
-print(message)
-
-
-Adding Whitespace to Strings with Tabs or Newlines
-print("\tgautam")
-
-
-# To add a newline in a string, use the character combination \n:
-
-print("Languages:\nPython\nC\nJava")
-Python
-C 
-Java 
-
-#################################################################
-
-# You can also combine tabs and newlines in a single string. The string "\n\t" tells Python to move to a new line, and start the next line with a tab
- 
-print("Languages:\n\tPython\n\tC\n\tJava")
-    Python 
-    C 
-    JavaScript 
- 
-Stripping Whitespace
-
-# #################################################################
-
- 
-Avoiding Type Errors with the str() Function
-. For example, say you want to wish someone a happy birthday. You might write code like this:
-
-age = 23
-message = "Happy " + age + "rd Birthday!"
-print(message)
-
-
-# You might expect this code to print the simple birthday greeting, Happy 23rd birthday! 
-# But if you run this code, you’ll see that it generates an error:
- 
-Traceback (most recent call last): 
-  File "birthday.py", line 2, in <module>     message = "Happy " + age + "rd Birthday!" 
- TypeError: Can't convert 'int' object to str implicitly 
- 
-# This is a type error. It means Python can’t recognize the kind of information you’re using. 
-# In this example Python sees at  that you’re using a variable that has an integer value (int), 
-# but it’s not sure how to interpret that value. Python knows that the variable could represent either 
-# the numerical value 23 or the characters 2 and 3. When you use integers within strings like this, 
-# you need to specify explicitly that you want Python to use the integer as a string of characters. 
-# You can do this by wrapping the variable in the str() function, which tells Python to represent non-string values as strings:
-
-
-age = 23
-message = "Happy " + str(age) + "rd Birthday!"
-print(message)
 
 
 #################################################################
@@ -383,13 +134,17 @@ print(bicycles)
 bicycles = ['trek', 'cannondale', 'redline', 'specialized']
 print(bicycles[0])
 
+
+# ['trek', 'cannondale', 'redline', 'specialized']
+# trek
+
 #################################################################
 
 bicycles = ['trek', 'cannondale', 'redline', 'specialized']
 print(bicycles[0].title())
 
 
-# Index Positions Start at 0, Not 1
+# trek
  
 ################################################################# 
 
@@ -397,6 +152,8 @@ bicycles = ['trek', 'cannondale', 'redline', 'specialized']
 print(bicycles[0].title())
 print(bicycles[3])
 
+# Trek
+# specialized
 
 #################################################################
 
@@ -420,32 +177,7 @@ motorcycles[0] = 'ducati'
 print(motorcycles)
 
 ##################################################################
- 
-# The code at  defines the original list, with 'honda' as the first element. The code at  changes the value of the first item to 'ducati'. The output shows that the first item has indeed been changed, and the rest of the list stays the same:
- 
-['honda', 'yamaha', 'suzuki']
-['ducati', 'yamaha', 'suzuki']
- 
-# You can change the value of any item in a list, not just the first item.
-# appending Elements to the End of a List
-# The simplest way to add a new element to a list is to append the item to the list. 
 
-# in the previous example, we’ll add the new element 'ducati' to the end of the list:Fu
- 
-motorcycles = ['honda', 'yamaha', 'suzuki']
-print(motorcycles)
-motorcycles.append('ducati')
-print(motorcycles)
-
-
- 
-The append() method at  adds 'ducati' to the end of the list without affecting any of the other elements in the list:
- 
-['honda', 'yamaha', 'suzuki']
-['honda', 'yamaha', 'suzuki', 'ducati']
- 
-
-##################################################################
 
 # Inserting Elements into a List
 # You can add a new element at any position in your list by using the insert() method. You do this by specifying the index of the new element and the value of the new item.
@@ -658,9 +390,9 @@ for sana in magicians:
     print(sana.title() + ", that was a great trick!")
 
  
-Alice, that was a great trick! 
-David, that was a great trick! 
-Carolina, that was a great trick!
+# Alice, that was a great trick! 
+# David, that was a great trick! 
+# Carolina, that was a great trick!
 
 ##################################################################
  
@@ -670,12 +402,12 @@ for magician in magicians:
     print("I can't wait to see your next trick, " + magician.title() + ".\n")
  
  
-Alice, that was a great trick! 
-I can't wait to see your next trick, Alice. 
-David, that was a great trick! 
-I can't wait to see your next trick, David. 
-Carolina, that was a great trick! 
-I can't wait to see your next trick, Carolina.
+# Alice, that was a great trick! 
+# I can't wait to see your next trick, Alice. 
+# David, that was a great trick! 
+# I can't wait to see your next trick, David. 
+# Carolina, that was a great trick! 
+# I can't wait to see your next trick, Carolina.
  
 ###################################################################
 
@@ -687,50 +419,42 @@ for magician in magicians:
 
 
  
-Alice, that was a great trick! 
-I can't wait to see your next trick, Alice. 
-David, that was a great trick! 
-I can't wait to see your next trick, David. 
-Carolina, that was a great trick! 
-I can't wait to see your next trick, Carolina. 
-Thank you, everyone. That was a great magic show!
+# Alice, that was a great trick! 
+# I can't wait to see your next trick, Alice. 
+# David, that was a great trick! 
+# I can't wait to see your next trick, David. 
+# Carolina, that was a great trick! 
+# I can't wait to see your next trick, Carolina. 
+# Thank you, everyone. That was a great magic show!
  
 
 
 
 ##################################################################
  
-making numerical lists
+# making numerical lists
 
-Using the range() Function
-Python’s range() function makes it easy to generate a series of numbers. For example, you can use the range() function to print a series of numbers like this:
+# Using the range() Function
+# Python’s range() function makes it easy to generate a series of numbers. For example, you can use the range() function to print a series of numbers like this:
 
 for value in range(1,5):
     print(value)
 
-:
+
  
-1
-2
-3
-4
- 
-
-Using range() to Make a List of Numbers
-
-numbers = list(range(1,6))
-print(numbers)
-[1, 2, 3, 4, 5]
-
-We can also use the range() function to tell Python to skip numbers in a given range. For example, here’s how we would list the even numbers between 1 and 10:
-even_numbers = list(range(2,11,2))
-print(even_numbers)
-
-
-In this example, the range() function starts with the value 2 and then adds 2 to that value. It adds 2 repeatedly until it reaches or passes the end value, 11, and produces this result:
+# 1
+# 2
+# 3
+# 4
  
 
-Here’s how you might put the first 10 square numbers into a list:
+
+
+
+# In this example, the range() function starts with the value 2 and then adds 2 to that value. It adds 2 repeatedly until it reaches or passes the end value, 11, and produces this result:
+ 
+
+# Here’s how you might put the first 10 square numbers into a list:
  
 
 squares = [] #1
@@ -740,9 +464,9 @@ for value in range(1,11): #2
 print(squares)#5
 
  
-We start with an empty list called squares at . At , we tell Python to loop through each value from 1 to 10 using the range() function. Inside the loop, the current value is raised to the second power and stored in the variable square at . At , each new value of square is appended to the list squares. Finally, when the loop has finished running, the list of squares is printed at :
+# We start with an empty list called squares at . At , we tell Python to loop through each value from 1 to 10 using the range() function. Inside the loop, the current value is raised to the second power and stored in the variable square at . At , each new value of square is appended to the list squares. Finally, when the loop has finished running, the list of squares is printed at :
  
-To write this code more concisely, omit the temporary variable square and append each new value directly to the list:
+# To write this code more concisely, omit the temporary variable square and append each new value directly to the list:
  
 squares = []
 for value in range(1,11):
@@ -813,10 +537,10 @@ print("\nMy friend's favorite foods are:")
 print(friend_foods)
 
  
-My favorite foods are: 
-['pizza', 'falafel', 'carrot cake'] 
-My friend's favorite foods are: 
-['pizza', 'falafel', 'carrot cake'] 
+# My favorite foods are: 
+# ['pizza', 'falafel', 'carrot cake'] 
+# My friend's favorite foods are: 
+# ['pizza', 'falafel', 'carrot cake'] 
  
 # To prove that we actually have two separate lists, we’ll add a new food to each list and show that each list keeps track of 
 # the appropriate person’s favorite foods:
@@ -936,10 +660,10 @@ for car in cars:
         print(car.title())
  
 
-Audi 
-BMW 
-Subaru 
-Toyota
+# Audi 
+# BMW 
+# Subaru 
+# Toyota
  
 Conditional tests
  
@@ -1002,8 +726,8 @@ else:
     print("Please register to vote as soon as you turn 18!")
 
  
-Sorry, you are too young to vote.
-Please register to vote as soon as you turn 18!
+# Sorry, you are too young to vote.
+# Please register to vote as soon as you turn 18!
  
 
 ##################################################################
@@ -1017,8 +741,7 @@ elif age < 18:
 else:
     print("Your admission cost is $10.")
 
- 
- amusement_ 
+##################################################################
  
 
 age = 12
@@ -1030,8 +753,8 @@ else:
     price = 10
 print("Your admission cost is $" + str(price) + ".")
 
-Your admission cost is $5.
-Using Multiple elif Blocks
+# Your admission cost is $5.
+# Using Multiple elif Blocks
 age = 12
 if age < 4:
     price = 0
@@ -1044,8 +767,8 @@ else:
 print("Your admission cost is $" + str(price) + ".")
 
 
-Omitting the else Block
-Python does not require an else block at the end of an if-elif chain. 
+# Omitting the else Block
+# Python does not require an else block at the end of an if-elif chain. 
 
 age = 12
 if age < 4:
@@ -1059,10 +782,10 @@ print("Your admission cost is $" + str(price) + ".")
 
 ##################################################################
 
-Testing Multiple Conditions
-The if-elif-else chain is powerful, but it’s only appropriate to use when you just need one test to pass. As soon as Python finds one test that passes, it skips the rest of the tests. 
+# Testing Multiple Conditions
+# The if-elif-else chain is powerful, but it’s only appropriate to use when you just need one test to pass. As soon as Python finds one test that passes, it skips the rest of the tests. 
 
-However, sometimes it’s important to check all of the conditions of interest
+# However, sometimes it’s important to check all of the conditions of interest
 
 
 requested_toppings = ['mushrooms', 'extra cheese']
@@ -1078,11 +801,11 @@ print("\nFinished making your pizza!")
 
  
  
-Adding mushrooms.
-Adding extra cheese.
-Finished making your pizza!
+# Adding mushrooms.
+# Adding extra cheese.
+# Finished making your pizza!
  
-This code would not work properly if we used an if-elif-else block, because the code would stop running after only one test passes. Here’s what that would look like:
+# This code would not work properly if we used an if-elif-else block, because the code would stop running after only one test passes. Here’s what that would look like:
 
 requested_toppings = ['mushrooms', 'extra cheese']
 
@@ -1096,13 +819,13 @@ print("\nFinished making your pizza!")
 
 
  
-The test for 'mushrooms' is the first test to pass, so mushrooms are added to the pizza. However, the values 'extra cheese' and 'pepperoni' are never checked, because Python doesn’t run any tests beyond the first test that passes in an if-elif-else chain. The customer’s first topping will be added, but all of their other toppings will be missed:
+# The test for 'mushrooms' is the first test to pass, so mushrooms are added to the pizza. However, the values 'extra cheese' and 'pepperoni' are never checked, because Python doesn’t run any tests beyond the first test that passes in an if-elif-else chain. The customer’s first topping will be added, but all of their other toppings will be missed:
  
-Adding mushrooms.
-Finished making your pizza!
+# Adding mushrooms.
+# Finished making your pizza!
  
 
-using if statements with lists
+# using if statements with lists
 
 
 # The pizzeria displays a message whenever a topping is added to your pizza, as it’s being made. The code for this action can be written very efficiently by making a list of toppings the customer has requested and using a loop to announce each topping as it’s added to the pizza:
@@ -1112,10 +835,10 @@ for requested_topping in requested_toppings:
     print("Adding " + requested_topping + ".")
 print("\nFinished making your pizza!")
 
-Adding mushrooms.
-Adding green peppers.
-Adding extra cheese.
-Finished making your pizza!
+# Adding mushrooms.
+# Adding green peppers.
+# Adding extra cheese.
+# Finished making your pizza!
 
 ###################################################################
  
@@ -1130,15 +853,15 @@ print("\nFinished making your pizza!")
 
 
 
-This time we check each requested item before adding it to the pizza. The code at  checks to see if the person requested green peppers. If so, we display a message informing them why they can’t have green peppers. The else block at  ensures that all other toppings will be added to the pizza.
-The output shows that each requested topping is handled appropriately.
+# This time we check each requested item before adding it to the pizza. The code at  checks to see if the person requested green peppers. If so, we display a message informing them why they can’t have green peppers. The else block at  ensures that all other toppings will be added to the pizza.
+# The output shows that each requested topping is handled appropriately.
  
-Adding mushrooms.
-Sorry, we are out of green peppers right now.
-Adding extra cheese.
-Finished making your pizza!
+# Adding mushrooms.
+# Sorry, we are out of green peppers right now.
+# Adding extra cheese.
+# Finished making your pizza!
  
-Checking That a List Is Not Empty
+# Checking That a List Is Not Empty
 
 
 requested_toppings = []  #create an empty list 
@@ -1150,10 +873,10 @@ else:
     print("Are you sure you want a plain pizza?")
 
  
-Using Multiple Lists
-. What if a customer actually wants french fries on their pizza? 
+# Using Multiple Lists
+# . What if a customer actually wants french fries on their pizza? 
 
-Let’s watch out for unusual topping requests before we build a pizza. The following example defines two lists. The first is a list of available toppings at the pizzeria, and the second is the list of toppings that the user has requested. This time, each item in requested_toppings is checked against the list of available toppings before it’s added to the pizza:
+# Let’s watch out for unusual topping requests before we build a pizza. The following example defines two lists. The first is a list of available toppings at the pizzeria, and the second is the list of toppings that the user has requested. This time, each item in requested_toppings is checked against the list of available toppings before it’s added to the pizza:
 
  
 available_toppings = ['mushrooms', 'olives', 'green peppers','pepperoni', 'pineapple', 'extra cheese']
@@ -1166,15 +889,15 @@ for requested_topping in requested_toppings:
 print("\nFinished making your pizza!")
 
  
-At  we define a list of available toppings at this pizzeria. Note that this could be a tuple if the pizzeria has a stable selection of toppings. At , we make a list of toppings that a customer has requested. Note the unusual request, 'french fries'. At  we loop through the list of requested toppings. Inside the loop, we first check to see if each requested topping is actually in the list of available toppings . If it is, we add that topping to the pizza. If the requested topping is not in the list of available toppings, the else block will run . The else block prints a message telling the user which toppings are unavailable.
-This code syntax produces clean, informative output:
+# At  we define a list of available toppings at this pizzeria. Note that this could be a tuple if the pizzeria has a stable selection of toppings. At , we make a list of toppings that a customer has requested. Note the unusual request, 'french fries'. At  we loop through the list of requested toppings. Inside the loop, we first check to see if each requested topping is actually in the list of available toppings . If it is, we add that topping to the pizza. If the requested topping is not in the list of available toppings, the else block will run . The else block prints a message telling the user which toppings are unavailable.
+# This code syntax produces clean, informative output:
  
-Adding mushrooms.
-Sorry, we don't have french fries.
-Adding extra cheese.
-Finished making your pizza!
+# Adding mushrooms.
+# Sorry, we don't have french fries.
+# Adding extra cheese.
+# Finished making your pizza!
  
-styling your if statements
+# styling your if statements
  
 
 # DICtI o n a r I e s 
@@ -1211,17 +934,17 @@ print(alien_0)
 {'color': 'green', 'points': 5}
 {'color': 'green', 'points': 5, 'y_position': 25, 'x_position': 0}
  
-Modifying Values in a Dictionary 
+# Modifying Values in a Dictionary 
 
-. For example, consider an alien that changes from green to yellow as a game progresses:
+# . For example, consider an alien that changes from green to yellow as a game progresses:
 
 alien_0 = {'color': 'green'}
 print("The alien is " + alien_0['color'] + ".")
 alien_0['color'] = 'yellow'
 print("The alien is now " + alien_0['color'] + ".")
 
-The alien is green.
-The alien is now yellow.
+# The alien is green.
+# The alien is now yellow.
 
 For a more interesting example, let’s track the position of an alien that can move at different speeds. We’ll store a value representing the alien’s current speed and then use it to determine how far to the right the alien should move:
 alien_0 = {'x_position': 0, 'y_position': 25, 'speed': 'medium'}
@@ -1242,8 +965,8 @@ print("New x-position: " + str(alien_0['x_position']))
 check above 
  
  
-Original x-position: 0
-New x-position: 2
+# Original x-position: 0
+# New x-position: 2
  
 alien = {
     'gautam': 0,
@@ -1266,7 +989,7 @@ print("new" + str(alien['gautam']))
 
 
 
-Removing Key-Value Pairs:For example, let’s remove the key 'points' from the alien_0 dictionary along with its value:
+# Removing Key-Value Pairs:For example, let’s remove the key 'points' from the alien_0 dictionary along with its value:
 
 alien_0 = {'color': 'green', 'points': 5}
 print(alien_0)
@@ -1277,11 +1000,11 @@ print(alien_0)
 {'color': 'green', 'points': 5}
 {'color': 'green'}
  
-looping through a dictionary
-Looping Through All Key-Value Pairs
-The following dictionary would store one person’s username, first name, and last name:
+# looping through a dictionary
+# Looping Through All Key-Value Pairs
+# The following dictionary would store one person’s username, first name, and last name:
  
-.what if you wanted to see everything stored in this user’s dictionary? To do so, you could loop through the dictionary using a for loop:
+# .what if you wanted to see everything stored in this user’s dictionary? To do so, you could loop through the dictionary using a for loop:
  
 user_0 = {
     'username': 'efermi',
@@ -1294,12 +1017,12 @@ for key, value in user_0.items():
     print("Value: " + value)
  
  
-Key: last
-Value: fermi
-Key: first
-Value: enrico
-Key: username
-Value: efermi
+# Key: last
+# Value: fermi
+# Key: first
+# Value: enrico
+# Key: username
+# Value: efermi
 
 
 user_0 = {
@@ -1313,14 +1036,14 @@ for a, b in user_0.items():
     print("sana: " + b)
 
  
-gautam: username
-sana: efermi
+# gautam: username
+# sana: efermi
 
-gautam: first
-sana: enrico
+# gautam: first
+# sana: enrico
 
-gautam: last
-sana: fermi
+# gautam: last
+# sana: fermi
 
 
  
@@ -1334,10 +1057,10 @@ for name, language in favorite_languages.items():
     print(name.title() + "'s favorite language is " +  language.title() + ".")
  
  
-Jen's favorite language is Python.
-Sarah's favorite language is C.
-Phil's favorite language is Python.
-Edward's favorite language is Ruby.
+# Jen's favorite language is Python.
+# Sarah's favorite language is C.
+# Phil's favorite language is Python.
+# Edward's favorite language is Ruby.
  
 sana = {
     'sarah': 'c',
@@ -1350,8 +1073,8 @@ for name, language in sana.items():
 
 
 
-Looping Through All the Keys in a Dictionary
-The keys() method is useful when you don’t need to work with all of the values in a dictionary. Let’s loop through the favorite_languages dictionary and print the names of everyone who took the poll:
+# Looping Through All the Keys in a Dictionary
+# The keys() method is useful when you don’t need to work with all of the values in a dictionary. Let’s loop through the favorite_languages dictionary and print the names of everyone who took the poll:
 favorite_languages = {
     'jen': 'python',
     'sarah': 'c',
@@ -1365,10 +1088,10 @@ for name in favorite_languages.keys():
  
 The line at  tells Python to pull all the keys from the dictionary favorite_languages and store them one at a time in the variable name. The output shows the names of everyone who took the poll:
  
-Jen
-Sarah
-Phil
-Edward
+# Jen
+# Sarah
+# Phil
+# Edward
  
 Looping through the keys is actually the default behavior when looping through a dictionary, so this code would have exactly the same output if you wrote . . . 
  
@@ -1388,13 +1111,13 @@ for alien in aliens:
 
 ##################################################################
 
-We first create three dictionaries, each representing a different alien. At  we pack each of these dictionaries into a list called aliens. Finally, we loop through the list and print out each alien:
+# We first create three dictionaries, each representing a different alien. At  we pack each of these dictionaries into a list called aliens. Finally, we loop through the list and print out each alien:
  
 {'color': 'green', 'points': 5} 
 {'color': 'yellow', 'points': 10} 
 {'color': 'red', 'points': 15}
  
-A more realistic example would involve more than three aliens with code that automatically generates each alien. In the following example we use range() to create a fleet of 30 aliens:
+# A more realistic example would involve more than three aliens with code that automatically generates each alien. In the following example we use range() to create a fleet of 30 aliens:
  
 #Make an empty list for storing aliens.
 aliens = []
@@ -1448,13 +1171,13 @@ print("...")
 
 
  
-{'speed': 'medium', 'color': 'yellow', 'points': 10} 
-{'speed': 'medium', 'color': 'yellow', 'points': 10} 
-{'speed': 'medium', 'color': 'yellow', 'points': 10} 
-{'speed': 'slow', 'color': 'green', 'points': 5} 
-{'speed': 'slow', 'color': 'green', 'points': 5} ...
+# {'speed': 'medium', 'color': 'yellow', 'points': 10} 
+# {'speed': 'medium', 'color': 'yellow', 'points': 10} 
+# {'speed': 'medium', 'color': 'yellow', 'points': 10} 
+# {'speed': 'slow', 'color': 'green', 'points': 5} 
+# {'speed': 'slow', 'color': 'green', 'points': 5} ...
  
-A List in a Dictionary
+# A List in a Dictionary
 pizza = {
     'crust': 'thick',
     'toppings': ['mushrooms', 'extra cheese'],
@@ -1625,14 +1348,14 @@ while message != 'quit':
 
 
  
-Now the program makes a quick check before displaying the message and only prints the message if it does not match the quit value:
+# Now the program makes a quick check before displaying the message and only prints the message if it does not match the quit value:
  
-Tell me something, and I will repeat it back to you: 
-Enter 'quit' to end the program. Hello everyone!
-Hello everyone!
-Tell me something, and I will repeat it back to you: Enter 'quit' to end the program. quit
+# Tell me something, and I will repeat it back to you: 
+# Enter 'quit' to end the program. Hello everyone!
+# Hello everyone!
+# Tell me something, and I will repeat it back to you: Enter 'quit' to end the program. quit
  
-Using a Flag
+# Using a Flag
 
  
 prompt = "\nTell me something, and I will repeat it back to you:"
@@ -1648,16 +1371,16 @@ while active:
 
 
  
-We set the variable active to True 
- so the program starts in an active state. Doing so makes the while statement simpler because no comparison is made in the while statement itself; the logic is taken care of in other parts of the program. As long as the active variable remains True, the loop will continue running . 
-In the if statement inside the while loop, we check the value of message once the user enters their input. If the user enters 'quit' , we set active to False, and the while loop stops. If the user enters anything other than 'quit' 
-, we print their input as a message.
+# We set the variable active to True 
+#  so the program starts in an active state. Doing so makes the while statement simpler because no comparison is made in the while statement itself; the logic is taken care of in other parts of the program. As long as the active variable remains True, the loop will continue running . 
+# In the if statement inside the while loop, we check the value of message once the user enters their input. If the user enters 'quit' , we set active to False, and the while loop stops. If the user enters anything other than 'quit' 
+# , we print their input as a message.
 
-Using break to Exit a Loop
-To exit a while loop immediately without running any remaining code in the loop, regardless of the results of any conditional test, use the break statement. 
+# Using break to Exit a Loop
+# To exit a while loop immediately without running any remaining code in the loop, regardless of the results of any conditional test, use the break statement. 
 
-. 
-We can stop the while loop in this program by calling break as soon as the user enters the 'quit' value:
+# . 
+# We can stop the while loop in this program by calling break as soon as the user enters the 'quit' value:
 
 prompt = "\nPlease enter the name of a city you have visited:"
 prompt += "\n(Enter 'quit' when you are finished.) "
@@ -1671,12 +1394,12 @@ while True:
  
  	
  
-A loop that starts with while True  will run forever unless it reaches a break statement. The loop in this program continues asking the user to enter the names of cities they’ve been to until they enter 'quit'. When they enter 'quit', the break statement runs, causing Python to exit the loop:
+# A loop that starts with while True  will run forever unless it reaches a break statement. The loop in this program continues asking the user to enter the names of cities they’ve been to until they enter 'quit'. When they enter 'quit', the break statement runs, causing Python to exit the loop:
  
 
-Using continue in a Loop
+# Using continue in a Loop
 
-Rather than breaking out of a loop entirely without executing the rest of its code, you can use the continue statement to return to the beginning of the loop based on the result of a conditional test. For example, consider a loop that counts from 1 to 10 but prints only the odd numbers in that range
+# Rather than breaking out of a loop entirely without executing the rest of its code, you can use the continue statement to return to the beginning of the loop based on the result of a conditional test. For example, consider a loop that counts from 1 to 10 but prints only the odd numbers in that range
 
 
 current_number = 0
@@ -1698,9 +1421,9 @@ First we set current_number to 0. Because it’s less than 10, Python enters the
 5 
 7 
 9
-Avoiding Infinite Loops
-Every while loop needs a way to stop running so it won’t continue to run forever.
-For example, this counting loop should count from 1 to 5:
+# Avoiding Infinite Loops
+# Every while loop needs a way to stop running so it won’t continue to run forever.
+# For example, this counting loop should count from 1 to 5:
 x = 1
 while x <= 5:
     print(x)
@@ -1749,19 +1472,19 @@ for confirmed_user in confirmed_users:
     print(confirmed_user.title())
 
  
-We begin with a list of unconfirmed users at  (Alice, Brian, and Candace) and an empty list to hold confirmed users. 
-The while loop at  runs as long as the list unconfirmed_users is not empty. Within this loop, the pop() function at 
+# We begin with a list of unconfirmed users at  (Alice, Brian, and Candace) and an empty list to hold confirmed users. 
+# The while loop at  runs as long as the list unconfirmed_users is not empty. Within this loop, the pop() function at 
 
- removes unverified users one at a time from the end of unconfirmed_users. Here, because Candace is last in the unconfirmed_users list, her name will be the first to be removed, stored in current_user, and added to the confirmed_users list at . Next is Brian, then Alice.
-We simulate confirming each user by printing a verification message and then adding them to the list of confirmed users. As the list of unconfirmed users shrinks, the list of confirmed users grows. When the list of unconfirmed users is empty, the loop stops and the list of confirmed users is printed:
+#  removes unverified users one at a time from the end of unconfirmed_users. Here, because Candace is last in the unconfirmed_users list, her name will be the first to be removed, stored in current_user, and added to the confirmed_users list at . Next is Brian, then Alice.
+# We simulate confirming each user by printing a verification message and then adding them to the list of confirmed users. As the list of unconfirmed users shrinks, the list of confirmed users grows. When the list of unconfirmed users is empty, the loop stops and the list of confirmed users is printed:
  
-Verifying user: Candace 
-Verifying user: Brian 
-Verifying user: Alice 
-The following users have been confirmed: 
-Candace 
-Brian 
-Alice
+# Verifying user: Candace 
+# Verifying user: Brian 
+# Verifying user: Alice 
+# The following users have been confirmed: 
+# Candace 
+# Brian 
+# Alice
  
 Removing All Instances of Specific Values from a List
 Say you have a list of pets with the value 'cat' repeated several times. To remove all instances of that value, you can run a while loop until 'cat' is no longer in the list, as shown here:
@@ -1808,18 +1531,18 @@ for name, response in responses.items():
  
  	
  
-The program first defines an empty dictionary (responses) and sets a flag (polling_active) to indicate that polling is active. As long as polling_active is True, Python will run the code in the while loop. 
-Within the loop, the user is prompted to enter their username and a mountain they’d like to climb . That information is stored in the responses dictionary , and the user is asked whether or not to keep the poll running . If they enter yes, the program enters the while loop again. If they enter no, the polling_active flag is set to False, the while loop stops running, and the final code block at  displays the results of the poll.
-If you run this program and enter sample responses, you should see output like this:
+# The program first defines an empty dictionary (responses) and sets a flag (polling_active) to indicate that polling is active. As long as polling_active is True, Python will run the code in the while loop. 
+# Within the loop, the user is prompted to enter their username and a mountain they’d like to climb . That information is stored in the responses dictionary , and the user is asked whether or not to keep the poll running . If they enter yes, the program enters the while loop again. If they enter no, the polling_active flag is set to False, the while loop stops running, and the final code block at  displays the results of the poll.
+# If you run this program and enter sample responses, you should see output like this:
  
-What is your name? Eric 
-Which mountain would you like to climb someday? Denali 
-Would you like to let another person respond? (yes/ no) yes 
+# What is your name? Eric 
+# Which mountain would you like to climb someday? Denali 
+# Would you like to let another person respond? (yes/ no) yes 
  
-What is your name? Lynn 
-Which mountain would you like to climb someday? Devil's Thumb Would you like to let another person respond? (yes/ no) no 
---- Poll Results --- Lynn would like to climb Devil's Thumb. 
-Eric would like to climb Denali.
+# What is your name? Lynn 
+# Which mountain would you like to climb someday? Devil's Thumb Would you like to let another person respond? (yes/ no) no 
+# --- Poll Results --- Lynn would like to climb Devil's Thumb. 
+# Eric would like to climb Denali.
  
 8
 f u n C t I o n s

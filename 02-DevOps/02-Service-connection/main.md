@@ -1,19 +1,3 @@
-# Local (laptop) connection to GitHub
-To connect to GitHub with SSH from Windows, follow these steps:
-
-- Open PowerShell
-- Run the "ssh-keygen" command to create SSH keys (ssh-keygen -o -t rsa -C "windows-ssh@mcnz.com")
-- Copy the value of the SSH public key ( This is validated against a locally stored private key that Git uses to validate and establish a connection.)
-- Save the public key in your GitHub account settings
-- Perform a Git clone operation using your repo’s SSH URL
-
-
-
-# Azure-DevOps connection to GitHub repositories
- 
-To create a PAT, visit Personal access tokens in your GitHub settings. The required permissions are repo, admin:repo_hook, read:user, and user:email. These are the same permissions required when using OAuth above. Copy the generated PAT to the clipboard and paste it into a new GitHub service connection in your Azure DevOps project settings. For future recall, name the service connection after your GitHub username. It will be available in your Azure DevOps project for later use when creating pipelines.
-
-
 Azure-DevOps connection to Azure 
 [Azure DevOps | Creating a Service connection with Azure ]
 # https://www.youtube.com/watch?v=06wxMtSt_0g&t=367s
