@@ -11,6 +11,7 @@ For simplicity, let's take the view of a VM in a VNET connecting to a storage ac
 
 By default all traffic goes against the public endpoint of the storage account. Source IP of the traffic is the Public IP of the VM.
 
+
 # Service Endpoints
 
 Traffic is still directed against the public endpoint of the storage account but the source IP has changed to the private IP of the VM. In fact, the traffic is also using the VNET and Subnet as source in the network dataframe.

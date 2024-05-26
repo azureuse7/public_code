@@ -1,5 +1,15 @@
 # Azure-DevOps connection to GitHub repositories
- 
+
+1)Create a PAT in Github 
+<img src="images/aa.png">
+2)Copy the PAT in github
+<img src="images/bb.png">
+3) Go to Azure devops and Copy the PAT 
+<img src="images/cc.png">
+4) Create the service connection
+<img src="images/dd.png">
+5) You can access the via the sevice connection
+<img src="images/ee.png">
 To create a PAT, visit Personal access tokens in your GitHub settings. The required permissions are repo, admin:repo_hook, read:user, and user:email. These are the same permissions required when using OAuth above. Copy the generated PAT to the clipboard and paste it into a new GitHub service connection in your Azure DevOps project settings. For future recall, name the service connection after your GitHub username. It will be available in your Azure DevOps project for later use when creating pipelines.
 
 # Personal access token (PAT) authentication

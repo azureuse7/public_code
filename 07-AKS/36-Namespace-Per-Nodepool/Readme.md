@@ -1,17 +1,15 @@
 # Scheduling Pods using NodeSelector and Namespace Annotations
 
-## Introduction
 
-How can we enforce all pods within a namespace to be deployed into specific nodes or nodepools ?
+Enforce all pods within a namespace to be deployed into specific nodes or nodepools ?
 
 <img src="images/arch.png">
 
 Kubernetes supports logical and physical isolation for pods. This includes using namespaces, taints, nodeselectors, node affinity and antiaffinity, etc.
-Some customers requires strict physical isolation to meet security requirements or to isolate large applications. 
-They require creating a dedicated nodepool for an application. 
+Some customers require creating a dedicated nodepool for an application. 
 The application should be deployed into that specific nodepool.
 
-How to achieve that ?
+#### How to achieve that ?
 
 They have two options:
 1. using `NodeSelector` in each deployment targeting that nodepool.
