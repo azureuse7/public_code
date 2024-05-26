@@ -50,3 +50,7 @@ also in Azure devops
 
 ### what if we want to add a new repo to azure devops
 Create a new repo in github 
+
+
+Lets delete the service and let seee what happends 
+<img src="images/11.png">
