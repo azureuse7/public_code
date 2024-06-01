@@ -1,4 +1,4 @@
-# Scheduling Pods using NodeSelector and Namespace Annotations
+# 
 
 
 Enforce all pods within a namespace to be deployed into specific nodes or nodepools ?
