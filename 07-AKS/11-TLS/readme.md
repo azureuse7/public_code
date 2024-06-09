@@ -15,29 +15,6 @@ Lab steps:
 
 ## 1. Create an AKS cluster
 
-```powershell
-$AKS_RG="rg-aks-demo-tls"
-$AKS_NAME="aks-cluster"
-
-az group create -n $AKS_RG -l westeurope
-
-az aks create -g $AKS_RG -n $AKS_NAME `
-              --kubernetes-version "1.25.2" `
-              --enable-managed-identity `
-              --node-count 2 `
-              --network-plugin azure
-```
-
-## Connect to the cluster
-
-```powershell
-az aks get-credentials -n $AKS_NAME -g $AKS_RG --overwrite-existing
-
-kubectl get nodes
-# NAME                                STATUS   ROLES   AGE     VERSION
-# aks-nodepool1-17393022-vmss000000   Ready    agent   3m13s   v1.25.2
-# aks-nodepool1-17393022-vmss000001   Ready    agent   3m24s   v1.25.2
-```
 
 ## 2. Create TLS certificate for the Deployment
 

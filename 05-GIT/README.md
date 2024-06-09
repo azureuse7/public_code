@@ -63,3 +63,9 @@ git rev-parse --abbrev-ref HEAD
 
 ``` 
 https://devconnected.com/how-to-compare-two-git-branches/
+
+
+
+
+git fetch origin            # Updates origin/master
+git rebase origin/master    # Rebases current branch onto origin/master
