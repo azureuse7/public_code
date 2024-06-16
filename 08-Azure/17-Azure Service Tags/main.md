@@ -1,4 +1,4 @@
-User can connect to stoarge account as below 
+- User can connect to stoarge account as below 
 
 <img src="images/11.png">
 

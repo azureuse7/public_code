@@ -1,16 +1,16 @@
-Diagram 
+- Diagram 
 <img src="images/1.png">
 
-Add backend pools 
+- Add backend pools 
 
 <img src="images/2.png">
 
 
-Create a rule 
+- Create a rule 
 
 <img src="images/3.png">
 
-Access the application from the front end IP 
+- Access the application from the front end IP 
 
 <img src="images/4.png">
 

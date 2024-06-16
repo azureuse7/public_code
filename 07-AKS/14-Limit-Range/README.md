@@ -5,7 +5,7 @@ description: Understand Kubernetes Namespaces Limit Range Concept Azure Kubernet
 
 
 ## Step-01: Create Namespace manifest
-- **Important Note:** File name starts with `00-`  so that when creating k8s objects namespace will get created first so it don't throw an error.
+
 ```yaml
 apiVersion: v1
 kind: Namespace
