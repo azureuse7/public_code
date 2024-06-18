@@ -1,36 +1,35 @@
 https://jhooq.com/how-to-use-persistent-volume-and-persistent-claims-kubernetes/
 
-# How can I retain the data after the end of pod life cycle?
-How can I retain the data after the end of pod life cycle?
+## How can I retain the data after the end of pod life cycle?
 
 
-# What problems does it solve?
+
+### What problems does it solve?
 Containers running inside the pod can not share the files with each other.
 
-All the files inside the container are temporary which means if you terminate the container you are going to lose all your files.
-Secondly if in any case, your container crashes then there is no way to recover files.
-Kuberenetes provides volume plugin as Persistent Volume to address the above problems.
+- All the files inside the container are temporary which means if you terminate the container you are going to lose all your files.
 
-The lifecycle of these volumes are independent of the lifecycle of pods.
+- Kuberenetes provides volume plugin as Persistent Volume to address the above problems.
 
-So if PODs are terminated then volumes are unmounted and detached keeping the data intact.
+- The lifecycle of these volumes are independent of the lifecycle of pods.
+
+- So if PODs are terminated then volumes are unmounted and detached keeping the data intact.
 
 
 
 # What is Persistent Volume(PV)?
-In simple terms, it's storage available within your Kubernetes cluster. This storage can be provisioned by you or Kubernetes administrator.
+- In simple terms, it's storage available within your Kubernetes cluster. 
 
-It's basically a directory with some data in it and all the containers running inside the pods can access it. But Persistent Volumes are independent of the POD life cycle.
+- It's basically a directory with some data in it and all the containers running inside the pods can access it. But Persistent Volumes are independent of the POD life cycle.
 
-So if PODs live or die, persistent volume does get affected and it can be reused by some other PODs.
+- So if PODs live or die, persistent volume does get affected and it can be reused by some other PODs.
 
-Kubernetes provides many volume plugins based on the cloud service provider you are using -
-
-awsElasticBlockStore, azureDisk, azureFile, cephfs, cinder, configMap, csi, downwardAPI, emptyDir, fc (fibre channel), flexVolume, flocker, gcePersistentDisk, gitRepo (deprecated), glusterfs, hostPath, iscsi, local, nfs, persistentVolumeClaim, projected, portworxVolume, quobyte, rbd, scaleIO, secret, storageos, vsphereVolume
+- Kubernetes provides many volume plugins based on the cloud service provider you are using -
 
 
 
-# AKS Storage -  Storage Classes, Persistent Volume Claims
+
+## AKS Storage -  Storage Classes, Persistent Volume Claims
 
 - We are going to create a MySQL Database with persistence storage using **Azure Disks** 
 
@@ -39,8 +38,7 @@ awsElasticBlockStore, azureDisk, azureFile, cephfs, cinder, configMap, csi, down
 ### Create Storage Class manifest
 - https://kubernetes.io/docs/concepts/storage/storage-classes/#volume-binding-mode
 
-If you create a conatiner and delete it the stoarge is lost.
-To pressist data we can use volunes
+
 
 
 ### Create Persistent Volume Claims manifest

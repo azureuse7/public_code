@@ -60,9 +60,3 @@ kubectl get svc -n dev3
 http://<Public-IP-from-List-Services-Output>/app1/index.html
 
 ```
-## Step-04: Clean-Up
-- Delete all k8s objects created as part of this section
-```
-# Delete All
-kubectl delete -f kube-manifests/
-```
