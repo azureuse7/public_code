@@ -1,6 +1,6 @@
-In Kubernetes, the scheduler is responsible for assigning pods to nodes in the cluster based on various criteria.
+#### In Kubernetes, the scheduler is responsible for assigning pods to nodes in the cluster based on various criteria.
 
-# Node Selector
+##### Node Selector
 Node Selector is a simple way to constrain pods to nodes with specific labels. It allows you to specify a set of key-value pairs that must match the node's labels for a pod to be scheduled on that node. Usage: Include a nodeSelector field in the pod's YAML definition to specify the required labels.
 
 # Create a cluste with 3 nodes 
@@ -24,6 +24,7 @@ spec:
     disktype: ssd # now pod should be deployed on ssd nod that we created earlier 
 
 ```
+- now pod should be deployed on ssd nod that we created earlier 
 # Affinity and anti-affinity
 The affinity/anti-affinity language is more expressive. nodeSelector only selects nodes with all the specified labels. Affinity/anti-affinity gives you more control over the selection logic.
 

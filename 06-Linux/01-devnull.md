@@ -1,8 +1,9 @@
-What Is /Dev/Null
+### What Is /Dev/Null
 https://linuxhint.com/what_is_dev_null/
 
-The /dev/null is one of the most commonly used special virtual devices on Linux. In this guide, we will discuss about it and showcase the various ways of using it.
-What Is /Dev/Null in Linux
+- The /dev/null is one of the most commonly used special virtual devices on Linux. 
+- In this guide, we will discuss about it and showcase the various ways of using it.
+
 Linux treats everything as a file, be it a driver or a device. The /dev directory is used to store all the physical and virtual devices. If you worked with disk partitioning, you may have seen the /dev directory in use. For example: /dev/sda, /dev/sdb1, etc.
 
 Each of the special virtual devices come with unique properties. For example, reading from /dev/zero returns the ASCII NUL characters. Some of the popular virtual devices include:

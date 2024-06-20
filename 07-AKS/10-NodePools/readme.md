@@ -1,4 +1,4 @@
-Kubernetes Nodepools Explained
+### Kubernetes Nodepools Explained
 
 Tutorial available here:
 https://techcommunity.microsoft.com/t5/core-infrastructure-and-security/kubernetes-nodepools-explained/ba-p/2531581
@@ -38,7 +38,8 @@ $ kubectl get nodes
 ```
 <img src="images/1.png">
 
-- This node pool is of type System. It doesn't have any taints. Taints allows a node to ‘accept’ only some pods to be deployed. The only pods that could be deployed are the ones using a specific Toleration. In other words, the node says « I cannot accept any pod except the ones tolerating my taints ». And the pods says « I could be deployed on that node because I have the required toleration ». More details about taints and tolerations here.
+- This node pool is of type System. It doesn't have any taints. Taints allows a node to ‘accept’ only some pods to be deployed. 
+- The only pods that could be deployed are the ones using a specific Toleration. In other words, the node says « I cannot accept any pod except the ones tolerating my taints ». And the pods says « I could be deployed on that node because I have the required toleration ». 
 
  
 ```yml
@@ -52,17 +53,10 @@ But it has some labels for its nodes. Let's show the labels with the following c
 ```yml
 $ kubectl get nodes -o json | jq '.items[].metadata.labels'
 ```
-
-
-
-### 2. Add a new user nodepool for the user applications
-
-We'll add a new user nodepool. That could be done using the Azure portal. Go to the cluster, search for Nodepools in the left blade, then click 'add nodepool'.
-
 <img src="images/3.png">
 
 
-The creation of the nodepool could be done also using the command line which have more options like specifying Spot instances.
+### 2. Add a new user nodepool for the user applications
 
  
 ```yml
@@ -79,29 +73,26 @@ $ az aks nodepool add `
      --mode User
 ```
 
-Note the --priority parameter that could be used with value "Spot" to create Spot VM instances. Spot instances are used for cost optimization.
 
 We can then view the 2 nodepools from the portal or command line.
-
  
 ```yml
  $ az aks nodepool list --cluster-name aks-cluster --resource-group aks-cluster -o table
 ```
-<img src="images/4.png">
+<img src="images/5.png">
 
 The end result of adding a new nodepool should be like the following:
 
-<img src="images/5.png">
+<img src="images/6.png">
 
 ### 3. Deploy an application into a specific nodepool.
 
  
-
 By default, if we deploy a pod into the cluster, it could be deployed into any of the 2 nodepools.
 
 However, we can choose to target a specific nodepool using Labels on nodepools and nodeSelector from deployment/pods.
 
-Each nodepool have its own set of labels like the agent pool name ("agentpool": "appsnodepool",). We can use the label to target the nodes by using nodeSelector from the deployment file. More details about Labels and nodeSelector here.
+Each nodepool have its own set of labels like the agent pool name ("agentpool": "appsnodepool",). We can use the label to target the nodes by using nodeSelector from the deployment file. 
 
 Let's show the labels of one of one of the users nodepool nodes with the following command. Make sure to replace the node name.
 
@@ -110,9 +101,30 @@ Let's show the labels of one of one of the users nodepool nodes with the followi
 $ kubectl get node aks-appsnodepool-20474252-vmss000001 -o json | jq '.metadata.labels'
  
 ```
-
-
-Let's consider the following yaml deployment using the nodeSelector of pool name:
+```yml
+{
+  "agentpool": "appsnodepool",
+  "beta.kubernetes.io/arch": "amd64",
+  "beta.kubernetes.io/instance-type": "Standard_B2ms",
+  "beta.kubernetes.io/os": "linux",
+  "failure-domain.beta.kubernetes.io/region": "westeurope",
+  "failure-domain.beta.kubernetes.io/zone": "westeurope-3",
+  "kubernetes.azure.com/cluster": "MC_aks-cluster_aks-cluster_westeurope",
+  "kubernetes.azure.com/node-image-version": "AKSUbuntu-1804gen2containerd-2021.05.19",
+  "kubernetes.azure.com/role": "agent",
+  "kubernetes.io/arch": "amd64",
+  "kubernetes.io/hostname": "aks-appsnodepool-20474252-vmss000001",
+  "kubernetes.io/os": "linux",
+  "kubernetes.io/role": "agent",
+  "node-role.kubernetes.io/agent": "",
+  "node.kubernetes.io/instance-type": "Standard_B2ms",
+  "storageprofile": "managed",
+  "storagetier": "Premium_LRS",
+  "topology.kubernetes.io/region": "westeurope",
+  "topology.kubernetes.io/zone": "westeurope-3"
+}
+```
+- Let's consider the following yaml deployment using the nodeSelector of pool name:
 
  
 ```yml
@@ -140,7 +152,7 @@ spec:
         agentpool: appsnodepool
 ```
 
-Let's deploy the yaml file.
+- Let's deploy the yaml file.
 
  
 ```yml
@@ -153,7 +165,7 @@ Note how all the 100 pods are all deployed to the same user nodepool.
 ```yml
 $ kubectl get pods -o wide
 ``` 
-<img src="images/6.png">
+<img src="images/7.png">
 
 
 #### 4 Deploying system pods into system nodepool
@@ -175,7 +187,7 @@ System pods like CoreDNS already have default tolerations like CriticalAddonsOnl
 ```yml
 $ kubectl get deployment coredns -n kube-system -o json | jq ".spec.template.spec.tolerations"
 ```
-<img src="images/7.png">
+<img src="images/8.png">
 
 
 To allow these system pods to be deployed only to system nodepool, we need to make sure the system nodepool defines a taint with the same name. As seen earlier, the system nodepool doesn't have any taints by default. Unfortunately, we can add taints only during nodepool creation, not after. So we need to create a new system nodepool with taint (CriticalAddonsOnly=true:NoSchedule).
@@ -197,7 +209,7 @@ $ az aks nodepool add `
 ``` 
 
 The same thing could be achieved using the Azure portal :
-<img src="images/8.png">
+<img src="images/9.png">
 
 System pods will still run on old system nodepool until we drain that nodepool or delete it.
 
@@ -214,7 +226,7 @@ Let’s now verify that system pods (except the DaemonSets) are deployed only in
 ```yml
 $ kubectl get pods -n kube-system -o wide
 ```
-<img src="images/9.png">
+<img src="images/10.png">
 
 Note that it is possible to force pods to be scheduled into the system nodepool by adding the following toleration to the pod or the deployment. This should be done to the components like Calico, Prometheus, Elasticsearch…
 

@@ -1,4 +1,4 @@
-Unable to connect to the server: dial tcp: lookup <Server Location>: no such host
+### Unable to connect to the server: dial tcp: lookup <Server Location>: no such host
 
 az aks command invoke \
   --resource-group myResourceGroup \

@@ -1,0 +1,3 @@
+- An SSH key consists of two components: a public key and a private key. These keys are generated using cryptographic algorithms, and they work together as a pair. 
+The public key is meant to be shared with others, while the private key must be kept secret and protected. 
+Therefore, the private key remains securely stored on the developer's local machine & the public key can be safely shared with GitHub.

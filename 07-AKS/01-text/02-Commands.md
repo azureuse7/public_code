@@ -92,6 +92,3 @@ kubectl delete clusterrole name
 #  log into pod gautam
 k  exec -it <pod> /bin/sh
 
-
-
-![Image](https://live.staticflickr.com/65535/53509078416_51577427da_z.jpg "Azure AKS Kubernetes - Masterclass")
