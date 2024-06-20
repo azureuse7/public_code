@@ -5,22 +5,24 @@ https://www.youtube.com/watch?v=B9uaQcc2dLs&list=WL&index=4&ab_channel=TechnoPan
 2) vim gautam (save this)
 3) ls -> location of the file is home/gautam/abc.txt 
 
-4) docker run -d -volume home/gautam/abc.txt:/temp <image id> sleep infinity
+4) ```
+   docker run -d -volume home/gautam/abc.txt:/temp <image id> sleep infinity
 
 /temp is folder inside the container 
 
-5) docker exec -it <image id>
-6) cd /temp 
-7)  cat abc.txt 
+1) docker exec -it <image id>
+2) cd /temp 
+3)  cat abc.txt 
 
 also
+```
 docker container run \
     --rm \
     --publish 3000:3000 \
     --name hello-dock-dev \
     --volume $(pwd):/home/node/app \
     hello-dock:dev
-
+```
 
 How would we do that in docker compose file 
 

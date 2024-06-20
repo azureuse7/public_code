@@ -1,15 +1,14 @@
-Bash:
 
-# Delete all containers including its volumes use,
+#### Delete all containers including its volumes use,
 ```bash
 docker rm -vf $(docker ps -aq)
 ```
-# Delete all the images
+#### Delete all the images
 ```bash
 docker rmi -f $(docker images -aq)
 ```
 
-## Windows - Powershell
+##### Windows - Powershell
 ```bash
 docker images -a -q | % { docker image rm $_ -f }
 Windows - cmd.exe
@@ -17,7 +16,7 @@ Windows - cmd.exe
 for /F %i in ('docker images -a -q') do docker rmi -f %i
 
  
-## List and Remove Docker Images
+##### List and Remove Docker Images
 
 
 ```bash
@@ -25,12 +24,12 @@ docker image rm <image identifier>
 
 docker image rm custom-nginx:packaged
 ```
-You can also use the image prune command to cleanup all un-tagged dangling images as follows:
+- You can also use the image prune command to cleanup all un-tagged dangling images as follows:
 ```bash
 docker image prune --force
 ```
 
-## How to Access Logs from a Container in Docker
+##### How to Access Logs from a Container in Docker
 ```bash
 docker container logs <container identifier>
 ```
@@ -40,7 +39,7 @@ docker container logs notes-db
 ```
 
 
-## Three very fundamental concepts of containerization in general:
+##### Three very fundamental concepts of containerization in general:
 
 - Container
 
@@ -51,7 +50,9 @@ docker container logs notes-db
 
 ## What is a Container?
 
-A container is an abstraction at the application layer that packages code and dependencies together. Instead of virtualizing the entire physical machine, containers virtualize the host operating system only.
+A container is an abstraction at the application layer that packages code and dependencies together. 
+
+Instead of virtualizing the entire physical machine, containers virtualize the host operating system only.
 
 Just like virtual machines, containers are completely isolated environments from the host system as well as from each other. 
 
@@ -120,13 +121,13 @@ Docker daemon then creates a new container from the freshly pulled image.
 Finally Docker daemon runs the container created using the hello-world image outputting the wall of text on your terminal.
 
 It's the default behavior of Docker daemon to look for images in the hub that are not present locally. But once an image has been fetched, it'll stay in the local cache. So if you execute the command again, you won't see the following lines in the output:
-
+```
 Unable to find image 'hello-world:latest' locally
 latest: Pulling from library/hello-world
 0e03bdcc26d7: Pull complete
 Digest: sha256:d58e752213a51785838f9eed2b7a498ffa1cb3aa7f946dda11af39286c3db9a9
 Status: Downloaded newer image for hello-world:latest
-
+```
 If there is a newer version of the image available on the public registry, the daemon will fetch the image again. That :latest is a tag. Images usually have meaningful tags to indicate versions or builds. You'll learn about this in greater detail later on.
 
 How to Run a Container
