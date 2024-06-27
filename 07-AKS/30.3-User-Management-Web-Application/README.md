@@ -82,22 +82,3 @@ mysql> show tables;
 mysql> select * from user;
 ```
 
-## Step-06: Clean-Up
-- Delete all k8s objects created as part of this section
-```
-# Delete All
-kubectl delete -f kube-manifests/
-
-# List Pods
-kubectl get pods
-
-# Verify sc, pvc, pv
-kubectl get sc,pvc,pv
-
-# Delete PV Exclusively
-kubectl get pv
-kubectl delete pv <PV-NAME>
-
-# Delete Azure Disks 
-Go to All Services -> Disks -> Select and Delete the Disk
-```

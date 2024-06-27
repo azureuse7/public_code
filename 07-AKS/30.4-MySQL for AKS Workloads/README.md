@@ -115,13 +115,5 @@ Username: admin101
 Password: password101
 ```
 
-## Step-08: Clean Up 
-```
-# Delete all Objects created
-kubectl delete -f kube-manifests/
 
-# Verify current Kubernetes Objects
-kubectl get all
-
-# Delete Azure MySQL Database
 ```
