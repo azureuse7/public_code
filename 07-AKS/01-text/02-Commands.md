@@ -1,94 +1,131 @@
-# Configure Cluster Creds (kube config) for Azure AKS Clusters
+### Configure Cluster Creds (kube config) for Azure AKS Clusters →
+```t
 az aks get-credentials --resource-group aks-rg1 --name aksdemo1 --overwrite-existing && kubelogin convert-kubeconfig
+```
+### Node Status →
 
-# Node Status ->                                     
+```t
 kubectl get nodes/   -o wide
+```
 
-# List Pods →                                           
+### List Pods → 
+```t                                          
 kubectl get pods/ po  -n <namespace> / -o wide
+```
 
-# Describe the pod →                         
+### Describe the pod →  
+```t                       
 Kubectl describe pod <pod name> -n <namespace>
-
-# Delete Pod →                                     
+```
+### Delete Pod →  
+```t                                   
 kubectl delete pod <Pod name> -n <namespace>
-
-# Create a Pod →                                  
+```
+### Create a Pod →   
+```t                               
 kubectl run <desired-pod-name> --image <Container-Image> 
-
-# Get Pods from Namespace →        
+```
+### Get Pods from Namespace → 
+```t       
 kubectl get pods -n <namespace> (kubectl get namespace/ns)
-
-# Logs→                                                   
+```
+### Logs→   
+```t                                                
 k logs <pod-name> -n <namespace>
-
-# stream pod logs with -f-->              
+```
+### Stream pod logs with -f-->      
+```t        
 k logs -f <pod-name>
+```
+# Services 
 
-Services 
-
-# Service Info →                                        
+### Service Info →      
+```t                                  
 kubectl get service  -n <namespace>  /svc.    /-o wide
-
-# Delete Service->                              
+```
+### Delete Service->   
+```t                           
 delete svc <YourServiceName>
-
-# Verify if Service got deleted →        
+```
+### Verify if Service got deleted →     
+```t   
 kubectl get svc.   -n <namespace>
-
+```
  
-Replicaset 
+# Replicaset 
 
-# Replicaset Info →                                    
+### Replicaset Info →       
+```t                             
 kubectl get replicaset /  rs
-
-# Describe  ReplicaSet->                      
+```
+### Describe  ReplicaSet-> 
+```t                     
 kubectl describe rs/<replicaset-name>
-
-# Delete ReplicaSet->                             
+```
+### Delete ReplicaSet->    
+```                         
 kubectl delete rs <ReplicaSet-Name>
+```
 
-# Verify if ReplicaSet got deleted->   kubectl get rs
+### Verify if ReplicaSet got deleted-> 
+```   
+kubectl get rs
+``` 
+# Namespace
 
-Namespace
-
-# Namespace Info →                                    
+### Namespace Info →    
+```                                 
 kubectl get namespace 
-
-# Get all Objects in  namespace-->        
+``` 
+### Get all Objects in  namespace-->   
+```      
 kubectl get all. 
 kubectl get all --namespace <external-dns>
-
-# Create name space →                            
+``` 
+### Create name space →     
+```                        
 kubectl create ns <name space>
+``` 
+# Deployment 
 
-Deployment 
-
-# Deployments->                                      
+### Deployments->  
+```                                     
 kubectl get deployments --all-namespaces
-
-#  Delete →                                                       
+``` 
+###  Delete →   
+```                                                     
 kubectl delete -n NAMESPACE deployment DEPLOYMENT
+``` 
 
-
-# NetworkPolicies-->                               
+### NetworkPolicies-->  
+```                              
 k get NetworkPolicies -n gatekeeper-system
 k edit NetworkPolicies -n gatekeeper-system
 k apply -f <file> -n <namespace>
+``` 
 
-
-#  rolebindings
+###  rolebindings
+``` 
 kubectl get rolebindings,clusterrolebindings \
 --all-namespaces  \
 -o custom-columns='KIND:kind,NAMESPACE:metadata.namespace,NAME:metadata.name,SERVICE_ACCOUNTS:subjects[?(@.kind=="ServiceAccount")].name
-
+``` 
+``` 
 kubectl get clusterroles
 kubectl get clusterrolebindings
-find your role name and then delete
+``` 
+#### find your role name and then delete
+``` 
 kubectl delete clusterrolebinding name
 kubectl delete clusterrole name
+``` 
 
-
-#  log into pod gautam
+###  log into pod gautam
+``` 
 k  exec -it <pod> /bin/sh
-
+``` 
+### list the taints
+```t
+kubectl get nodes -o json | jq '.items[].spec'
+kubectl get nodes -o json | jq '.items[].spec.taints'
+```

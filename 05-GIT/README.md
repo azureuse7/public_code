@@ -39,7 +39,6 @@ git branch
 ``` 
 #### To push Tags
 ``` 
-Make changes
 git add .
 git commit -m "w"
 git tag v.02 

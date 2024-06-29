@@ -40,31 +40,37 @@ capabilities= [ "update", "delete"]
 # Policies using CLI 
 
 - delete the above KV 
-```t
-#Login to the pod 
-k exec 
 
-# Log into vault
-vauly login
-
-#enable the secret engine 
-vault secret enable -version=2 kv 
-
-# Create Policy 
-vault policy --help 
-create a user and attach policy → vault write auth/userpass/users/bikram password=vault policies=secret_policy
-
+#### Login to the pod
 ```
-# Using API 
+k exec 
+```
+##### Log into vault
+```
+vauly login
+```
+##### enable the secret engine 
+```
+vault secret enable -version=2 kv 
+```
+#### Create Policy 
+```
+vault policy --help 
+```
+#### create a user and attach policy → 
+```vault write auth/userpass/users/bikram password=vault policies=secret_policy
+```
+#### Using API 
 
 - Create a json file name: secretngine.json
-```t
+```
 {
   "options" : {
     "version": "2"
   },
   "type": "kv"
 }
-
-# Use the curl command to create policy 
+```
+#### Use the curl command to create policy 
+```
 curl -k -h "X-vault-Token: <toke>: --data @secretengine.json <ip>:8200/v1/sys/mount/kv 

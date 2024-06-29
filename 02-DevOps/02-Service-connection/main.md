@@ -3,7 +3,7 @@ Azure-DevOps connection to Azure
 # https://www.youtube.com/watch?v=06wxMtSt_0g&t=367s
 
 
-# Service connection 
+#### Service connection 
  
 "service connection" refers to a secure and managed way to connect to external services or resources from Azure Pipelines, Azure DevOps, or Azure Automation to azure basically its a connection.
 
@@ -18,13 +18,13 @@ To create a service conection you need the below
 
 
 
-# For Service connection to authenticate, we use Service Principle 
+#### For Service connection to authenticate, we use Service Principle 
 what is service principle
 
 It will use the app ID and aap secret to connect to azure subscpition. 
 
 
-# Create an app-registration
+#### Create an app-registration
 <img src="images/3.png"/>
 
 - Once ceated 

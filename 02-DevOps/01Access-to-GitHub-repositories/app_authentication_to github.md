@@ -2,7 +2,7 @@ Access to GitHub repositories thee are thee way.
 
 <img src="images/a.png">
 
-# GitHub app authentication
+#### GitHub app authentication
 After you install the GitHub App in your GitHub account or organization, your pipeline will run without using your personal GitHub identity. 
  
 Builds and GitHub status updates will be performed using the Azure Pipelines identity. 
@@ -13,7 +13,7 @@ After installation, the GitHub App will become Azure Pipelines' default method o
 
 
 
-# How to configure.
+### How to configure.
 https://www.youtube.com/watch?v=YZlaoNPzaxA
 
 - I have created a new github and azure devops project.

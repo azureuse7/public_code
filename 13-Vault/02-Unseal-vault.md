@@ -11,19 +11,24 @@
 # CLI
 - Remove old settings and remove disk etc 
 
-```t
-#Login to the vault pod 
+
+#### Login to the vault pod 
+```
 k exec -it vault1-0 /bin/sh
-
-# Notice its sealed
+```
+####  Notice its sealed
+```
 vault status  
-
-#Init the pod
+```
+####  Init the pod
+```
 vault operator init  
-#Copy the keys and token
+```
+####  Copy the keys and token
 
-# Use the keys to unseal
+####  Use the keys to unseal
+```
 vault operator unseal 
-# copy the keys and Repeat three times and Notice it would say sealed false 
-# Copy The Ip and test 
-``` 
+```
+####  copy the keys and Repeat three times and Notice it would say sealed false 
+####  Copy The Ip and test 

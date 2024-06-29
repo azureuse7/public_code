@@ -1,8 +1,8 @@
-# Logging commands
+#### Logging commands
 
-Logging commands are how tasks and scripts communicate with the agent. They cover actions like creating new variables, marking a step as failed, and uploading artifacts.
+- Logging commands are how tasks and scripts communicate with the agent. They cover actions like creating new variables, marking a step as failed, and uploading artifacts.
 
-# To invoke a logging command, echo the command via standard output.
+#### To invoke a logging command, echo the command via standard output.
 #!/bin/bash
 echo "##vso[task.setvariable variable=testvar;]testvalue"
 

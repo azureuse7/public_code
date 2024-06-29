@@ -18,75 +18,94 @@
 
 # Authentication CLI using username and password
 
-```t
 
-# Login a pod
+
+#### Login a pod
+```
 k exec -it <pod> bin/bash or bin/sh
 
 vault status
-
-# I need to enable auth for username and password
+```
+### I need to enable auth for username and password
 vault login
 #using the  root token 
 
 #enable vault auth userpass
+```
 vault auth enable userpass
-#Check-in vault that auth is enabled 
+```
+#### Check-in vault that auth is enabled 
 
-#Create user and password
-# my default vault monts auth/userpass/users
+#### Create user and password
+#### my default vault monts auth/userpass/users
+```
 vault write auth/userpass/users/gautam password=gautam
-# Verify this in UI 
+```
+#### Verify this in UI 
 
-#Login with the user
+### Login with the user
+```
 vault login -method=userpass username=gautam
-#login using the password notice it created a token and with the token there are policy applied and other information
+```
+#### login using the password notice it created a token and with the token there are policy applied and other information
 
-#list the auth methos
+#### list the auth methos
+```
 Vault auth list 
-
-#read the deatils 
+```
+#### read the deatils 
+```
 vault read auth/userpass/users/gautam
-
-#The user can’t see much or do anything and we need to assign the policy 
+```
+#### The user can’t see much or do anything and we need to assign the policy 
 ``` 
 
 # Same can be down for github
-```t
+```
 
 
-# I need to enable auth for username and password
+#### I need to enable auth for username and password
+```
 vault login
-#login using the  root token 
+```
+#### login using the  root token 
 
-#enable vault auth github
+#### enable vault auth github
+```
 vault auth enable github
-#Check-in vault that auth is enabled 
+```
+#### Check-in vault that auth is enabled 
 
-#list the auth methos
+#### list the auth methos
+```
 Vault auth list 
-
-#To login, the organization name is the username in github
+```
+#### To login, the organization name is the username in github
+```
 vault write auth/github/config organization=gautam
-# Verify this in UI 
+```
+#### Verify this in UI 
 
 https://www.youtube.com/watch?v=-EHmM5ocUsM&ab_channel=LearnwithGVR
-``` 
+ 
 
-# Authentication API
+#### Authentication API
 
 
 
-```t
-#create a payload.json file and add the password below
+
+#### create a payload.json file and add the password below
 "password": "gautam"
 
-#Do a curl command to login 
+#### Do a curl command to login 
+```
 curl -k -h 'X-vault-Token: <toke> -x post --data @payload.json http://<ip>/v1/auth/userspass/users/gautam 
 
 ``` 
 
-# Enable userpass using API 
+#### Enable userpass using API 
+```
 curl -k --header 'X-vault-Token: <toke> --request POST --data '{"type": "userpass"}
+```
 
-# login user using API 
+#### login user using API 
