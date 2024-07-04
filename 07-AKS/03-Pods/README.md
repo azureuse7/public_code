@@ -24,10 +24,10 @@ kubectl get po
 kubectl get pods -o wide
 ```
 
-# To get list of pod names
+### To get list of pod names
 kubectl get pods
 
-# Describe the Pod
+### Describe the Pod
 kubectl describe pod <Pod-Name>
 kubectl describe pod my-first-pod 
 ```
@@ -39,10 +39,10 @@ kubectl describe pod my-first-pod
 
 ### Delete Pod
 ```
-# To get list of pod names
+### To get list of pod names
 kubectl get pods
 
-# Delete Pod
+### Delete Pod
 kubectl delete pod <Pod-Name>
 kubectl delete pod my-first-pod
 ```
@@ -63,18 +63,18 @@ kubectl delete pod my-first-pod
 kubectl run <desired-pod-name> --image <Container-Image> 
 kubectl run my-first-pod --image stacksimplify/kubenginx:1.0.0 
 
-# Expose Pod as a Service
+### Expose Pod as a Service
 kubectl expose pod <Pod-Name>  --type=LoadBalancer --port=80 --name=<Service-Name>
 kubectl expose pod my-first-pod  --type=LoadBalancer --port=80 --name=my-first-service
 
-# Get Service Info
+### Get Service Info
 kubectl get service
 kubectl get svc
 
-# Describe Service
+### Describe Service
 kubectl describe service my-first-service
 
-# Access Application
+### Access Application
 http://<External-IP-from-get-service-output>
 ```
 - Verify the following after LB Service creation
@@ -90,14 +90,14 @@ http://<External-IP-from-get-service-output>
 
 ### Verify Pod Logs
 ```
-# Get Pod Name
+### Get Pod Name
 kubectl get po
 
-# Dump Pod logs
+### Dump Pod logs
 kubectl logs <pod-name>
 kubectl logs my-first-pod
 
-# Stream pod logs with -f option and access application to see logs
+### Stream pod logs with -f option and access application to see logs
 kubectl logs <pod-name>
 kubectl logs -f my-first-pod
 ```
@@ -109,11 +109,11 @@ kubectl logs -f my-first-pod
 ### Connect to Container in a POD
 - **Connect to a Container in POD and execute commands**
 ```
-# Connect to Nginx Container in a POD
+### Connect to Nginx Container in a POD
 kubectl exec -it <pod-name> -- /bin/bash
 kubectl exec -it my-first-pod -- /bin/bash
 
-# Execute some commands in Nginx container
+### Execute some commands in Nginx container
 ls
 cd /usr/share/nginx/html
 cat index.html
@@ -124,7 +124,7 @@ exit
 ```
 kubectl exec -it <pod-name> -- env
 
-# Sample Commands
+### Sample Commands
 kubectl exec -it my-first-pod -- env
 kubectl exec -it my-first-pod -- ls
 kubectl exec -it my-first-pod -- cat /usr/share/nginx/html/index.html

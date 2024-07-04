@@ -1,12 +1,12 @@
 # EKS
 
-# Access Keys (for Programmatic Access):
+## Access Keys (for Programmatic Access):
 
 - If you selected "Programmatic access" during user creation, you will receive access keys (Access Key ID and Secret Access Key).
 
 - Store these access keys securely, as they will be used to authenticate API requests made to AWS services.
 
-# Configuring the AWS CLI, Eksctl and kubectl
+## Configuring the AWS CLI, Eksctl and kubectl
  
 
 - Configuring AWS CLI Credentials:
@@ -20,7 +20,7 @@ aws configure
 
 - Choose a default region and output format for AWS CLI commands.
 
-# Installing kubectl:
+## Installing kubectl:
 
 Configuring kubectl for EKS and Eksctl
 
@@ -73,7 +73,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-bala
 
  
 
-# commands to configure IAM OIDC provider
+## commands to configure IAM OIDC provider
 
 ```t
 export cluster_name=demo-cluster
@@ -88,7 +88,7 @@ oidc_id=$(aws eks describe-cluster --name $cluster_name --query "cluster.identit
 <img src="images/6.png">
  
 
-# Check if there is an IAM OIDC provider configured already
+## Check if there is an IAM OIDC provider configured already
 - aws iam list-open-id-connect-providers | grep $oidc_id | cut -d "/" -f4\n
 
 - If not, run the below command
@@ -98,7 +98,7 @@ oidc_id=$(aws eks describe-cluster --name $cluster_name --query "cluster.identit
 eksctl utils associate-iam-oidc-provider --cluster $cluster_name --approve
 ```
 
-# How to setup alb add on
+## How to setup alb add on
 
 - Download IAM policy
 
@@ -126,7 +126,7 @@ eksctl create iamserviceaccount \
   --approve
 ```
 
-# Deploy ALB controller
+## Deploy ALB controller
 Add helm repo
 ```t
 
@@ -157,10 +157,10 @@ Verify that the deployments are running.
 kubectl get deployment -n kube-system aws-load-balancer-controller
 ```
 
-# 2.3 Preparing Networking and Security Groups for EKS
+## 2.3 Preparing Networking and Security Groups for EKS
 Before launching an EKS cluster, you need to prepare the networking and security groups to ensure proper communication and security within the cluster:
 
-# Creating an Amazon VPC (Virtual Private Cloud):
+## Creating an Amazon VPC (Virtual Private Cloud):
 
 - Go to the AWS Management Console and navigate to the VPC service.
 
@@ -170,11 +170,11 @@ Before launching an EKS cluster, you need to prepare the networking and security
 
 - Sure! Let's go into detail for each of the points:
 
-# Configuring Security Groups
+## Configuring Security Groups
 
 - Security Groups are a fundamental aspect of Amazon Web Services (AWS) that act as virtual firewalls for your AWS resources, including Amazon Elastic Kubernetes Service (EKS) clusters. Security Groups control inbound and outbound traffic to and from these resources based on rules you define. Here's a step-by-step guide on configuring Security Groups for your EKS cluster:
 
-# Create a Security Group:
+## Create a Security Group:
 
 - Go to the AWS Management Console and navigate to the Amazon VPC service.
 
@@ -186,7 +186,7 @@ Before launching an EKS cluster, you need to prepare the networking and security
 
 - Select the appropriate VPC for the Security Group.
 
-# Inbound Rules:
+## Inbound Rules:
 
 - Define inbound rules to control incoming traffic to your EKS worker nodes.
 
@@ -194,7 +194,7 @@ Before launching an EKS cluster, you need to prepare the networking and security
 
 - Common inbound rules include allowing SSH (port 22) access for administrative purposes and allowing ingress traffic from specific CIDR blocks or Security Groups.
 
-# Outbound Rules:
+## Outbound Rules:
 
 - Define outbound rules to control the traffic leaving your EKS worker nodes.
 
@@ -202,7 +202,7 @@ Before launching an EKS cluster, you need to prepare the networking and security
 
 - For security purposes, you can restrict outbound traffic to specific destinations or ports.
 
-# Security Group IDs:
+## Security Group IDs:
 
  After creating the Security Group, you'll receive a Security Group ID. This ID will be used when launching your EKS worker nodes.
 
@@ -212,11 +212,11 @@ When launching the EKS worker nodes, specify the Security Group ID in the launch
 
 Configuring Security Groups ensures that only the necessary traffic is allowed to and from your EKS worker nodes, enhancing the security of your EKS cluster.
 
-# Setting Up Internet Gateway (IGW)
+## Setting Up Internet Gateway (IGW)
 
 - An Internet Gateway (IGW) is a horizontally scaled, redundant, and highly available AWS resource that allows communication between your VPC and the internet. To enable EKS worker nodes to access the internet for tasks like pulling container images, you need to set up an Internet Gateway in your VPC. Here's how to do it:
 
-# Create an Internet Gateway:
+## Create an Internet Gateway:
 
 - Go to the AWS Management Console and navigate to the Amazon VPC service.
 
@@ -226,13 +226,13 @@ Configuring Security Groups ensures that only the necessary traffic is allowed t
 
 - Provide a name for the Internet Gateway and click "Create Internet Gateway."
 
-# Attach Internet Gateway to VPC:
+## Attach Internet Gateway to VPC:
 
 - After creating the Internet Gateway, select the Internet Gateway in the list and click on "Attach to VPC."
 
 - Choose the VPC to which you want to attach the Internet Gateway and click "Attach."
 
-# Update Route Tables:
+## Update Route Tables:
 
 - Go to "Route Tables" in the Amazon VPC service.
 
@@ -242,11 +242,11 @@ Configuring Security Groups ensures that only the necessary traffic is allowed t
 
 - By setting up an Internet Gateway and updating the Route Tables, you provide internet access to your EKS worker nodes, enabling them to interact with external resources like container registries and external services.
 
-# Configuring IAM Policies
+## Configuring IAM Policies
 
 - Identity and Access Management (IAM) is a service in AWS that allows you to manage access to AWS resources securely. IAM policies define permissions that specify what actions are allowed or denied on specific AWS resources. For your EKS cluster, you'll need to configure IAM policies to grant necessary permissions to your worker nodes and other resources. Here's how to do it:
 
-# Create a Custom IAM Policy:
+## Create a Custom IAM Policy:
 
 - Go to the AWS Management Console and navigate to the IAM service.
 
@@ -256,7 +256,7 @@ Configuring Security Groups ensures that only the necessary traffic is allowed t
 
 - Choose "JSON" as the policy language and define the permissions required for your EKS cluster. For example, you might need permissions for EC2 instances, Auto Scaling, Elastic Load Balancing, and accessing ECR (Elastic Container Registry).
 
-# Attach the IAM Policy to IAM Roles:
+## Attach the IAM Policy to IAM Roles:
 
 - Go to "Roles" in the IAM service and select the IAM role that your EKS worker nodes will assume.
 
@@ -264,7 +264,7 @@ Configuring Security Groups ensures that only the necessary traffic is allowed t
 
 - Attach the policy to the IAM role.
 
-# Update EKS Worker Node Launch Configuration:
+## Update EKS Worker Node Launch Configuration:
 
 - When launching your EKS worker nodes, specify the IAM role ARN (Amazon Resource Name) of the IAM role that includes the necessary IAM policy.
 
