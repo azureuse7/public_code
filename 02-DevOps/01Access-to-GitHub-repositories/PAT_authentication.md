@@ -1,7 +1,7 @@
 # Azure-DevOps connection to GitHub repositories
 
 1) Create a PAT in Github 
-<img src="images/aa.png">
+<img src="Images/aa.png">
 2) Copy the PAT in github
 <img src="images/bb.png">
 3) Go to Azure devops and Copy the PAT 
