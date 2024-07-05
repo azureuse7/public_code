@@ -1,0 +1,19 @@
+{
+    "gautam_seccomps_profile_effect": {
+        "type": "String",
+        "defaultValue":"audit",
+        "allowedValues": [
+            "audit",
+            "deny",
+            "disabled"
+        ]
+    },
+    "gautam_seccomps_profile_excluded_namespaces": {
+        "type": "Array",
+        "defaultValue": ["kube-system", "gatekeeper-system"]
+    },
+    "gautam_seccomps_profile_allowedProfiles": {
+        "type": "Array",
+        "defaultValue":["runtime/default"]
+    }
+}

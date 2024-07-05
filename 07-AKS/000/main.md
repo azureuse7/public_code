@@ -1,24 +1,30 @@
 (https://www.youtube.com/watch?v=_pBYrm_CNrQ)
 
-- Create a controller with policy add-on enabled.
+- Create a Cluster with policy add-on enabled.
 <img src="images/a.png">
 
-- Log in to the to the cluster and run
+- Log in to the to the cluster.
 - You can see that the policy is running.
 <img src="images/2.png">
 You can also see gatekeeper namespace has been created and pods
 <img src="images/3.png">
 
 Check what constraints are running.
-get constraint template
+``` 
+ k get constraint template
+``` 
 - https://open-policy-agent.github.io/gatekeeper/website/docs/constrainttemplates/
--
-- k get constraint
-These constraints ca'n't be changed, Husng Kubectl; you have to edit the Azure policy.
-These are dry runs.
+``` 
+ k get constraint
+``` 
+- These constraints can't be changed, using Kubectl; you have to edit the Azure policy.
+-These are dry runs.
 
-Now let's check a character and view the definition.
+Now let's check a constrainttemplate
+ and view the definition.
+```  
 kubcetl get constrainttemplate <>
+``` 
 ### Now let's test this
 
 Let's create a pod with privileges.
