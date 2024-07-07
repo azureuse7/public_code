@@ -1,10 +1,9 @@
 https://jhooq.com/how-to-use-persistent-volume-and-persistent-claims-kubernetes/
 
-## How can I retain the data after the end of pod life cycle?
+### How can I retain the data after the end of pod life cycle?
 
 
-
-### What problems does it solve?
+#### What problems does it solve?
 Containers running inside the pod can not share the files with each other.
 
 - All the files inside the container are temporary which means if you terminate the container you are going to lose all your files.
@@ -20,7 +19,8 @@ Containers running inside the pod can not share the files with each other.
 # What is Persistent Volume(PV)?
 - In simple terms, it's storage available within your Kubernetes cluster. 
 
-- It's basically a directory with some data in it and all the containers running inside the pods can access it. But Persistent Volumes are independent of the POD life cycle.
+- It's basically a directory with some data in it and all the containers running inside the pods can access it. 
+- But Persistent Volumes are independent of the POD life cycle.
 
 - So if PODs live or die, persistent volume does get affected and it can be reused by some other PODs.
 
@@ -29,12 +29,12 @@ Containers running inside the pod can not share the files with each other.
 
 
 
-## AKS Storage -  Storage Classes, Persistent Volume Claims
+#### AKS Storage -  Storage Classes, Persistent Volume Claims
 
 - We are going to create a MySQL Database with persistence storage using **Azure Disks** 
 
 
-## Step-02: Create following Kubernetes manifests
+### Step-02: Create following Kubernetes manifests
 ### Create Storage Class manifest
 - https://kubernetes.io/docs/concepts/storage/storage-classes/#volume-binding-mode
 
@@ -87,20 +87,4 @@ kubectl run -it --rm --image=mysql:5.6 --restart=Never mysql-client -- mysql -h 
 # Verify usermgmt schema got created which we provided in ConfigMap
 mysql> show schemas;
 ```
-
-
-
-## Step-06: Delete PV exclusively - It exists due to retain policy
-```
-# List PV
-kubect get pv
-
-# Delete PV exclusively
-kubectl get pv
-kubectl delete pv <PV-NAME>
-
-# Delete Azure Disks 
-Go to All Services -> Disks -> Select and Delete the Disk
-```
-
 
