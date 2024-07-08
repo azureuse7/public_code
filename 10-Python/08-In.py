@@ -4,7 +4,7 @@
 
 def main():
     a_string = 'Little Red Riding-Hood comes to me one Christmas Eve to give me information of the cruelty and ' \
-               'treachery of that dissembling Wolf who ate her grandmother. '
+                'treachery of that dissembling Wolf who ate her grandmother. '
 
     print('Red' in a_string)
 
