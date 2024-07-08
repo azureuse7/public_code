@@ -1,14 +1,3 @@
-# When you do a k apply –f deployment.yaml 
-# 1)	It authenticates  and authorization and admission controller checks weather the reqies is secure and compliant then its deploys 
-# Process involved in Gatekeeper implementation 
-# 1)	Intsall gatekeeper
-# 2)	Create a constraint thenplete (rego)
-# 3)	Create constraint CRD
-# 4)	Create deploy and test 
-
-
-
-
 # Deploy OPA Gatekeeper
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/master/deploy/gatekeeper.yaml
 
