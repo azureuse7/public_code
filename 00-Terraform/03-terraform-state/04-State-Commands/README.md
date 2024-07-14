@@ -13,13 +13,7 @@ description: Master Terraform State Commands
 6. terraform apply -target command  
 
 
-## Step-01: Review Terraform Configs
-1. c1-versions.tf
-2. c2-variables.tf
-3. c3-local-values.tf
-4. c4-resource-group.tf
-5. c5-virtual-network.tf
-6. c6-datasouce-subscription.tf
+
 
 ## Step-02: Update the Terraform Backend Key
 - Update `Terraform Backend Key`

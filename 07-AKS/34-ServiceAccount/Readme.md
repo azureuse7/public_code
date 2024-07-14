@@ -255,3 +255,90 @@ curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET https:/
 #           },
 # ...
 ```
+
+=====================================================
+
+- In Kubernetes, a **Service Account** provides an identity for processes that run in a Pod. When you (a human) interact with Kubernetes, you typically use a user account. Similarly, processes in containers inside pods can also contact the Kubernetes API and they authenticate with the API server as a service account.
+
+##### Why Use Service Accounts?
+Service accounts are used to provide specific identities to applications running in your pods, separate from user accounts. This is useful for several reasons:
+
+1) **Scoped Permissions**: Each service account can have specific permissions governing what actions it can and cannot perform on the Kubernetes API, defined through roles and role bindings. This follows the principle of least privilege, limiting access rights for pod applications to the minimum necessary to perform their job.
+
+2) **Automatic API Token Mounting:** Kubernetes automatically mounts service account tokens in the pods using that service account, facilitating secure communication with the Kubernetes API without manual token management.
+
+3) **Default Accounts**: Kubernetes automatically creates a default service account in each namespace. If a pod does not explicitly specify a service account, it is assigned the default service account in its namespace.
+
+##### Creating a Service Account
+- You can create a service account using a YAML file or via the kubectl command. Here's how to do it using kubectl:
+
+```
+kubectl create serviceaccount my-service-account
+```
+- This command creates a new service account named my-service-account in the current namespace.
+
+##### Using a Service Account with a Pod
+- To use a specific service account in a pod, specify the service account name in the pod's YAML definition:
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  serviceAccountName: my-service-account
+  containers:
+  - name: my-container
+    image: my-image
+```
+##### Assigning Permissions to a Service Account
+Permissions are assigned to service accounts through **Roles** and **RoleBindings** (or ClusterRoles and ClusterRoleBindings for cluster-wide permissions):
+
+1)**Role**: Defines permissions to perform certain sets of actions on a set of resources within a namespace.
+
+2)**RoleBinding**: Grants the permissions defined in a Role to a user, group, or service account in the same namespace.
+
+- Here’s an example of creating a role and a role binding for a service account:
+
+Role YAML Definition (role.yaml):
+```
+yaml
+Copy code
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+RoleBinding YAML Definition (rolebinding.yaml):
+```
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: my-service-account
+  namespace: default
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+ ``` 
+Apply these with kubectl:
+
+```
+kubectl apply -f role.yaml
+kubectl apply -f rolebinding.yaml
+```
+##### These configurations allow the my-service-account to perform "get", "watch", and "list" actions on pods within the "default" namespace.
+
+- Best Practices
+Do not use the default service account unnecessarily, as it can have broader permissions than required for your applications.
+- Regularly review and tighten permissions for service accounts to ensure they only have access necessary for their function.
+- Service accounts are a fundamental aspect of security in Kubernetes, helping to manage and restrict how internal processes interact with the Kubernetes API.

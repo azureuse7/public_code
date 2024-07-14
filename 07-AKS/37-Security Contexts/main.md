@@ -1,6 +1,4 @@
 https://yuminlee2.medium.com/kubernetes-security-contexts-e54624e29d52
-
-
 - To define a security context for a Pod in Kubernetes, you can use the securityContext field in your Pod or container specification. 
 - The security context allows you to specify security-related settings for a Pod or its containers, such as running as a specific user, adding capabilities, or enforcing security constraints.
 
@@ -35,8 +33,8 @@ spec:
   - name: secure-volume
     emptyDir: {}
 ```     
-##### Explanation
-- Pod-level Security Context:
+#### Explanation
+##### Pod-level Security Context:
 - The securityContext at the Pod level applies to all containers within the Pod unless overridden at the container level.
 - **runAsUser**: 1000 ensures that all containers in the Pod run as user ID 1000.
 - **runAsGroup**: 3000 ensures that all containers in the Pod run as group ID 3000.

@@ -35,8 +35,8 @@ spec:
     image: busybox
     command: ['sh', '-c', 'sh /etc/config/init-script.sh']
     volumeMounts:
-    - name: config-volume
-      mountPath: /etc/config
+    - name: config-volume    # name of the volume mount 
+      mountPath: /etc/config # mount here 
   containers:
   - name: my-container
     image: nginx
@@ -48,7 +48,7 @@ spec:
   volumes:
   - name: config-volume
     configMap:
-      name: init-config
+      name: init-config  #name of the config 
 ``` 
 ``` 
 kubectl apply -f pod-with-init.yaml

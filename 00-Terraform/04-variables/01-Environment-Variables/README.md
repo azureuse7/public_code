@@ -41,16 +41,6 @@ unset TF_VAR_subnet_name
 echo $TF_VAR_resoure_group_name, $TF_VAR_resoure_group_location, $TF_VAR_virtual_network_name, $TF_VAR_subnet_name
 ```
 
-## Step-04: Clean-Up Files
-```t
-# Delete Files
-rm -rf .terraform*
-rm -rf terraform.tfstate*
-```
-
-
-## References
-- [Terraform Input Variables](https://www.terraform.io/docs/language/values/variables.html)
 
 
 

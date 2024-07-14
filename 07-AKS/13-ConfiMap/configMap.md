@@ -45,12 +45,12 @@ spec:
       valueFrom:
         configMapKeyRef:
           name: my-config
-          key: database_url
+          key: database_url     # from the config map 
     - name: DATABASE_USER
       valueFrom:
         configMapKeyRef:
           name: my-config
-          key: database_user
+          key: database_user   # from the config map 
     - name: DATABASE_PASSWORD
       valueFrom:
         configMapKeyRef:
