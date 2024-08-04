@@ -1,3 +1,4 @@
+```bash
 #!/bin/bash
 
 echo -n "Enter the name of a country: "
