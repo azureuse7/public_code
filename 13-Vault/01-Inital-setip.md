@@ -37,15 +37,16 @@ helm search repo vault --versions. → all the version
 ```
 #### Install vault
 ```
-helm install vault1 hashicorp/vault --set='ui.enable=true' --set='ui.serviceType=LoadBalancer'
+helm install vault5 hashicorp/vault  --set='ui.enabled=true' --set='ui.serviceType=LoadBalancer'
 ```
 #### Check the pods
 ```
-K get pods
+Kubectl get pods
 ```
 #### The the IP of the service
 ```
-k get service 
+Kubectl get service 
 ```
 #### Copy the IP on the browser and add :8200
 ``` 
+
