@@ -1,6 +1,6 @@
 
 # split(",", "foo,bar,baz")
-# split("z", "foo,bar,bazgautam")
+# split("z", "foo,bar,bazgagan")
 
 
 #Split Use Case

@@ -23,7 +23,7 @@ ssh-keygen -t ed25519
 
 #### 2. Sign the SSH key with Vault:
 ```tf
-vault write -field=signed_key ssh-<egagan-cluster>/sign/<ggaganh-role public_key=@$HOME/.ssh/id_ed25519.pub ttl=60m > signed-cert.pub
+vault write -field=signed_key ssh-<egagan-cluster>/sign/<ggagan_key=@$HOME/.ssh/id_ed25519.pub ttl=60m > signed-cert.pub
 ```
 - **vault write**: This is a command used to interact with HashiCorp Vault, a tool for securely accessing secrets, keys, and other sensitive data.
 
