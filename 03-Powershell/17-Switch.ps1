@@ -1,16 +1,16 @@
-$Imagename = "gautam1"
+$Imagename = "gagan1"
 
 
 
 switch ($Imagename) {
-  gautam {
+  gagan {
   Write-Host "sana"
   }
-  gautam1
+  gagan1
   {
-  Write-Host "gautam"
+  Write-Host "gagan"
   }
   Default {
-  Write-Host "sana and Gautam"
+  Write-Host "sana and gagan"
   }
   }

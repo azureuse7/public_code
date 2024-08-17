@@ -42,7 +42,7 @@ targetPort: We define container port here on which our application is running.
 
 - ExternalName will just map a CNAME record in DNS. No proxying of any kind is established. This is commonly used to create a service within Kubernetes to represent an external datastore like a database that runs externally to Kubernetes. One potential use case would be using AWS RDS as the production database, and a MySQL container for the testing environment.
 
-<img width="1319" alt="404e6966-be50-4ce6-98cd-ae3cfac5b94a" src="https://github.com/gautam-thakur786/terraform-code/assets/38037498/e514616d-59fc-4b2e-8d03-3909f05f8323">
+<img width="1319" alt="404e6966-be50-4ce6-98cd-ae3cfac5b94a" src="https://github.com/gagan-thakur786/terraform-code/assets/38037498/e514616d-59fc-4b2e-8d03-3909f05f8323">
 
 
 By default, services are only reachable inside the cluster using the clusterIP service type. Other service types do allow external access; the LoadBalancer type is the most common in cloud deployments. It will spin up a load balancer per service on the cloud environment, which can be expensive. With many services, it can also become very complex.

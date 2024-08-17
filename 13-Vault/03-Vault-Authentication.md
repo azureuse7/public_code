@@ -39,13 +39,13 @@ vault auth enable userpass
 #### Create user and password
 #### my default vault monts auth/userpass/users
 ```
-vault write auth/userpass/users/gautam password=gautam
+vault write auth/userpass/users/gagan password=ggagan
 ```
 #### Verify this in UI 
 
 ### Login with the user
 ```
-vault login -method=userpass username=gautam
+vault login -method=userpass username=gagan
 ```
 #### login using the password notice it created a token and with the token there are policy applied and other information
 
@@ -55,7 +55,7 @@ Vault auth list
 ```
 #### read the deatils 
 ```
-vault read auth/userpass/users/gautam
+vault read auth/userpass/users/gagan
 ```
 #### The user can’t see much or do anything and we need to assign the policy 
 ``` 
@@ -82,7 +82,7 @@ Vault auth list
 ```
 #### To login, the organization name is the username in github
 ```
-vault write auth/github/config organization=gautam
+vault write auth/github/config organization=gagan
 ```
 #### Verify this in UI 
 
@@ -95,11 +95,11 @@ https://www.youtube.com/watch?v=-EHmM5ocUsM&ab_channel=LearnwithGVR
 
 
 #### create a payload.json file and add the password below
-"password": "gautam"
+"password": "gagan"
 
 #### Do a curl command to login 
 ```
-curl -k -h 'X-vault-Token: <toke> -x post --data @payload.json http://<ip>/v1/auth/userspass/users/gautam 
+curl -k -h 'X-vault-Token: <toke> -x post --data @payload.json http://<ip>/v1/auth/userspass/users/gagan 
 
 ``` 
 

@@ -7,7 +7,7 @@
 
 
 # To generta a ssh key 
-ssh-keygen -t ed25519 -C "gautam default"
+ssh-keygen -t ed25519 -C "gagan default"
 
 - it asks where to save the key
 - Press enter 

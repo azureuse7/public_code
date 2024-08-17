@@ -1,17 +1,17 @@
-# New-AzResourceGroup -Name rg-dev-uks-gautam-registry -Location Uksouth
+# New-AzResourceGroup -Name rg-dev-uks-gagan-registry -Location Uksouth
 
 #  Check if ACR exists
 $acr = az acr check-name -n thakur1 | convertfrom-json
 
 if($acr.nameAvailable -match "True"){
-    az acr create -n thakur1 -g gautam --sku Standard
+    az acr create -n thakur1 -g gagan --sku Standard
 } else {
     write-host ("acr exists" )
 }
 
 #  Check if image exists
 $tfVersion= "1.0.5"
-$availableTags = az acr repository show --name thakur1 --image gautam:$tfVersion | convertfrom-json
+$availableTags = az acr repository show --name thakur1 --image gagan:$tfVersion | convertfrom-json
 
 
 if($availableTags.name -match $tfVersion){
@@ -19,9 +19,9 @@ if($availableTags.name -match $tfVersion){
 }else{
 
     az acr login --name thakur1
-    docker build -t gautam:$tfVersion .
-    docker tag gautam:$tfVersion thakur1.azurecr.io/gautam:$tfVersion
-    docker push thakur1.azurecr.io/gautam:$tfVersion
+    docker build -t gagan:$tfVersion .
+    docker tag gagan:$tfVersion thakur1.azurecr.io/ggagan$tfVersion
+    docker push thakur1.azurecr.io/gagan:$tfVersion
 }
 
 

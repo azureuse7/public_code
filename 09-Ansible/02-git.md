@@ -7,6 +7,6 @@
 - clone with ssh git clone <URL>
 
 # Tell git who we are 
-- git config --global user.name "gautam"
-- git config --global user.email "gautam@gmail.com"
+- git config --global user.name "gagan"
+- git config --global user.email "gagan@gmail.com"
 - 

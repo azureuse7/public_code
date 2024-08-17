@@ -1,6 +1,6 @@
 locals {
-  customer_subnets = { for gautam, sana in try(var.virtual) :
-    gautam => { for bikram, vickey in sana :
+  customer_subnets = { for gagan, sana in try(var.virtual) :
+    gagan => { for bikram, vickey in sana :
       bikram => {
         name                                           = try(vickey.name, bikram)
         cidr                                           = vickey.cidr
@@ -23,7 +23,7 @@ variable "virtual" {
         private_link_service_enabled  = false
         service_endpoints             = []
         subnet_type                   = "standard"
-        nsg                           = "gautam"
+        nsg                           = "gagan"
       }
       aks2 = {
         cidr                          = "1.1.1.1/25"

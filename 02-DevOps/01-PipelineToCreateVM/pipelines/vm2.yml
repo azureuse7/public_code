@@ -6,7 +6,7 @@ jobs:
     - task: AzurePowerShell@5
       inputs:
         azureSubscription: $(SVC_CONNECTION)
-        scriptPath: $(System.DefaultWorkingDirectory)/gautam_scripts/gautam_storage.ps1
+        scriptPath: $(System.DefaultWorkingDirectory)/gagan_scripts/ggaganstorage.ps1
         scriptArguments:
           -rgName $(RESOURCE_GROUP_NAME) `
           -storageAccountName $(STORAGE_NAME) `
@@ -19,7 +19,7 @@ jobs:
   - job: Deploy_Virtual_Machines
   - deployment: VirtualMachines
     displayName: Virtual Machines
-    environment: ${{ parameters.gautam_Envioremnt }}
+    environment: ${{ parameters.gagan_Envioremnt }}
     continueOnError: false
     strategy:
       runOnce:
@@ -48,7 +48,7 @@ jobs:
               failOnStandardError: true
               scriptLocation: inlineScript
               scriptType: bash
-              workingDirectory: $(System.DefaultWorkingDirectory)/gautam_code/vm/
+              workingDirectory: $(System.DefaultWorkingDirectory)/gagan_code/vm/
               inlineScript: |
 
                 echo  $(SUBSCRIPTION)
@@ -72,11 +72,11 @@ jobs:
 
                 terraform init \
                 -reconfigure \
-                -backend-config="resource_group_name=gautam" \
-                -backend-config="storage_account_name=gautamthakur" \
+                -backend-config="resource_group_name=gagan" \
+                -backend-config="storage_account_name=gaganthakur" \
                 -backend-config="subscription_id=$TERRAFORM_BACKEND_SUBSCRIPTION_ID" \
                 -backend-config="container_name=tfstate" \
-                -backend-config="key=gautamthakur.tfstte" \
+                -backend-config="key=gaganthakur.tfstte" \
                 -backend-config=use_azuread_auth=true \
                 -backend-config="access_key=$(sa01-azdo-accesskey)" 
 
@@ -89,7 +89,7 @@ jobs:
               failOnStandardError: true
               scriptLocation: inlineScript
               scriptType: bash
-              workingDirectory: '$(System.DefaultWorkingDirectory)/gautam_code/vm'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/gagan_code/vm'
 
               inlineScript: |
                 az account set --subscription $(SUBSCRIPTION)
@@ -121,5 +121,5 @@ jobs:
               scriptLocation: inlineScript
               scriptType: bash
               inlineScript: |
-                cd gautam_code/vm
+                cd gagan_code/vm
                 terraform apply tfplan

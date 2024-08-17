@@ -120,7 +120,7 @@ kubectl delete clusterrolebinding name
 kubectl delete clusterrole name
 ``` 
 
-###  log into pod gautam
+###  log into pod gagan
 ``` 
 k  exec -it <pod> /bin/sh
 ``` 

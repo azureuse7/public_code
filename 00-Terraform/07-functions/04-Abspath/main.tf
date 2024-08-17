@@ -9,4 +9,4 @@ output sana {
 }
 
 # Changes to Outputs:
-#   + sana = "/Users/Gautam.Thakur/Documents/org/spoke"
+#   + sana = "/Users/gaganThakur/Documents/org/spoke"

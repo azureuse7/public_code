@@ -3,7 +3,7 @@ resource "azurerm_application_security_group" "item" {
   for_each            = toset(var.asg_names)
   name                = each.key
   location            = "uksouth"
-  resource_group_name = "gautam"
+  resource_group_name = "gagan"
 }
 
 

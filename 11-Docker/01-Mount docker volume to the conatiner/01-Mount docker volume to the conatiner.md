@@ -2,11 +2,11 @@ https://www.youtube.com/watch?v=B9uaQcc2dLs&list=WL&index=4&ab_channel=TechnoPan
 
 
 1) touch abc.txt 
-2) vim gautam (save this)
-3) ls -> location of the file is home/gautam/abc.txt 
+2) vim gagan (save this)
+3) ls -> location of the file is home/gagan/abc.txt 
 
 4) ```
-   docker run -d -volume home/gautam/abc.txt:/temp <image id> sleep infinity
+   docker run -d -volume home/gagan/abc.txt:/temp <image id> sleep infinity
 
 /temp is folder inside the container 
 

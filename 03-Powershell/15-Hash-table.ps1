@@ -20,13 +20,13 @@ $sana = [PSCustomObject]@{
   
 
   return @{
-    gautam = "love you"
+    gagan = "love you"
 }
 
   return [PSCustomObject]@{
-    gautam = "loave you"
+    gagan = "loave you"
   }
 
     return [PSCustomObject]@{
-    gautam = "loave you"
+    gagan = "loave you"
   } | ConvertTo-Json

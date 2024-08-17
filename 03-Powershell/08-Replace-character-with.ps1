@@ -1,2 +1,2 @@
-$gautam=($baseImageChanges).Replace("/", "-")
-Write-Host $gautam
+$gagan=($baseImageChanges).Replace("/", "-")
+Write-Host $gagan

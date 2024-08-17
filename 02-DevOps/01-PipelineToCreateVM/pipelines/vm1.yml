@@ -33,7 +33,7 @@ parameters:
 #Define variables to use in your pipeline.
 variables:               
   SVC_CONNECTION: "gggagan1"  # The service connection 
-  Envioremnt : "gautam"
+  Envioremnt : "gagan"
 
 
 #Stages are a collection of related jobs.
@@ -46,7 +46,7 @@ stages:
   jobs:
   - template: vm2.yml
     parameters:
-      gautam_Envioremnt: ${{ variables.Envioremnt }}
+      gagan_Envioremnt: ${{ variables.Envioremnt }}
       planDeploy: ${{ parameters.planDeploy}}
       environment: Dev
       svcConnection: ${{ variables.SUBSCRIPTION }}
@@ -61,4 +61,4 @@ stages:
       - template: vm2.yml
         parameters:
               TF_BACKEND_STORAGE_NAME: ${{ variables.STORAGE_NAME }}
-              gautam_Envioremnt: ${{ variables.Envioremnt }}
+              gagan_Envioremnt: ${{ variables.Envioremnt }}

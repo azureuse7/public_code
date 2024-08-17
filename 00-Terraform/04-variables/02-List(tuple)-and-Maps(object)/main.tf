@@ -16,7 +16,7 @@ provider "azurerm" {
 
 # Resource-1: Azure Resource Group
 resource "azurerm_resource_group" "myrg" {
-  name = "gautam-rg"
+  name = "gagan-rg"
   location = "uksouth"
   tags = var.common_tags
 }
@@ -36,7 +36,7 @@ variable "common_tags" {
 
 # Create Virtual Network
 resource "azurerm_virtual_network" "myvnet" {
-  name                = "gautam-vnet"
+  name                = "gagan-vnet"
   #address_space      = ["10.0.0.0/16"]
   address_space       = var.virtual_network_address_space
   #address_space       = [var.virtual_network_address_space[0]]

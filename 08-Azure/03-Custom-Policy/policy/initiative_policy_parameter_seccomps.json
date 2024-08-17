@@ -1,11 +1,11 @@
 {
     "effect": {
-        "value": "[parameters('gautam_seccomps_profile_effect')]"
+        "value": "[parameters('gagan_seccomps_profile_effect')]"
     },
     "excludedNamespaces": {
-        "value": "[parameters('gautam_seccomps_profile_excluded_namespaces')]"
+        "value": "[parameters('gagan_seccomps_profile_excluded_namespaces')]"
     },
     "allowedProfiles": {
-        "value":"[parameters('gautam_seccomps_profile_allowedProfiles')]"
+        "value":"[parameters('gagan_seccomps_profile_allowedProfiles')]"
     }
 }

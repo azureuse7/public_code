@@ -12,9 +12,9 @@ locals {
 }
 
 resource "azurerm_policy_set_definition" "aks" {
-  name         = "gautamInitiative"
+  name         = "gaganInitiative"
   policy_type  = "Custom"
-  display_name = "Apply gautam AKS Policies"
+  display_name = "Apply gagan AKS Policies"
 
   # Parameters for the policy definition. This field is a JSON string that maps to the Parameters field from the Policy Definition.
   parameters = file("${path.module}/policy/initiative_parameters.json")
@@ -33,7 +33,7 @@ resource "azurerm_policy_set_definition" "aks" {
 
 resource "azurerm_subscription_policy_assignment" "aks" {
   name                 = "aksPolicy"
-  display_name         = "Apply gautam AKS policies"
+  display_name         = "Apply gagan AKS policies"
   policy_definition_id = azurerm_policy_set_definition.aks.id
   subscription_id      = data.azurerm_subscription.current.id
 

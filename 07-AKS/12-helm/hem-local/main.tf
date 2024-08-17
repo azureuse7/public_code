@@ -1,8 +1,8 @@
 resource "helm_release" "global_network_policies" {
-  name = "gautam"
+  name = "gagan"
   chart       = "${path.module}/charts/global-network-policies"
   values      = [templatefile("${path.module}/files/global-network-policies/values.yaml", {})]
-  namespace   = "gautam"
+  namespace   = "gagan"
   max_history = 5
   postrender {
   binary_path = "${path.module}/kustomize/kustomize.sh"

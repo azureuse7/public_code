@@ -8,11 +8,11 @@ docker build .
 
 docker images
 
-docker tag f5813f4913bd44e0006d823whatevertheidis gautamvthakur/auth:latest
+docker tag f5813f4913bd44e0006d823whatevertheidis gaganvthakur/auth:latest
 
 docker login 
 
-docker push gautamvthakur/auth:latest
+docker push gaganvthakur/auth:latest
 ```
 
 #### Working with Container Registry (Azure Container Registry)

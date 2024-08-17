@@ -1,4 +1,4 @@
-foreach ($gautam in $azureImages){
-    $dockerfile=Get-Content -Path "images/$gautam"
+foreach ($gagan in $azureImages){
+    $dockerfile=Get-Content -Path "images/$gagan"
     # Write-Host $dockerfile
 }

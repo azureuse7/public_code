@@ -32,12 +32,12 @@ locals {
       object_id          = "837f1a08-6407-4639-b1dd-uetyutuuu",  #object_id  of usr azuredevops
       secret_permissions = ["Get", "Set"]
     }
-    gautam = {
+    gagan = {
       tenant_id          = "a9a2d5a7-17e6-463b-9fc5-utyutyyu"
-      object_id          = "a3ca9a64-e073-45fd-8dd4-utyututu",  #object_id  of user gautam
+      object_id          = "a3ca9a64-e073-45fd-8dd4-utyututu",  #object_id  of user gagan
       secret_permissions = ["Get", "Set"]
     }
-    gautam1 = {
+    gagan1 = {
       tenant_id          = "a9a2d5a7-17e6-463b-9fc5-utyutu"
       object_id          = "8421d496-292b-4522-8640-tyutyuytu",
       secret_permissions = ["Get", "Set"]

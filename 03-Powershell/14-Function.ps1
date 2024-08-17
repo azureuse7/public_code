@@ -23,7 +23,7 @@ function New-sana {
     }
 }
 
-function New-gautam {
+function New-gagan {
     param(
         [Parameter(Mandatory=$true)]
         [String]$rgName,
@@ -57,4 +57,4 @@ function New-gautam {
 }
 
 New-sana -rgName $rgName -location $location
-New-gautam -rgName $rgName -storageAccountName sa6746na -location $location
+New-gagan -rgName $rgName -storageAccountName sa6746na -location $location

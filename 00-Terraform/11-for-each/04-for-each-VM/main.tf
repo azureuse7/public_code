@@ -5,8 +5,8 @@ provider "azurerm" {
 variable "virtual_machine" {
   description = "The image source Id"
   default = {
-    gautam = {
-      name         = "gautam"
+    gagan = {
+      name         = "gagan"
       image_source = "",
     }
     sana = {

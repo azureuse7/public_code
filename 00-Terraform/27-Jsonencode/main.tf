@@ -5,8 +5,8 @@ provider "azurerm" {
 # Terraform
 
 data "azurerm_virtual_network" "example" {
-  name                = "gautam"
-  resource_group_name = "gautam"
+  name                = "gagan"
+  resource_group_name = "gagan"
 }
 
 resource "azurerm_policy_definition" "example" {

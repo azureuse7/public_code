@@ -10,5 +10,5 @@ def love(sapna, num: str):
     sapna.results = sapna.heman(int(num))
 
 @then('we should see {results}')
-def gautam(shabnam, results: str):
+def gagan(shabnam, results: str):
     assert(shabnam.results == int(results))

@@ -3,7 +3,7 @@
 - Click on the secret engine  
 - enable 
 - Use kV
-- create a secret  > kv > users > gautam 
+- create a secret  > kv > users > gagan 
 
 
 #### List the secerts
@@ -20,7 +20,7 @@ vault secret list
 ```
 #### enable the secert 
 ```
-vault secret enable -path=gautam kv 
+vault secret enable -path=gagan kv 
 ```
 #### List the secerts 
 ```
@@ -28,10 +28,10 @@ vault secret list
 ```
 #### Now if I want to write secrets to gutam, (adding key value )
 ```
-vault kv put gautam/webui username=abc password=123
+vault kv put gagan/webui username=abc password=123
 ```
 #### How to read 
 
 ```
-vaullt get gautam/webui 
+vaullt get gagan/webui 
  ```
