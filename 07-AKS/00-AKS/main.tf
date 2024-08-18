@@ -40,3 +40,7 @@ resource "azurerm_kubernetes_cluster" "example" {
   }
 
 }
+
+
+# terraform init
+# terraform apply --auto-approve
