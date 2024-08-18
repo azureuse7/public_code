@@ -18,8 +18,6 @@
 
 # Authentication CLI using username and password
 
-
-
 #### Login a pod
 ```
 k exec -it <pod> bin/bash or bin/sh

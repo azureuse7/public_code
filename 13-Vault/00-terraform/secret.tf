@@ -15,7 +15,6 @@ resource "vault_transit_secret_backend_key" "key" {
   depends_on = [vault_mount.transit]
   backend = transit
   name    = "dummy"
-  deleteion_allowed = true 
 }
 
 # Plan and apply 

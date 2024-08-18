@@ -49,7 +49,7 @@ ssh -i ./signed-cert.pub -i ~/.ssh/id_ed25519 ec2-user@<ip-address>
 
 - **-i ~/.ssh/id_ed25519:** This specifies the private key corresponding to the public key that was signed. The private key is necessary to prove ownership of the public key.
 
-- **ec2-user@<ip-address>:** This indicates the username (ec2-user is the default user for Amazon Linux instances) and the IP address of the EC2 instance to which you are connecting.
+- **azure-user@<ip-address>:** This indicates the username  and the IP address of the  instance to which you are connecting.
 
 Summary:
 - Step 1: Generate an SSH key pair using ed25519.

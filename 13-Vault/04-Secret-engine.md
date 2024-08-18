@@ -26,7 +26,7 @@ vault secret enable -path=gagan kv
 ```
 vault secret list 
 ```
-#### Now if I want to write secrets to gutam, (adding key value )
+#### Now if I want to write secrets to gagan, (adding key value )
 ```
 vault kv put gagan/webui username=abc password=123
 ```

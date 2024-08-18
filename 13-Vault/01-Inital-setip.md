@@ -1,9 +1,7 @@
 https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-azure-aks
 https://developer.hashicorp.com/vault/docs?product_intent=vault
 ## Initial setup 
-
 - Create an AKS cluster and Connect it to the AKS cluster 
-
 
 #### check helm if it's installed 
 ```
@@ -48,12 +46,3 @@ Kubectl get pods
 Kubectl get service 
 ```
 #### Copy the IP on the browser and add :8200
-``` 
-
-Unseal Key 1: tIB6qlFiKJwhDL2S+5HqMnjRWrNS256evZW6MOp+/lXS
-Unseal Key 2: bxq1rYmGBQQcgDUW+H40M8ZkuJ6E3dKnesAyAadzu88b
-Unseal Key 3: hplQhKIjrCxqTZDDLCrNHgIbH7EE0BfLBNJ1aDoXR7t+
-Unseal Key 4: 5f699aeu9ohoRbZMFg6JPckErwfyiaZbV4tfDeTDjDYI
-Unseal Key 5: Qw4ZwRn0Zpft2EkC5nB211PvA+VkO5/SbplUy32v3M4Y
-
-Initial Root Token: hvs.WrvC1Oixs8l8tEhQO34gfoTD
