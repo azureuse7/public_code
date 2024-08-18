@@ -1,6 +1,6 @@
 provider "vault" {
-  address = "http://85.210.168.91:8200/"
-  token   = "hvs.WrvC1Oixs8l8tEhQO34gfoTD"
+  address = "http://85.210.42.45:8200"
+  token   = "hvs.vyBpSQcGPRuEKo103lPEgObj"
 }
 
 # vault_mount is used to manage secret engine mounts in Vault. 
@@ -28,23 +28,29 @@ output "ssh_ca_backend" {
 # These roles define the rules and policies for how SSH credentials 
 # (such as SSH certificates or one-time passwords) are issued by Vault.
 resource "vault_ssh_secret_backend_role" "otp_role" {
-  backend      = vault_ssh_secret_backend.ssh.path
+  backend      = vault_mount.ssh.path
   name         = "aks-role"
   key_type     = "ca"
   default_user = "azureuser"  # Default SSH user on AKS nodes
   ttl          = "1h"         # Time-bound: Certificate valid for 1 hour
   allow_user_certificates = true
   allowed_users           = "azureuser"
-  allow_host_certificates = false
-  allow_user_key_ids      = "*"
+  allow_host_certificates = true
+  # allow_user_key_ids      = "*"
 }
+
+
+# # vault write ssh/sign/aks-role \
+# #     public_key=@~/.ssh/id_rsa.pub \
+# #     cert_type=user \
+# #     ttl=1h
 
 
 
 # The tls_private_key resource in Terraform is used to generate a private key that can be used for 
 # cryptographic operations, such as securing SSH connections, signing certificates, or encrypting data. 
 # This resource can generate various types of private keys, including RSA, ECDSA, and Ed25519.
-resource "tls_private_key" "example" {
+resource "tls_private_key" "ssh" {
   algorithm = "RSA"
   rsa_bits  = 2048
 }
@@ -57,26 +63,29 @@ resource "vault_mount" "kv" {
   type = "kv-v2"
 }
 
-resource "vault_generic_secret" "ssh_cert" {
-  path = "secret/foo"
-
+resource "vault_generic_secret" "ssh_key" {
+  path = "secret/aks-ssh-key"
   data_json = jsonencode({
-    username = "myuser"
-    password = "mypassword"
+    private_key = tls_private_key.ssh.private_key_pem
+    public_key  = tls_private_key.ssh.public_key_pem
   })
 }
 
-# The data "vault_kv_secret_v2" block in Terraform is used to retrieve a secret from a 
+
+
+
+
+# # The data "vault_kv_secret_v2" block in Terraform is used to retrieve a secret from a 
 # Key-Value (KV) version 2 secrets engine in HashiCorp Vault. 
 # Data sources in Terraform allow you to fetch or reference data from external systems or from the current infrastructure.
 
 data "vault_kv_secret_v2" "example" {
   mount = "secret"
-  name = "myapp/config"  # Path to the secret
+  name = "aks-ssh-key"  # Path to the secret
 }
 
 output "my_secret_value" {
-  value     = data.vault_kv_secret_v2.example.data["username"]
+  value     = data.vault_kv_secret_v2.example.data["private_key"]
   sensitive = true
 }
 

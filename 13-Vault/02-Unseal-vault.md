@@ -14,7 +14,7 @@
 
 #### Login to the vault pod 
 ```
-Kubectl exec -it vault1-0 /bin/sh
+Kubectl exec -it vault5-0 /bin/sh
 ```
 ####  Notice its sealed
 ```
