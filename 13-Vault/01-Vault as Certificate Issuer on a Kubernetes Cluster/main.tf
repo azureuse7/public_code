@@ -12,7 +12,7 @@ terraform {
 provider "vault" {
     address         = "http://51.11.23.159:8200/" # IP of the UI of vault 
     # skip_tls_verify = false
-    token           = "hvs.pzfohdXulMHRR3al0pzJ0y3X" #root token 
+    token           = "" #root token 
 }
 
 #helm install vault hashicorp/vault --set='ui.enabled=true' --set='ui.serviceType=LoadBalancer'

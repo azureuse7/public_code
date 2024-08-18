@@ -7,7 +7,7 @@
 ```
 provider "vault" {
   address = "http://4.158.34.185:8200"
-  token   = "hvs.mK3lRHFHStyKCyPKgwEjkddV"
+  token   = ""
 }
 ```
 
