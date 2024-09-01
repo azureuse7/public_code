@@ -45,5 +45,4 @@ http://vcloud-lab.com/entries?page=1#post-112923
 - rm .terraform.lock.hcl
 - rm tfplan
 - rm tfplan.json
-- 
 - rm -r .terraform/

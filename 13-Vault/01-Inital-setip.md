@@ -69,11 +69,12 @@ vault operator unseal
 ####  Copy The Ip and test 
 
 
-/ $ vault operator init
-Unseal Key 1: 6SkvFikbcTdKiAee7HgdiCqjUcs8A4DBwczqW0QgcRTE
-Unseal Key 2: MI6GzlPOYwJ20BpmPx1fhAQXR5Z3OBFjhnG34KZ2FqTU
-Unseal Key 3: HerV9Ncdnv3XGOF0wMRXft1yWq0yeW7M37mGU3NLbKHg
-Unseal Key 4: 6M9Q4HFK4GyIkrK/1wwviTns7VqycuXvrSh8xmavEric
-Unseal Key 5: 7vZ8o1Qeb0L886tv0YlAV11d2EjkWb+sy4Qrz1G1gYNU
 
-Initial Root Token: hvs.mK3lRHFHStyKCyPKgwEjkddV
+
+Initial Root Token: hvs.NBais15QMvxDW6JbvP6WRbrJ
+
+
+helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0 --set installCRDs=true
+
+
+helm upgrade --install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --namespace ingress-nginx --create-namespace

@@ -1,5 +1,5 @@
 - Creating time-bound SSH keys using HashiCorp Vault and using Certificate Authority (CA) certificates to access Azure Kubernetes Service (AKS) nodes involves several steps. 
-- 
+
 
 
 #### 1. Configure Vault

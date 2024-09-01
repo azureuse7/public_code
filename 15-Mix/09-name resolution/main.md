@@ -1,7 +1,6 @@
 #### Name resolution is the process of associating names and IP addresses, and it's one of the most essential services on a network.
 
 
-The three identities are the following:
 
 The three identities are the following:
 
