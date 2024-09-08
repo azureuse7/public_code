@@ -1,27 +1,34 @@
+# - Creating time-bound SSH keys using HashiCorp Vault and using Certificate Authority (CA) certificates to 
+# access Azure Kubernetes Service (AKS) nodes involves several steps.
+
 provider "vault" {
-  address = "http://4.158.34.185:8200"
-  token   = ""
+  address = "http://4.158.91.114:8200"
+  token   = "hvs.2PMF1fNc0f48CFS2NXOIFX9q"
+}
+provider "azurerm" {
+  features {}
 }
 
-# vault_mount is used to manage secret engine mounts in Vault. 
-# In this the vault_mount resource is used to enable the SSH secrets engine.
+provider "tls" {
+}
 
 # Enable the SSH secrets engine
+# vault_mount is used to manage secret engine mounts in Vault. 
+# vault secrets enable -path=ssh ssh
+
 resource "vault_mount" "ssh" {
-  path = "ssh"  #Just a name 
-  type = "ssh"
-  description = "SSH secrets engine"
+  path        = "ssh-client-signer"
+  type        = "ssh"
+  description = "SSH Client Signing Engine"
 }
 
 
-# used to manage roles within the SSH secrets engine in HashiCorp Vault. 
-# These roles define the rules and policies for how SSH credentials 
-# (such as SSH certificates or one-time passwords) are issued by Vault.
-# You need to define a role that specifies the parameters for the SSH certificates.
+# Configure the SSH role for time limit
+# These roles define the rules and policies for how SSH credentials
+# (such as SSH certificates or one-time passwords) are issued by Vault. 
 
-# Configure the SSH role
 resource "vault_ssh_secret_backend_role" "otp_role" {
-  backend      = vault_mount.ssh.path
+  backend      = "ssh-client-signer"
   name         = "aks-role"
   key_type     = "ca"
   default_user = "azureuser"  # Default SSH user on AKS nodes
@@ -32,42 +39,52 @@ resource "vault_ssh_secret_backend_role" "otp_role" {
   # allow_user_key_ids      = "*"
 }
 
+# Configure Vault for Client Key Signing (CA)
+# vault write ssh/config/ca generate_signing_key=true
 
-
-# The vault_ssh_secret_backend_ca resource in Terraform is used to manage the Certificate Authority (CA) 
-# for the SSH secrets engine in HashiCorp Vault. 
-# This resource allows you to configure the SSH secrets engine to act as a CA, 
-# which can sign SSH certificates that are used to authenticate SSH users or hosts.
-resource "vault_ssh_secret_backend_ca" "foo" {
-    backend = vault_mount.ssh.path
+resource "vault_ssh_secret_backend_ca" "ssh_ca" {
+    backend = "ssh-client-signer"
     generate_signing_key = true
 }
 
-output "ssh_ca_backend" {
-  value = vault_ssh_secret_backend_ca.foo.backend
+# Retrieve the Public Key for SSH Configuration CA public key (to be trusted by your Azure VMs)
+data "vault_generic_secret" "ssh_ca_public_key" {
+  path = "ssh-client-signer/config/ca"
 }
 
+output "my_secret_value" {
+  value     = data.vault_generic_secret.ssh_ca_public_key.data["public_key"]
+  sensitive = true
+}
 
+# This Can be added as below 
+output "my_secret_value" {
+  value     = data.vault_generic_secret.ssh_ca_public_key.data["public_key"]
+  sensitive = true
+}
 
+# When you need to SSH into the VM, you will request a temporary SSH certificate from Vault:
+# Generate an SSH keypair
 
-# # # vault write ssh/sign/aks-role \
-# # #     public_key=@~/.ssh/id_rsa.pub \
-# # #     cert_type=user \
-# # #     ttl=1h
-
-
-
-# The tls_private_key resource in Terraform is used to generate a private key that can be used for 
-# cryptographic operations, such as securing SSH connections, signing certificates, or encrypting data. 
-# This resource can generate various types of private keys, including RSA, ECDSA, and Ed25519.
 resource "tls_private_key" "ssh" {
   algorithm = "RSA"
   rsa_bits  = 2048
 }
 
+
+# # Ask Vault to sign the public key
+# resource "vault_generic_endpoint" "signed_ssh_key" {
+#   path = "ssh-client-signer/sign/aks-role"
+
+#   data_json = jsonencode({
+#     public_key = tls_private_key.ssh_key.public_key_openssh
+#   })
+# }
+
+
 # vault_mount is used to manage secret engine mounts in Vault. 
 # In this the vault_mount resource is used to enable "Key-Value version 2," 
-# which is the second version of the Key-Value secrets engine in Vault.
+
 resource "vault_mount" "kv" {
   path = "secret"
   type = "kv-v2"
@@ -82,27 +99,22 @@ resource "vault_generic_secret" "ssh_key" {
 }
 
 
+data "vault_kv_secret_v2" "example" {
+  mount = "secret"
+  name = "aks-ssh-key"  # Path to the secret
+}
+
+output "my_secret_value1" {
+  value     = data.vault_kv_secret_v2.example.data["private_key"]
+  sensitive = true
+}
+
+# 1. Requesting SSH Certificates
+# When you need to access an AKS node, you'll request an SSH certificate from Vault.
 
 
-
-# # # The data "vault_kv_secret_v2" block in Terraform is used to retrieve a secret from a 
-# # Key-Value (KV) version 2 secrets engine in HashiCorp Vault. 
-# # Data sources in Terraform allow you to fetch or reference data from external systems or from the current infrastructure.
-
-# data "vault_kv_secret_v2" "example" {
-#   mount = "secret"
-#   name = "aks-ssh-key"  # Path to the secret
-# }
-
-# output "my_secret_value" {
-#   value     = data.vault_kv_secret_v2.example.data["private_key"]
-#   sensitive = true
-# }
-
-
-
-
-
-
-
-
+# vault write -field=signed_key ssh/sign/aks \
+#     public_key=@$HOME/.ssh/id_rsa.pub \
+#     valid_principals="ubuntu"
+# ```
+# This command will return a signed SSH certificate that is valid for the duration specified in the TTL.

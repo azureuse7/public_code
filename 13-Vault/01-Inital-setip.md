@@ -68,10 +68,9 @@ vault operator unseal
 ####  copy the keys and Repeat three times and Notice it would say sealed false 
 ####  Copy The Ip and test 
 
+vault login
 
 
-
-Initial Root Token: hvs.NBais15QMvxDW6JbvP6WRbrJ
 
 
 helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.11.0 --set installCRDs=true

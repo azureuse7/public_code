@@ -1,16 +1,11 @@
 - Creating time-bound SSH keys using HashiCorp Vault and using Certificate Authority (CA) certificates to access Azure Kubernetes Service (AKS) nodes involves several steps. 
-
-
-
 #### 1. Configure Vault
-
 ```
 provider "vault" {
   address = "http://4.158.34.185:8200"
   token   = ""
 }
 ```
-
 ##### a. Enable the SSH secrets engine
 ```
 vault secrets enable -path=ssh ssh
@@ -39,25 +34,54 @@ resource "vault_ssh_secret_backend_role" "otp_role" {
   allow_host_certificates = true
   # allow_user_key_ids      = "*"
 }
-output "ssh_ca_private_key" {
-  value = vault_generic_secret.ssh_ca_private_key.data["private_key"]
+
+```
+
+###### Configure Vault for Client Key Signing (CA)
+```
+vault write ssh/config/ca generate_signing_key=true
+```
+```
+resource "vault_ssh_secret_backend_ca" "ssh_ca" {
+    backend = "ssh-client-signer"
+    generate_signing_key = true
+}
+```
+###### Vault will create a private key for signing SSH certificates.
+###### To distribute the CA public key (to be trusted by your Azure VMs):
+###### Retrieve the Public Key for SSH Configuratio
+```
+vault read -field=public_key ssh/config/ca
+```
+```
+data "vault_generic_secret" "ssh_ca_public_key" {
+  path = "ssh-client-signer/config/ca"
+}
+
+output "my_secret_value" {
+  value     = data.vault_generic_secret.ssh_ca_public_key.data["public_key"]
   sensitive = true
 }
 ```
+###### Create a Terraform file for provisioning an Azure VM:
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = file("path/to/your/ca-public-key.pub")
+  }
 
+##### Request Time-bound SSH Certificates from Vault
 
-##### c. . Create the SSH key and store it in Vault
-
-
-##### The tls_private_key resource in Terraform is used to generate a private key that can be used for 
-- cryptographic operations, such as securing SSH connections, signing certificates, or encrypting data. 
-- This resource can generate various types of private keys, including RSA, ECDSA, and Ed25519.
+#####  When you need to SSH into the VM, you will request a temporary SSH certificate from Vault:
+##### Generate SSH keypair:
 ```
 resource "tls_private_key" "ssh" {
   algorithm = "RSA"
   rsa_bits  = 2048
 }
 ```
+
+
+
 ##### vault_mount is used to manage secret engine mounts in Vault. 
 - In this the vault_mount resource is used to enable "Key-Value version 2," 
 - which is the second version of the Key-Value secrets engine in Vault.
@@ -132,3 +156,9 @@ You can automate the entire workflow by integrating the SSH certificate request 
 
 ##### Conclusion
 This setup provides a secure and time-bound mechanism for accessing AKS nodes using SSH, leveraging Vault’s dynamic secret management capabilities. It ensures that access is temporary and controlled, minimizing the risk of unauthorized access. Terraform plays a crucial role in automating the infrastructure setup and ensuring consistency across environments.
+
+
+
+
+
+
