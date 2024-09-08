@@ -3,7 +3,7 @@
 
 provider "vault" {
   address = "http://4.158.91.114:8200"
-  token   = "hvs.2PMF1fNc0f48CFS2NXOIFX9q"
+  token   = ""
 }
 provider "azurerm" {
   features {}
@@ -13,7 +13,8 @@ provider "tls" {
 }
 
 # Enable the SSH secrets engine
-# vault_mount is used to manage secret engine mounts in Vault. 
+# vault_mount is used to manage secret engine mounts in Vault.
+
 # vault secrets enable -path=ssh ssh
 
 resource "vault_mount" "ssh" {
@@ -112,9 +113,22 @@ output "my_secret_value1" {
 # 1. Requesting SSH Certificates
 # When you need to access an AKS node, you'll request an SSH certificate from Vault.
 
+# Generate an SSH Keypair:
+# ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa
+
+
+# Sign the Public Key Using Vault:
+
+# Request a time-bound SSH certificate from Vault by signing the public key with the CA. The certificate will be valid for the specified TTL.
 
 # vault write -field=signed_key ssh/sign/aks \
 #     public_key=@$HOME/.ssh/id_rsa.pub \
-#     valid_principals="ubuntu"
-# ```
+#     valid_principals="azureuser"
+
 # This command will return a signed SSH certificate that is valid for the duration specified in the TTL.
+
+# Save the Signed Certificate:
+
+
+# Save the Signed Certificate:
+# ssh -i ~/.ssh/id_rsa -o CertificateFile=~/.ssh/id_rsa-cert.pub azureuser@<aks-node-ip>
