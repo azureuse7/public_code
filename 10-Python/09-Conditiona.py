@@ -1,10 +1,4 @@
-# How to Write Conditional Statements in Python
 
-# This is where it gets interesting. In Python or in any other programming language you can make decisions based on conditions.
-
-# I hope you remember the boolean data type from a previous section – the one that can only hold True or False values.
-
-# Well, you can use a boolean with an if statement (a conditional statement) in Python to perform an action conditionally.
 
 def main():
     number = int(input('what number would you like to check?\n- '))

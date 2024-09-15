@@ -20,5 +20,6 @@ In cases where you want to run an interactive command inside a running container
 ```bash
 docker container exec -it notes-api sh
 ```
+```
 # / # uname -a
 # Linux b5b1367d6b31 5.10.9-201.fc33.x86_64 #1 SMP Wed Jan 20 16:56:23 UTC 2021 x86_
