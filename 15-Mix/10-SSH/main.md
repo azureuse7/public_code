@@ -13,4 +13,14 @@ ssh-keygen -t ed25519
 ssh -i <privatekey> <username><ip>
 ```
 
+```tf
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/id_rsa
+chmod 644 ~/.ssh/id_rsa.pub
 
+cd ~/.ssh
+ls -la ~/.ssh 
+
+ssh -keygen -R <IP address>
+
+ssh user@<ip addresss> - l <private key>
