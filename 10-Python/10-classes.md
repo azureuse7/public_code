@@ -1,6 +1,3 @@
-- In Python, classes are fundamental building blocks of Object-Oriented Programming (OOP). 
-- A class is a blueprint or template for creating objects (instances), which are collections of attributes (data) and methods (functions) that act on the data. 
-- Python classes allow you to define reusable and organized code by grouping related data and functionality.
 
 #### Key Concepts of Classes in Python
 ##### 1. Class Definition
@@ -12,7 +9,7 @@ Syntax to define a class:
 class ClassName:
     # Class body: Attributes and methods
 ```
-Example:
+**Example**:
 ```
 class Dog:
     # Class attribute

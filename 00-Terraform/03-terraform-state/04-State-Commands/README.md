@@ -1,10 +1,6 @@
----
-title: Terraform State Commands
-description: Master Terraform State Commands
----
 
 ## Step-00: Introduction
-- Terraform Commands
+
 1. terraform show
 2. terraform state
 3. terraform force-unlock   
