@@ -1,6 +1,6 @@
 https://www.middlewareinventory.com/blog/deploy-docker-image-to-kubernetes/#google_vignette
 
-#### Create a docker repo in docker hub calls it auth 
+#### Create a docker repo in docker hub calls it "auth"
 
 
 ```bash

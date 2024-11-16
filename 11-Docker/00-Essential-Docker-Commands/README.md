@@ -94,19 +94,19 @@ In the past, different container engines had different image formats. But later 
 
 Containers are just images in running state. When you obtain an image from the internet and run a container using that image, you essentially create another temporary writable layer on top of the previous read-only ones.
 
-Docker Architecture Overview
+#### Docker Architecture Overview
 
-The engine consists of three major components:
+###### The engine consists of three major components:
 
-Docker Daemon: The daemon (dockerd) is a process that keeps running in the background and waits for commands from the client. The daemon is capable of managing various Docker objects.
+**Docker** **Daemon**: The daemon (dockerd) is a process that keeps running in the background and waits for commands from the client. The daemon is capable of managing various Docker objects.
 
-Docker Client: The client  (docker) is a command-line interface program mostly responsible for transporting commands issued by users.
+**Docker** **Client**: The client  (docker) is a command-line interface program mostly responsible for transporting commands issued by users.
 
-REST API: The REST API acts as a bridge between the daemon and the client. Any command issued using the client passes through the API to finally reach the daemon.
+**REST** **API**: The REST API acts as a bridge between the daemon and the client. Any command issued using the client passes through the API to finally reach the daemon.
 
-The Full Picture
+#### The Full Picture
 
-This image is a slightly modified version of the one found in the official docs. The events that occur when you execute the command are as follows:
+
 
 You execute docker run hello-world command where hello-world is the name of an image.
 

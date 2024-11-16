@@ -1,6 +1,6 @@
-- Private Endpoints grant network access to specific resources behind a given service providing granular segmentation. Traffic can reach the service resource from on premises without using public endpoints.
+- **Private** **Endpoints** grant network access to specific resources behind a given service providing granular segmentation. Traffic can reach the service resource from on premises without using public endpoints.
 
-- A Service Endpoint remains a publicly routable IP address. A Private Endpoint is a private IP in the address space of the virtual network where the private endpoint is configured.
+- A **Service** **Endpoint** remains a publicly routable IP address. A Private Endpoint is a private IP in the address space of the virtual network where the private endpoint is configured.
 
 - For simplicity, let's take the view of a VM in a VNET connecting to a storage account in the same subscription and same Azure region. There are three ways to connect.
 

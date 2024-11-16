@@ -3,13 +3,13 @@ Access to GitHub repositories thee are thee way.
 <img src="images/a.png">
 
 #### GitHub app authentication
-After you install the GitHub App in your GitHub account or organization, your pipeline will run without using your personal GitHub identity. 
+- After you install the GitHub App in your GitHub account or organization, your pipeline will run without using your personal GitHub identity. 
  
-Builds and GitHub status updates will be performed using the Azure Pipelines identity. 
+- Builds and GitHub status updates will be performed using the Azure Pipelines identity. 
 
-To use the GitHub App, install it in your GitHub organization or user account.
+- To use the GitHub App, install it in your GitHub organization or user account.
 
-After installation, the GitHub App will become Azure Pipelines' default method of authentication to GitHub (instead of OAuth) when pipelines are created for the repositories.
+- After installation, the GitHub App will become Azure Pipelines' default method of authentication to GitHub (instead of OAuth) when pipelines are created for the repositories.
 
 
 
@@ -59,9 +59,9 @@ stages:
      parameters:
         ...
 ```
-The main character in this story is the endpoint MyGitHubOrg. This is the name of a service connection created by the Azure Pipelines GitHub App mentioned above.
+- The main character in this story is the endpoint **MyGitHubOrg**. This is the name of a service connection created by the Azure Pipelines GitHub App mentioned above.
 
-When you install the Azure Pipelines app it will create the Service Connection for you. In whatever team project you supply during installation.
+- When you install the Azure Pipelines app it will create the Service Connection for you. In whatever team project you supply during installation.
 
 Once it’s installed and working for one Team Project in Azure DevOps you can share it with other projects so they can also use it. To do this go to that Service Connection in Azure DevOps and select Security. If you are not sure where this is it’s under Project Settings — Service Connections in Azure DevOps.
 
