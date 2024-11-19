@@ -31,19 +31,16 @@ spec:
         - name: http
           containerPort: 80 
 ```
-- **apiVersion: apps/v1** and kind: Deployment: Specifies that this resource is a Deployment using the **apps**/**v1** API version.
 
-- **metadata.name: test-deployment**: Names the Deployment **test**-**deployment**.
 
-- **spec**.replicas: 3: Indicates the Deployment should maintain three replicas (Pods) at all times.
 
-- **spec**.selector.matchLabels.app: test-pod: The Deployment uses this selector to identify the Pods it manages, targeting Pods with the label **app: test-pod**.
+- **spec.selector.matchLabels.app: test-pod:** The Deployment uses this selector to identify the Pods it manages, targeting Pods with the label **app: test-pod**.
 
-- **spec**.template:
+- **spec.template:**
 
-  - **metadata.labels.app:** test-pod: Labels the Pods created by this Deployment with app: test-pod.
+  - **metadata.labels.app: test-pod:** Labels the Pods created by this Deployment with **app: test-pod.**
 
-  - **spec**.containers:
+  - **spec.containers:**
 
       - **name**: python-http-server: Names the container **python-http-server.**
 
@@ -85,9 +82,7 @@ spec:
     targetPort: http
 ```
 ### Explanation
-- **kind: Service and apiVersion: v1**: Defines a Service resource using the core **v1** API.
 
-- **metadata**.name: test-service: Names the Service **test-service**.
 
 - **spec**.selector.app: test-pod: The Service targets Pods with the label **app: test-pod.**
 
@@ -122,9 +117,7 @@ spec:
     args: ["-c", "curl test-service:4000"]
 ```
 ### Explanation
-- **apiVersion**: v1 and kind: Pod: Specifies a standalone Pod.
 
-- **metadata**.name: client-pod: Names the Pod **client**-**pod**.
 
 - **spec**.containers:
 
