@@ -9,22 +9,22 @@ Enable at Kubelet
 
 ## Default Profile
 
-- Audit -      audit.json.              → "defaultAction": "SCMP_ACT_LOG"--> Give me logs
+- **Audit** -      audit.json.              → "defaultAction": "SCMP_ACT_LOG"--> Give me logs
 
-- Violation-   violation.json.        → action": "SCMP_ACT_ERRNO"
+- **Violation**-   violation.json.        → action": "SCMP_ACT_ERRNO"
 
-- Custom -  fine-grained.json, ->  we can use both Allow and Error 
+- **Custom** -  fine-grained.json, ->  we can use both Allow and Error 
 
 ## SECCOMP profile action can be
 
-- "action":        "SCMP_ACT_ALLOW"
+- "**action**":        "SCMP_ACT_ALLOW"
 
-- "action":        "SCMP_ACT_ERRNO"
+- "**action**":        "SCMP_ACT_ERRNO"
 
-- "defaultAction": "SCMP_ACT_LOG"
+- "**defaultAction**": "SCMP_ACT_LOG"
 
 
-seccomp profile "/var/lib/kubelet/seccomp/profiles/violation.json
+**seccomp** **profile** "/var/lib/kubelet/seccomp/profiles/violation.json
 
 1)K get nodes
 
@@ -72,7 +72,7 @@ spec:
       allowPrivilegeEscalation: false
  ```
 
-To test Audit 
+#### To test Audit 
 
 Now this Pod is making audit call sing profile audit.json 
 

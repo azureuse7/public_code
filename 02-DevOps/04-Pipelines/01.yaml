@@ -1,0 +1,56 @@
+- task: AzureCLI@2  
+  # Runs Azure CLI commands as part of the pipeline.
+  displayName: 'List AKS Clusters and Set Global Variables'
+  name: get_clusters
+  inputs:
+    azureSubscription: $(SVC_CONNECTION)                        
+    # Azure service connection to authenticate with $(SVC_CONNECTION) is a pipeline variable holding the connection name.
+    scriptType: 'bash'                                          
+    # scriptType: Set to 'bash' indicating the script to run is a Bash script.
+    scriptLocation: 'inlineScript' # scriptLocation: Set to 'inlineScript', meaning the script is written directly in the YAML file.
+    inlineScript: |        
+      CLUSTER_NAMES=$(az aks list --query "[?tags.powermanagement == 'true'].name" -o tsv)
+      count=0
+      for cluster_name in ${CLUSTER_NAMES}; do
+        echo "##vso[task.setvariable variable=cluster_name${count};isOutput=true]$cluster_name"
+        (( count++ ))
+      done
+
+# Loop Explanation:
+# count=0: Initializes a counter to keep track of the cluster index.
+# for cluster_name in ${CLUSTER_NAMES}; do: Begins a loop over each cluster name obtained from the previous command.
+# Inside the loop:
+# echo "##vso[task.setvariable variable=cluster_name${count};isOutput=true]$cluster_name":
+# Uses a special Azure DevOps logging command to set a pipeline variable dynamically.
+# variable=cluster_name${count}: Creates variables like cluster_name0, cluster_name1, etc.
+# isOutput=true: Marks the variable as an output variable, allowing it to be accessed in subsequent jobs or stages.
+# $cluster_name: The value assigned to the variable, which is the name of the cluster.
+# (( count++ )): Increments the counter for the next iteration. -->
+
+- task: AzureCLI@2
+  displayName: 'Echo cluster names'
+  inputs:
+    azureSubscription: $(SVC_CONNECTION)
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    env:
+      cluster_name0: $[ dependencies.get_clusters.outputs['get_clusters.cluster_name0'] ]
+    inlineScript: |
+      echo "The value of cluster_name0 is: $cluster_name0"
+
+# Another demonstration of accessing the output variable, this time using a script task instead of AzureCLI@2.
+- script: |   #script: A shorthand for - task: Bash, allowing execution of Bash commands.
+    echo "The value of cluster_name is: $cluster_name"
+  displayName: 'Echo variable using Bash'
+  env:
+    cluster_name: $[ dependencies.get_clusters.outputs['get_clusters.cluster_name0'] ]
+
+- stage: aks
+  variables:
+    cluster_name: $[ stageDependencies.get_the_schedule.Get_the_schedule.outputs['get_clusters.cluster_name0'] ]
+  jobs:
+  - job: aks
+    steps:
+    - template: power_mgmt_dev_gt.yml
+      parameters:
+        clusters: $(cluster_name)

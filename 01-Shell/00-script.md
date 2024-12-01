@@ -248,3 +248,9 @@ echo "##vso[task.setvariable variable=$key]$value"
 After this command is executed, the variable deploymentEnvironment in the Azure DevOps pipeline environment would be set to production, and subsequent tasks in the pipeline can use this variable.
 
 This allows for very dynamic and flexible pipeline configurations, where outputs from one task can influence the behavior of later tasks.
+
+
+
+Accessing Output Variables Correctly
+$[ stageDependencies.{StageName}.{JobName}.outputs['{TaskName}.{VariableName}'] ]
+
