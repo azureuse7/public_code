@@ -1,4 +1,3 @@
-### Overview
 ### Taints: 
 Applied to **nodes** to repel pods that do not have matching tolerations.
 ### Tolerations: 

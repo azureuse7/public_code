@@ -2,13 +2,23 @@
 
 # Listing pods with their IP
 # Craete cluster 
+
 from kubernetes import client, config
+# The code uses the official Kubernetes Python client to interact with the Kubernetes API.
+
 config.load_kube_config()
+# This line loads your local Kubernetes configuration (usually ~/.kube/config) so that the Python client knows 
+# how to authenticate and communicate with your Kubernetes cluster
+
 v1 = client.CoreV1Api()
+# CoreV1Api is one of the main APIs provided by the Kubernetes Python client. 
+# It allows you to manage core Kubernetes objects such as Pods, Services, Namespaces, etc.
+
 print("Listing pods with their IPs:")
+# retrieves all the Pods across all namespaces in your cluster.
 ret = v1.list_pod_for_all_namespaces(watch=False)
 for i in ret.items:
-    print("%s\t%s\t%s" % (i.status.pod_ip, i.metadata.namespace, i.metadata.name)
+    print("%s\t%s\t%s" % (i.status.pod_ip, i.metadata.namespace, i.metadata.name))
 
 
 
