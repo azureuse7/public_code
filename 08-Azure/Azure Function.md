@@ -1,4 +1,6 @@
-﻿` `Certainly! Let's dive into **Azure Functions**, **Function Apps**, and how they work together in Microsoft Azure, including a practical example using Python.
+﻿[azure logic apps to control azure function](https://medium.com/@abdelhakbahri/start-stop-azure-virtual-machines-using-a-rest-api-and-azure-functions-a62758decc34)
+
+https://www.youtube.com/watch?v=uBBCA2cJe1k
 
 -----
 ## **1. What is an Azure Function?**

@@ -1,4 +1,8 @@
-﻿Azure Logic Apps is a cloud-based service provided by Microsoft Azure that allows you to automate and orchestrate tasks, business processes, and workflows without the need for extensive coding. It leverages a visual designer to help users create workflows by connecting various services and applications through pre-built connectors. This makes it accessible to both developers and non-developers for integrating systems, automating processes, and managing data flows efficiently.
+﻿https://medium.com/@arunag1992/a-step-by-step-guide-to-building-a-standard-logic-app-workflow-in-azure-df10fc5bc428
+
+https://www.youtube.com/watch?v=uBBCA2cJe1k
+
+Azure Logic Apps is a cloud-based service provided by Microsoft Azure that allows you to automate and orchestrate tasks, business processes, and workflows without the need for extensive coding. It leverages a visual designer to help users create workflows by connecting various services and applications through pre-built connectors. This makes it accessible to both developers and non-developers for integrating systems, automating processes, and managing data flows efficiently.
 ## **Key Features of Azure Logic Apps**
 1. **Visual Workflow Designer:** A drag-and-drop interface that simplifies the creation of workflows, allowing users to design complex processes visually.
 1. **Connectors:** Over 400 built-in connectors to integrate with various services, including Microsoft services (like Office 365, SharePoint), third-party applications (like Salesforce, Dropbox), and on-premises systems.

@@ -33,8 +33,7 @@
 ## **Example: Using Azure CLI to Create and Manage Azure Cosmos DB**
 Below is a step-by-step example demonstrating how to create an Azure Cosmos DB account, create a database and container, and perform basic operations using the Azure CLI in a Bash environment.
 ### **Prerequisites:**
-1. **Azure CLI Installed:** Ensure you have the Azure CLI installed. If not, you can install it from [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
-1. **Azure Subscription:** You need an active Azure subscription. If you don't have one, you can create a free account [here](https://azure.microsoft.com/en-us/free/).
+
 ### **Step 1: Log in to Azure**
 ``` bash
 bash
@@ -48,8 +47,6 @@ This command will open a web browser prompting you to enter your Azure credentia
 Define variables for resource group, Cosmos DB account, database, and container.
 ``` bash
 bash
-
-Copy code
 
 \# Variables
 
@@ -66,7 +63,7 @@ CONTAINER\_NAME="MyContainer"
 PARTITION\_KEY="/myPartitionKey"
 ``` 
 ### **Step 3: Create a Resource Group**
-A resource group is a container that holds related resources for an Azure solution.
+
 ``` bash
 bash
 
@@ -78,8 +75,6 @@ az group create --name $RESOURCE\_GROUP --location $LOCATION
 Here, we'll create a Cosmos DB account using the SQL (Core) API.
 ``` bash
 bash
-
-Copy code
 
 az cosmosdb create \
 
@@ -96,8 +91,6 @@ You'll need the primary key to authenticate and interact with the database.
 ``` bash
 bash
 
-Copy code
-
 COSMOS\_KEY=$(az cosmosdb keys list --name $COSMOS\_ACCOUNT --resource-group $RESOURCE\_GROUP --query "primaryMasterKey" --output tsv)
 
 echo $COSMOS\_KEY
@@ -105,8 +98,6 @@ echo $COSMOS\_KEY
 ### **Step 6: Create a Database**
 ``` bash
 bash
-
-Copy code
 
 az cosmosdb sql database create \
 
@@ -120,8 +111,6 @@ az cosmosdb sql database create \
 A container is a schema-agnostic container of items. Here, we define a partition key for scalability.
 ``` bash
 bash
-
-Copy code
 
 az cosmosdb sql container create \
 
@@ -162,7 +151,6 @@ Then, insert the document:
 ``` bash
 bash
 
-Copy code
 
 az cosmosdb sql container item create \
 
@@ -181,7 +169,6 @@ Retrieve documents using a SQL query.
 ``` bash
 bash
 
-Copy code
 
 az cosmosdb sql container item query \
 

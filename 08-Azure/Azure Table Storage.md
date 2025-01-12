@@ -1,4 +1,4 @@
-﻿#### Azure Table Storage
+﻿####Azure Table Storage 
 Azure Table Storage is a highly scalable, NoSQL cloud storage solution provided by Microsoft Azure. It is designed to store large amounts of structured, non-relational data, making it ideal for applications that require quick access to vast datasets without the overhead of a traditional relational database.
 
 **What is Azure Table Storage?**

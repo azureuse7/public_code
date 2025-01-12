@@ -1,4 +1,6 @@
 ﻿
+https://medium.com/@abhimanyubajaj98/getting-started-with-azure-event-grid-a-comprehensive-guide-1e8f94152ff3
+
 #### Azure Event Grid 
 Azure Event Grid is a fully managed event routing service provided by Microsoft Azure. It enables the creation, management, and consumption of events across various Azure services and custom applications with high scalability and low latency. Event Grid facilitates a reactive programming model, allowing applications to respond to events as they occur, thereby enabling real-time processing and integration between services.
 

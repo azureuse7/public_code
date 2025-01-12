@@ -36,10 +36,9 @@ Let's create a simple workflow where a user registration process involves the fo
 **Step 1: Define the State Machine**
 
 Here's an example of an ASL definition for this workflow:
-
+``` json
 json
 
-Copy code
 
 {
 
@@ -114,21 +113,21 @@ Copy code
 `  `}
 
 }
-
+``` 
 **Step 2: Breakdown of the State Machine**
 
 1. **StartAt**: Specifies the starting state, which is CreateUser.
-1. **CreateUser State**:
+2. **CreateUser State**:
    1. **Type**: Task – invokes the CreateUserFunction Lambda.
-   1. **Next**: On success, transitions to SendWelcomeEmail.
-   1. **Catch**: If the task fails (States.TaskFailed), transitions to HandleCreateUserFailure.
-1. **SendWelcomeEmail State**:
+   2. **Next**: On success, transitions to SendWelcomeEmail.
+   3. **Catch**: If the task fails (States.TaskFailed), transitions to HandleCreateUserFailure.
+3. **SendWelcomeEmail State**:
    1. **Type**: Task – invokes the SendEmailFunction Lambda.
-   1. **Next**: On success, transitions to FinalizeRegistration.
-   1. **Catch**: If the task fails, transitions to HandleSendEmailFailure.
-1. **FinalizeRegistration State**:
+   2. **Next**: On success, transitions to FinalizeRegistration.
+   3. **Catch**: If the task fails, transitions to HandleSendEmailFailure.
+4. **FinalizeRegistration State**:
    1. **Type**: Succeed – indicates the workflow has completed successfully.
-1. **HandleCreateUserFailure & HandleSendEmailFailure States**:
+5. **HandleCreateUserFailure & HandleSendEmailFailure States**:
    1. **Type**: Fail – terminates the workflow with an error, providing error details.
 
 **Step 3: Deploy and Execute**
@@ -169,4 +168,6 @@ Copy code
 AWS Step Functions provide a robust and scalable way to orchestrate workflows across various AWS services. By abstracting the complexities of state management, error handling, and scaling, Step Functions allow developers to focus on building business logic and delivering value efficiently.
 
 If you're building applications that require coordinating multiple services or managing complex workflows, AWS Step Functions are definitely worth considering.
+
+======================
 
