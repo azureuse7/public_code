@@ -1,19 +1,6 @@
 
-## Step-00: Introduction
-
-1. terraform show
-2. terraform state
-3. terraform force-unlock   
-4. terraform taint
-5. terraform untaint
-6. terraform apply -target command  
-
-
-
-
 ## Step-02: Update the Terraform Backend Key
 - Update `Terraform Backend Key`
-- **c1-versions.tf**
 ```t
 # Terraform State Storage to Azure Storage Container
   backend "azurerm" {
@@ -70,8 +57,7 @@ Observation: It should display the state file
 ```
 
 ## Step-05: Terraform State Command
-### Step-05-01: Terraform State List and Show commands
-- These two commands comes under **Terraform Inspecting State**
+
 - **terraform state list:**  This command is used to list resources within a Terraform state.
 - **terraform  state show:** This command is used to show the attributes of a single resource in the Terraform state.
 ```t
