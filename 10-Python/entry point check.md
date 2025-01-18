@@ -3,9 +3,7 @@
 In Python, the **entry point check** is a common programming pattern used to determine whether a Python file is being run as the main program or if it is being imported as a module into another script. This check is typically done using the following code snippet:
 
 ```python
-
 if __name__ == "__main__":
-
 # Code to execute when the file is run as a script
 ```
 **How It Works**
@@ -27,36 +25,26 @@ Consider a Python file called calculator.py:
 
 python
 ```python
-
-\# calculator.py
+# calculator.py
 
 def add(a, b):
-
-`    `"""Return the sum of two numbers."""
-
-`    `return a + b
+    """Return the sum of two numbers."""
+    return a + b
 
 def subtract(a, b):
-
-`    `"""Return the difference between two numbers."""
-
-`    `return a - b
+    """Return the difference between two numbers."""
+    return a - b
 
 def main():
+    # Code in main() runs only when the script is executed directly
+    print("Testing the calculator functions:")
+    print("3 + 5 =", add(3, 5))
+    print("10 - 7 =", subtract(10, 7))
 
-`    `# Code in main() runs only when the script is executed directly
-
-`    `print("Testing the calculator functions:")
-
-`    `print("3 + 5 =", add(3, 5))
-
-`    `print("10 - 7 =", subtract(10, 7))
-
-\# Entry point check
-
+# Entry point check
 if __name__ == "__main__":
+    main()
 
-`    `main()
 ```
 **When Running as the Main Program:**
 
@@ -65,11 +53,9 @@ if __name__ == "__main__":
 
   bash
 ```
-
   Testing the calculator functions:
 
   3 + 5 = 8
-
   10 - 7 = 3
 ```
 **When Importing the Module:**
@@ -79,13 +65,11 @@ if __name__ == "__main__":
   python
 
 ```python
-
   # app.py
 
   import calculator
 
   result = calculator.add(2, 2)
-
   print("2 + 2 =", result)
 ```
 - Behavior: When **calculator.py** is imported, **\_\_name\_\_** in that context is "calculator", not "\_\_main\_\_". Thus, the **if **condition evaluates to **False** and **main()** is not executed. Only the functions **add** and **subtract** become available to the importing script.
