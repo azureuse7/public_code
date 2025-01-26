@@ -15,5 +15,5 @@ az aks command invoke \
 https://learn.microsoft.com/en-gb/azure/aks/access-private-cluster?tabs=azure-cli
 
   
-=========
+
 

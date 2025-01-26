@@ -65,10 +65,10 @@ In short, these network rules allow network communication to    yor pods from ne
 
 # There are various types of pods:
 
-- ReplicaSet, the default, is a relatively simple type. It ensures the specified number of pods are running A selector enables the replica set to identify all the pods running underneath it. Using this feature, you can manage pods labeled with the same value as the selector value, but not created with the replicated set.
-- Deployment is a declarative way of managing pods via ReplicaSets. Includes rollback and rolling update mechanisms Deployments make use of YAML-based definition files, and make it easy to manage deployments
-- Daemonset is a way of ensuring each node will run an instance of a pod. Used for cluster services, like health monitoring and log forwarding
-- StatefulSet is tailored to managing pods that must persist or maintain state
+- **ReplicaSet**, . It ensures the specified number of pods are running A selector enables the replica set to identify all the pods running underneath it. Using this feature, you can manage pods labeled with the same value as the selector value, but not created with the replicated set.
+- **Deployment** is a declarative way of managing pods via ReplicaSets. Includes rollback and rolling update mechanisms Deployments make use of YAML-based definition files, and make it easy to manage deployments
+- **Daemonset** is a way of ensuring each node will run an instance of a pod. Used for cluster services, like health monitoring and log forwarding
+- **StatefulSet** is tailored to managing pods that must persist or maintain state
 - Job and CronJob run short-lived jobs as a one-off or on a schedule.
 
 
@@ -83,27 +83,35 @@ In short, these network rules allow network communication to    yor pods from ne
 
 # Kubernetes Networking
 
-- Pod-to-Pod Communication within the Same Node: 
-  When multiple pods are scheduled on the same node, they can communicate with each other directly using localhost or the loopback interface. This communication happens through the pod’s assigned IP address within the cluster, typically in the form of a Virtual Ethernet (veth) pair. The communication occurs at the network layer, enabling high-performance and low-latency interactions between pods on the same node.
+ #### Pod-to-Pod Communication within the Same Node: 
+  - When multiple pods are scheduled on the same node, they can communicate with each other directly using localhost or the loopback interface. 
+  - This communication happens through the pod’s assigned IP address within the cluster, typically in the form of a Virtual Ethernet (veth) pair. The communication occurs at the network layer, enabling high-performance and low-latency interactions between pods on the same node.
 
-- Pod-to-Pod Communication across Nodes:
-    When pods need to communicate across different nodes in the cluster, Kubernetes employs various networking solutions, such as Container Network Interfaces (CNIs) and software-defined networking (SDN) technologies. These solutions create a virtual network overlay that spans the entire cluster, enabling pod-to-pod communication across nodes. Some popular CNIs include Calico, Flannel, Weave, and Cilium. These networking solutions ensure that the pod’s IP address remains reachable and provides transparent network connectivity regardless of the pod’s location within the cluster.
+  #### Pod-to-Pod Communication across Nodes:
 
-# Cluster-Internal Communication
-    By default, pods within a Kubernetes cluster can communicate with each other using their internal IP addresses. This communication happens over a virtual network overlay provided by the underlying container runtime or network plugin. The internal IP addresses are assigned by the Kubernetes cluster networking solution and are routable only within the cluster.
+  - When pods need to communicate across different nodes in the cluster, Kubernetes employs various networking solutions, such as Container Network Interfaces (CNIs) and software-defined networking (SDN) technologies. These solutions create a virtual network overlay that spans the entire cluster, enabling pod-to-pod communication across nodes. Some popular CNIs include Calico, Flannel, Weave, and Cilium. 
+  - These networking solutions ensure that the pod’s IP address remains reachable and provides transparent network connectivity regardless of the pod’s location within the cluster.
+
+  #### Cluster-Internal Communication
+  - By default, pods within a Kubernetes cluster can communicate with each other using their internal IP addresses. This communication happens over a virtual network overlay provided by the underlying container runtime or network plugin. 
+  - The internal IP addresses are assigned by the Kubernetes cluster networking solution and are routable only within the cluster.
 
 # DNS-Based Service Discovery
-Kubernetes provides a built-in DNS service for service discovery within the cluster. Services act as stable endpoints that abstract the underlying pods. Each service is assigned a DNS name, which resolves to the IP addresses of the pods backing that service. This DNS-based approach allows pods to communicate with each other using the service names rather than directly referencing the individual pod IP addresses.
+- Kubernetes provides a built-in DNS service for service discovery within the cluster. Services act as stable endpoints that abstract the underlying pods. 
+- Each service is assigned a DNS name, which resolves to the IP addresses of the pods backing that service. This DNS-based approach allows pods to communicate with each other using the service names rather than directly referencing the individual pod IP addresses.
 
 # Service Load Balancing
-When multiple pods are serving the same application, Kubernetes provides built-in load balancing capabilities for distributing traffic across those pods. By creating a service object and associating it with a set of pods, Kubernetes automatically load balances the incoming requests among the available pods. This load balancing mechanism ensures high availability and scalability of the application.
+- When multiple pods are serving the same application, Kubernetes provides built-in load balancing capabilities for distributing traffic across those pods. 
+- By creating a service object and associating it with a set of pods, Kubernetes automatically load balances the incoming requests among the available pods. This load balancing mechanism ensures high availability and scalability of the application.
 
 # Network Policies
-Kubernetes offers network policies as a means to control traffic flow between pods. Network policies define rules that specify which pods can communicate with each other based on various parameters such as IP addresses, ports, and protocols. By enforcing network policies, you can segment your application’s network traffic and add an additional layer of security.
+- Kubernetes offers network policies as a means to control traffic flow between pods. Network policies define rules that specify which pods can communicate with each other based on various parameters such as IP addresses, ports, and protocols.
+-   By enforcing network policies, you can segment your application’s network traffic and add an additional layer of security.
 
 # External Communication
-Pods often need to communicate with resources outside the Kubernetes cluster, such as external services or databases. Kubernetes provides several mechanisms to facilitate this external communication. One approach is to expose a pod or a set of pods using a service of type “LoadBalancer” or “NodePort,” allowing external clients to access the pods. Another option is to use an Ingress controller, which provides a way to route incoming traffic from outside the cluster to the appropriate pods based on defined rules.
+- Pods often need to communicate with resources outside the Kubernetes cluster, such as external services or databases. Kubernetes provides several mechanisms to facilitate this external communication. One approach is to expose a pod or a set of pods using a service of type “LoadBalancer” or “NodePort,” allowing external clients to access the pods.
+-  Another option is to use an Ingress controller, which provides a way to route incoming traffic from outside the cluster to the appropriate pods based on defined rules.
 
 # Service Mesh
-For advanced networking scenarios, a service mesh can be employed to enhance pod-to-pod communication. A service mesh, such as Istio or Linkerd, sits as a layer on top of the Kubernetes cluster and provides features like traffic management, observability, and security. With a service mesh, you can control and monitor the communication between pods with advanced routing rules, circuit breaking, and distributed tracing.
+- For advanced networking scenarios, a service mesh can be employed to enhance pod-to-pod communication. A service mesh, such as Istio or Linkerd, sits as a layer on top of the Kubernetes cluster and provides features like traffic management, observability, and security. With a service mesh, you can control and monitor the communication between pods with advanced routing rules, circuit breaking, and distributed tracing.
 
