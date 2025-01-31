@@ -1,6 +1,5 @@
 # How to Execute Commands in a Running Container
 
-For this, you'll have to use the exec command to execute a custom command inside a running container.
 
 The generic syntax for the exec command is as follows:
 ```bash

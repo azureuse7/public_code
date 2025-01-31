@@ -16,7 +16,7 @@ Containers running inside the pod can not share the files with each other.
 
 
 
-# What is Persistent Volume(PV)?
+### What is Persistent Volume(PV)?
 - In simple terms, it's storage available within your Kubernetes cluster. 
 
 - It's basically a directory with some data in it and all the containers running inside the pods can access it. 
