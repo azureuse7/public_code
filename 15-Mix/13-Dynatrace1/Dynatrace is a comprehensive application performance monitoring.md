@@ -1,13 +1,11 @@
 ﻿#### Dynatrace
 
-
------
 **1. How Dynatrace Works**
 
 **a. Automatic Instrumentation**
 
 - **OneAgent Deployment:**
-  At the heart of Dynatrace’s monitoring strategy is the OneAgent. When deployed on a host (physical machine, virtual machine, or container), the OneAgent automatically discovers and instruments running applications, services, processes, and infrastructure. This eliminates the need for manual configuration or code changes.
+  At the heart of Dynatrace’s monitoring strategy is the OneAgent. When deployed on a host (physical machine, virtual machine, or container), the OneAgent automatically discovers and instruments running applications, services, processes, and infrastructure. 
 - **Auto-Discovery and Instrumentation:**
   The agent dynamically detects changes in the environment, such as new services or instances of a containerized application, and begins collecting metrics and tracing data without requiring manual intervention. It instruments at various layers—network, application, and even down to code-level instrumentation—enabling comprehensive monitoring coverage.
 

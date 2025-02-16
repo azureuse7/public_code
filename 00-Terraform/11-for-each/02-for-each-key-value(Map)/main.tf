@@ -20,13 +20,11 @@ variable "inbound_rules" {
     101 = 3389
     102 = 22
     103 = 443
-
   }
 }
 
 # Resource Group
 resource "azurerm_resource_group" "rg" {
-
   name     = "rg-mytesourcegroup"
   location = "West US 2"
 }
