@@ -38,6 +38,7 @@ helm install mynginx mybitnami/nginx
 # List Helm Releases (Default Table Output)
 helm list 
 helm ls
+-
 
 # List Helm Releases (YAML Output)
 helm list --output=yaml
