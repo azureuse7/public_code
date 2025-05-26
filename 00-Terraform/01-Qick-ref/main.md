@@ -1,5 +1,3 @@
-http://vcloud-lab.com/entries?page=1#post-112923
-
 ##### Using tfvars
 - terraform apply -var-file="testing.tfvars"
 
@@ -16,7 +14,6 @@ http://vcloud-lab.com/entries?page=1#post-112923
 - terrasform validate
 
 #####  plan and save the infra changes into tfplan file
-#####  should fail validation
 - terraform plan -out tfplan -var rg_name="myRG" -var location="easteurope" 
 
 #####  should display the 4 resources to be created

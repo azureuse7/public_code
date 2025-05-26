@@ -32,7 +32,7 @@ resource "azurerm_kubernetes_cluster" "example" {
   default_node_pool {
     name       = "default"
     node_count = 1
-    vm_size    = "Standard_D2ps_v5"
+    vm_size    = "Standard_B2ls_v2"
   }
 
   identity {

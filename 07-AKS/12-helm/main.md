@@ -22,7 +22,7 @@ helm search repo wildfly
 ```
 
 ## Step-03: Install Helm Chart
-- Installs the Helm Chart
+
 ```t
 # Update Helm Repo
 helm repo update  # Make sure we get the latest list of charts
@@ -33,7 +33,7 @@ helm install mynginx mybitnami/nginx
 ```
 
 ## Step-04: List Helm Releases
-- This command lists all of the releases for a specified namespace
+
 ```t
 # List Helm Releases (Default Table Output)
 helm list 
@@ -82,7 +82,7 @@ helm uninstall mynginx
 
 
 ## Step-02: Custom Helm Repo
-### Step-02-01: Review our Custom Helm Repo
+
 - [StackSimplify Helm Repo hosted on GitHub](https://stacksimplify.github.io/helm-charts/)
 - [GitHub Repository for StackSimplify Helm Repo](https://github.com/stacksimplify/helm-charts)
 - [artifacthub.io](https://artifacthub.io): Search for `stacksimplify`
@@ -205,11 +205,7 @@ helm status RELEASE_NAME --revision int
 helm status myapp1 --revision 2
 ```
 
-## Step-09: Uninstall Helm Release
-```t
-# Uninstall Helm Release
-helm uninstall myapp1
-```
+
 
 # Helm Upgrade with Chart Versions
 

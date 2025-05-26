@@ -10,6 +10,7 @@ Running multiple containers is a very common scenario.
 
 Take for example a WordPress (WP) application. It consists of a WordPress service that talks to a MySQL database.
 
+
 We could run both containers using two docker run commands with a bunch of cli arguments. The db container might be started like this:
 
 ```t
