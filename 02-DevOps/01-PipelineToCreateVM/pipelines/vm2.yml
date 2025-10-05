@@ -73,10 +73,10 @@ jobs:
                 terraform init \
                 -reconfigure \
                 -backend-config="resource_group_name=gagan" \
-                -backend-config="storage_account_name=gaganthakur" \
+                -backend-config="storage_account_name=gagansingh" \
                 -backend-config="subscription_id=$TERRAFORM_BACKEND_SUBSCRIPTION_ID" \
                 -backend-config="container_name=tfstate" \
-                -backend-config="key=gaganthakur.tfstte" \
+                -backend-config="key=gagansingh.tfstte" \
                 -backend-config=use_azuread_auth=true \
                 -backend-config="access_key=$(sa01-azdo-accesskey)" 
 

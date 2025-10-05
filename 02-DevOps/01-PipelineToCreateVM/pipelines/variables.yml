@@ -11,7 +11,7 @@ variables:
   LOCATION: "uksouth"
 
 
-  TF_STATE_NAME: "gaganthakur.tfstte"
+  TF_STATE_NAME: "gagansingh.tfstte"
   TF_BACKEND_RESOURCE_GROUP_NAME: "gagan"
   TF_VERSION: "1.1.9"
   VAULT_NAME: "gagan-vault"
