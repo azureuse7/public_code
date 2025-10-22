@@ -1,5 +1,39 @@
-- An EKS access entry is an EKS-side object that tells the cluster which IAM principal is allowed to talk to the Kubernetes API and with what permissions. 
-- It’s the modern replacement for managing users in the legacy aws-auth ConfigMap. 
+- I have one IAM user 
+
+
+<img src="images/accessentry/3.png">
+
+- I have one EKS clustre 
+<img src="images/accessentry/4.png">
+
+- You can see the User can't see the node of the EKS 
+<img src="images/accessentry/5.png">
+- How can we provide access 
+
+- Log into as admin 
+
+- Go to access and either use EKS API or ConfigMap
+<img src="images/accessentry/6.png">
+
+
+- Select the user 
+- Create a access entry 
+
+- Add a policy name 
+<img src="images/accessentry/7.png">
+- Add another policy 
+<img src="images/accessentry/8.png">
+- Confirm 
+<img src="images/accessentry/9.png">
+- Log in as that user
+<img src="images/accessentry/10.png">
+- You can see access has been granted
+
+
+
+
+
+An access entry allows an IAM principal (user or role) to access your cluster. Access entries can replace the need to maintain the aws-auth ConfigMap for authentication. 
 
 ####  How it works 
 -  Create an access entry for an IAM user/role (the “principal”). This establishes authentication. 
