@@ -4,15 +4,19 @@
 <img src="images/accessentry/3.png">
 
 - I have one EKS clustre 
+- You can see the User can't see the node of the EKS 
 <img src="images/accessentry/4.png">
 
-- You can see the User can't see the node of the EKS 
+- Go to access and either use EKS API or ConfigMap
+
 <img src="images/accessentry/5.png">
 - How can we provide access 
 
 - Log into as admin 
 
-- Go to access and either use EKS API or ConfigMap
+- Create a acess entry 
+<img src="images/accessentry/5.1png">
+
 <img src="images/accessentry/6.png">
 
 
