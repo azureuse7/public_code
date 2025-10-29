@@ -10,12 +10,13 @@
 - Go to access and either use EKS API or ConfigMap
 
 <img src="images/accessentry/5.png">
+
 - How can we provide access 
 
 - Log into as admin 
 
 - Create a acess entry 
-<img src="images/accessentry/5.1png">
+<img src="images/accessentry/5a.png">
 
 <img src="images/accessentry/6.png">
 
