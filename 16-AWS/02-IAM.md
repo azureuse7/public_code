@@ -1,10 +1,12 @@
-### IAM
-Idenity and Access managment 
+### IAM : Idenity and Access managment 
 
 ### Components of IAM 
 
 ##### Users:
-IAM users represent individual people or entities 
+- Represent individual people or applications that need to interact with AWS
+- Each user has unique credentials (username/password for console access, access keys for programmatic access)
+- By default, new users have NO permissions (explicit deny)
+- Users can have long-term credentials (passwords and access keys)
 
 ##### Groups: 
 - IAM groups are collections of users with similar access requirements.
@@ -12,15 +14,74 @@ IAM users represent individual people or entities
 - Users can be added or removed from groups as needed.
 
 #### Roles: 
-- IAM roles are used to grant temporary access to AWS resources. 
-- Roles are typically used by applications or services that need to access AWS resources on behalf of users or other services. 
-- Roles have associated policies that define the permissions and actions allowed for the role.
+- Temporary identities that can be assumed by users, applications, or AWS services
+- Don't have long-term credentials - instead use temporary security credentials
+- Common use cases:
+
+##### EC2 instances needing to access other AWS services
+##### Cross-account access between AWS accounts
+##### Federated users from external identity providers
+##### AWS services acting on your behalf
+
+
+- When a role is assumed, AWS returns temporary credentials (access key, secret key, session token)
 
 #### Policies: 
-- IAM policies are JSON documents that define permissions. 
-- Policies specify the actions that can be performed on AWS resources and the resources to which the actions apply. 
-- Policies can be attached to users, groups, or roles to control access. 
-- IAM provides both AWS managed policies (predefined policies maintained by AWS) and customer managed policies (policies created and managed by you).
+- Policies are JSON documents that define permissions. There are several types:
+##### Identity-Based Policies
+
+- Attached to IAM identities (users, groups, or roles)
+- Define what actions an identity can perform on which resources
+
+##### Managed Policies:
+
+- AWS Managed Policies: Created and managed by AWS, cover common use cases
+- Customer Managed Policies: Created and managed by you, reusable across multiple identities
+
+##### Inline Policies:
+
+- Embedded directly into a single user, group, or role
+- Deleted when the identity is deleted
+- Use when you need a strict one-to-one relationship
+
+##### Resource-Based Policies
+
+- Attached directly to resources (S3 buckets, SQS queues, KMS keys, etc.)
+- Specify who can access the resource and what actions they can perform
+- Support cross-account access without requiring a role- 
+- Must specify a Principal (who the policy applies to)
+  
+ #### Policy Structure
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::my-bucket/*",
+      "Condition": {
+        "IpAddress": {
+          "aws:SourceIp": "203.0.113.0/24"
+        }
+      }
+    }
+  ]
+}
+####  Key elements:
+-  Version: Policy language version (always use "2012-10-17")
+- Statement: Array of individual permission statements
+- Effect: "Allow" or "Deny"
+- Action: What API operations are allowed/denied
+- Resource: Which AWS resources the actions apply to (ARN format)
+- Principal: Who the statement applies to (only in resource-based policies)
+- Condition: Optional conditions that must be met (IP addresses, time, MFA, etc.)
+### Cluster IAM role (a.k.a. EKS service role)
+- Used by: The managed EKS control plane (AWS on your behalf).
+- Typical policy: AmazonEKSClusterPolicy attached to the role you pass at cluster creation
+
+### Node IAM role (via EC2 instance profile)
+- Used by: Each EC2 node
+
 
 ## User 
 
