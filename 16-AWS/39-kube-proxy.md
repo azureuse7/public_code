@@ -1,3 +1,52 @@
+Kube-proxy is a network component that runs on each node in your EKS cluster and maintains network rules to enable communication to your Pods. Here's how it works specifically on Amazon EKS:
+
+## Core Function
+
+Kube-proxy implements part of the Kubernetes Service concept by maintaining network rules that allow network communication to your Pods from inside or outside the cluster. When you create a Service in Kubernetes, kube-proxy configures the node to handle traffic routing to the appropriate Pod endpoints.
+
+## Proxy Modes on EKS
+
+Amazon EKS supports two proxy modes:
+
+**iptables mode** (default for most EKS versions)
+
+*   Uses iptables rules to redirect traffic to backend Pods
+*   More mature and widely tested
+*   Random selection of backend Pods for load balancing
+*   Lower overhead for smaller clusters
+
+**IPVS mode** (available but requires configuration)
+
+*   Uses IP Virtual Server for load balancing
+*   Better performance at scale with large numbers of Services
+*   More load balancing algorithms available (round-robin, least connection, etc.)
+*   Requires IPVS kernel modules to be loaded
+
+## EKS-Specific Considerations
+
+**Daemonset Deployment**: On EKS, kube-proxy runs as a DaemonSet in the `kube-system` namespace, meaning one instance per node.
+
+**VPC CNI Integration**: Kube-proxy works alongside the AWS VPC CNI plugin. While the VPC CNI handles Pod IP address assignment from your VPC, kube-proxy handles Service-level routing and load balancing.
+
+**EKS Auto Mode**: In EKS Auto Mode (which you're working with), AWS manages the kube-proxy deployment and configuration automatically, including updates and version compatibility with your cluster version.
+
+**Version Management**: The kube-proxy version should match your EKS cluster version. EKS automatically updates the kube-proxy add-on during cluster upgrades.
+
+## Key Traffic Flows
+
+1.  **ClusterIP Services**: kube-proxy intercepts traffic to the Service's virtual IP and forwards it to one of the backend Pods
+2.  **NodePort Services**: kube-proxy configures each node to listen on a specific port and forward traffic to the Service
+3.  **LoadBalancer Services**: Works with AWS Load Balancers, where kube-proxy handles the node-level routing after traffic reaches the node
+
+You can check your kube-proxy configuration with:
+
+bash
+
+    kubectl get daemonset kube-proxy -n kube-system
+    kubectl logs -n kube-system -l k8s-app=kube-proxy
+
+Since you're working with EKS Auto Mode, AWS handles most of the kube-proxy management, but understanding its role is important for troubleshooting networking issues or understanding how Service traffic flows through your cluster.
+
 
 
 **What Is kube-proxy on Amazon EKS?**
