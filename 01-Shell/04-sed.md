@@ -1,3 +1,6 @@
+# sed: Stream Editor for Text Manipulation in Bash
+> `sed` is a non-interactive Unix stream editor that reads input line by line and applies transformation commands (substitution, deletion, trimming). It is commonly used to modify strings, strip characters, and process text in scripts without opening an editor.
+
 #### trimming the first 19 characters of a variable in a Bash script using sed
 ```bash
 #!/bin/bash

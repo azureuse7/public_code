@@ -1,4 +1,7 @@
-- Amazon Web Services (AWS) Lambda is a serverless computing service that allows you to run code without provisioning or managing servers. 
+# AWS Lambda: Serverless Functions
+> Lambda lets you run code without managing servers. You upload your function, configure a trigger (API Gateway, S3 event, SQS, EventBridge, etc.), and AWS handles execution, scaling, and billing per invocation.
+
+- Amazon Web Services (AWS) Lambda is a serverless computing service that allows you to run code without provisioning or managing servers.
 - With AWS Lambda, you can run code for virtually any type of application or backend service, all with zero administration. 
 - You simply upload your code, and Lambda takes care of everything required to run and scale your code with high availability.
 

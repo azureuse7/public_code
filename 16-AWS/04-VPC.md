@@ -1,3 +1,6 @@
+# VPC: Amazon Virtual Private Cloud
+> Amazon VPC lets you launch AWS resources inside a logically isolated virtual network that you define. You control the IP address range, subnets, route tables, internet gateways, NAT gateways, and security rules.
+
 Amazon Virtual Private Cloud (Amazon VPC) is a service that allows you to launch AWS resources into a logically isolated virtual network that you define. You have complete control over your virtual networking environment, including the selection of your own IP address range, creation of subnets, and configuration of route tables and network gateways.
 
 #### Key Features of Amazon VPC

@@ -1,3 +1,6 @@
+# ELB: Elastic Load Balancing
+> Amazon ELB automatically distributes incoming traffic across multiple targets (EC2, containers, IPs, Lambda) across Availability Zones for high availability and fault tolerance. It comes in three flavors: ALB (layer 7), NLB (layer 4), and CLB (legacy).
+
 Amazon Elastic Load Balancing (ELB) is a fully managed load balancing service provided by Amazon Web Services (AWS). ELB automatically distributes incoming application traffic across multiple targets, such as Amazon EC2 instances, containers, IP addresses, and Lambda functions, in one or more Availability Zones. This ensures high availability, fault tolerance, and scalability of your applications.
 
 #### Key Features of Elastic Load Balancing

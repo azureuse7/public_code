@@ -1,3 +1,6 @@
+# Bash Script: Parsing .tfvars Files and Setting Azure DevOps Pipeline Variables
+> This script reads a Terraform `.tfvars` file line by line, extracts key-value pairs, and exports them as Azure DevOps pipeline variables using the `##vso[task.setvariable]` logging command.
+
 ```bash
 script: |
 # Path to the .tfvars file

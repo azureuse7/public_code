@@ -1,4 +1,7 @@
-### IAM : Idenity and Access managment 
+# IAM: Identity and Access Management
+> IAM is the AWS service that controls **who** can authenticate and **what** they are authorized to do. It manages users, groups, roles, and policies to enforce the principle of least privilege across your AWS account.
+
+### IAM : Idenity and Access managment
 
 ### Components of IAM 
 

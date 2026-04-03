@@ -1,3 +1,6 @@
+# Bash Case Statements
+> Case statements provide a multi-branch conditional structure in Bash — similar to `switch` in other languages. They match a variable against a series of patterns and execute the matching block, making scripts easier to read than long `if/elif` chains.
+
 ```bash
 #!/bin/bash
 

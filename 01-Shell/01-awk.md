@@ -1,4 +1,7 @@
-- **awk** is a powerful text processing tool in Unix/Linux environments, commonly used for pattern scanning and processing. It allows you to manipulate and extract data from text files or input streams. 
+# AWK: Text Processing in Bash
+> `awk` is a Unix/Linux tool for pattern scanning and field-based text processing. It reads input line by line, splits each line into fields, and applies user-defined patterns and actions — ideal for filtering, extracting, and transforming structured text.
+
+- **awk** is a powerful text processing tool in Unix/Linux environments, commonly used for pattern scanning and processing. It allows you to manipulate and extract data from text files or input streams.
 - Here’s how you can use **awk** in Bash, along with some examples to illustrate its functionality.
 
 ### Basic Syntax

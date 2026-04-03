@@ -1,4 +1,7 @@
-- Using while loops in Bash allows you to execute a block of commands repeatedly as long as a specified condition is true. 
+# Bash While Loops
+> While loops in Bash repeatedly execute a block of commands as long as a condition remains true. They are useful for iterating over file lines, polling for a status, processing input streams, or retrying operations.
+
+- Using while loops in Bash allows you to execute a block of commands repeatedly as long as a specified condition is true.
 - Here's how you can use while loops in Bash, along with some examples to demonstrate their usage.
 
 #### Basic Syntax

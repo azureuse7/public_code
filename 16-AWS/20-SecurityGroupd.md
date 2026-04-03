@@ -1,3 +1,6 @@
+# AWS Security Groups
+> Security Groups are stateful virtual firewalls attached to EC2 instances (and other resources). They control inbound and outbound traffic using allow rules — by default all inbound is denied and all outbound is allowed.
+
 Let's talk about these firewalls
 
 They will control how the traffic is allowed into

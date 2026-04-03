@@ -1,3 +1,6 @@
+# Amazon RDS: Managed Relational Database Service
+> Amazon RDS is a managed service that handles provisioning, patching, backups, and scaling for relational databases. It supports Amazon Aurora, PostgreSQL, MySQL, MariaDB, Oracle, and SQL Server — letting you focus on your application, not the database engine.
+
 - Amazon Relational Database Service (Amazon RDS) is a managed database service provided by Amazon Web Services (AWS) that makes it easy to set up, operate, and scale a relational database in the cloud. Amazon RDS supports multiple database engines, including Amazon Aurora, PostgreSQL, MySQL, MariaDB, Oracle, and Microsoft SQL Server.
 
 ### Key Features of Amazon RDS

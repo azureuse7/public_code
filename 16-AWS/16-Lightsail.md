@@ -1,3 +1,6 @@
+# Amazon Lightsail: Simplified Cloud Platform
+> Lightsail is Amazon's simplified VPS product for developers and small businesses who want straightforward, predictable pricing. It bundles compute, storage, and networking into easy-to-configure plans — a good entry point before moving to full AWS services.
+
 - Amazon Lightsail is a simplified cloud platform designed to make it easy to launch and manage virtual private servers (VPS). It is part of the Amazon Web Services (AWS) ecosystem and is aimed at developers, small businesses, and other users who need a straightforward and cost-effective way to get started with cloud computing.
 
 ### Key Features of Amazon Lightsail

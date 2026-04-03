@@ -1,3 +1,6 @@
+# curl: Making HTTP API Calls in Bash
+> `curl` is a command-line tool for transferring data with URLs. It is widely used to interact with REST APIs — sending POST/GET requests, passing authentication headers, retrieving tokens, and downloading scripts.
+
 ```bash
 response=$( curl -s -k -H "Content-Type: application/json" -X POST -d '{"username":"'$username'", "password":"'$password'"}' ${api_addr}/api/v1/authenticate )
 

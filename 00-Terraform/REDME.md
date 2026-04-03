@@ -1,3 +1,6 @@
+# Terraform Practice Test Notes
+> Key concepts and exam-relevant facts covering Sentinel policies, state management, backends, workspaces, cloud authentication, and Terraform Cloud/Enterprise features.
+
 Practice Test 3
 
 **Sentinel** is a policy-as-code framework integrated with the HashiCorp Enterprise products. Sentinel policies are checked during plan stage. 
