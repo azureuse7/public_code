@@ -3,6 +3,6 @@ def heman(stride: int):
         return stride + x
     return f
 
-sana = incrementor(10)
+sana = heman(10)
 
-print(foo(5))
+print(sana(5))

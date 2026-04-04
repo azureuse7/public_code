@@ -12,8 +12,7 @@ import (
 func TestTerraformAzureResourceGroupExample(t *testing.T) {
 	t.Parallel()
 
-	// subscriptionID is overridden by the environment variable "ARM_SUBSCRIPTION_ID"
-	subscriptionID := ""
+	subscriptionID := "" // set via ARM_SUBSCRIPTION_ID environment variable
 	uniquePostfix := random.UniqueId()
 
 	// Configure Terraform setting up a path to Terraform code.
