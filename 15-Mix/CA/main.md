@@ -1,3 +1,6 @@
+# Certificate Authorities (CA)
+> A Certificate Authority (CA) is a trusted entity that issues digital certificates, binding a public key to an identity. It is the foundation of TLS/HTTPS trust on the internet and in internal PKI (e.g., Vault, cert-manager).
+
 ## 1\. What problem does a CA solve?
 
 Without a CA, if you connect to https://example.com, your browser has no built-in way to know:

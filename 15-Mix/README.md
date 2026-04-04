@@ -21,6 +21,7 @@
 | [13-Dynatrace1/](13-Dynatrace1/) | Dynatrace APM — installation and key concepts |
 | [14-SQL databases and NoSQL.md](14-SQL%20%28Structured%20Query%20Language%29%20databases%20and%20NoSQL%20%28Not%20Only%20SQL%29.md) | SQL vs NoSQL — when to use each, key differences |
 | [15-alias/](15-alias/) | Shell aliases — productivity shortcuts |
+| [17/](17/) | Religious / personal research notes |
 | [CA/](CA/) | Certificate Authority — how CAs work, trust chains |
 
 ---

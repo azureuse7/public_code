@@ -14,7 +14,7 @@
 | [05-azure_policy_custom/](05-azure_policy_custom/) | Custom policy with Terraform |
 | [06-Private-endpoint and service-endpoint/](06-Private-endpoint%20and%20service-endpoint/) | Private Endpoints vs Service Endpoints — when to use each |
 | [07-Keyvault/](07-Keyvault/) | Azure Key Vault — secrets, keys, certificates |
-| [08-Managed-Idenity/](08-Managed-Idenity/) | System-assigned and user-assigned Managed Identity |
+| [08-Managed-Idenity/](08-Managed-Idenity/) | Managed Identity — ExternalDNS MSI setup and VM-to-Storage access |
 | [09-Application-Gateway/](09-Application-Gateway/) | Application Gateway — layer-7 load balancing and WAF |
 | [10-Refresh/](10-Refresh/) | Terraform refresh-only for Azure resources |
 | [11-Terratest/](11-Terratest/) | Terratest — Go-based infrastructure tests for Azure |
@@ -23,7 +23,6 @@
 | [16-Azure Private DNS/](16-Azure%20Private%20DNS/) | Private DNS zones — custom DNS resolution inside VNets |
 | [17-Azure Service Tags/](17-Azure%20Service%20Tags/) | Service Tags — simplify NSG rules for Azure services |
 | [18-Loadbalancer/](18-Loadbalancer/) | Azure Load Balancer — layer-4 inbound/outbound rules |
-| [19-Managed-Idenity/](19-Managed-Idenity/) | Managed Identity advanced patterns |
 | [20-RBAC/](20-RBAC/) | Azure RBAC — built-in and custom roles, role assignments |
 | [21-Azure Cosmos DB.md](21-Azure%20Cosmos%20DB.md) | Cosmos DB — NoSQL, APIs, partitioning, consistency levels |
 | [22-Azure Cosmos DB-cli.md](22-Azure%20Cosmos%20DB-cli.md) | Cosmos DB CLI commands |

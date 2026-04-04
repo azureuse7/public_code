@@ -47,7 +47,8 @@
 | [31-Secrets/](31-Secrets/) | Kubernetes Secrets and Azure Key Vault CSI driver |
 | [32-SideCar/](32-SideCar/) | Sidecar pattern — log shippers, proxy containers |
 | [34-ServiceAccount/](34-ServiceAccount/) | ServiceAccounts and Workload Identity |
-| [35-Assigning-Pods-to-Nodes/](35-Assigning-Pods-to-Nodes/) | Advanced pod scheduling |
+| [35-Assigning-Pods-to-Nodes/](35-Assigning-Pods-to-Nodes/) | Advanced pod scheduling YAML manifests |
+| [43-Falco/](43-Falco/) | Falco — runtime security monitoring via Helm/Terraform, ACNS/WireGuard encryption notes |
 
 ---
 
