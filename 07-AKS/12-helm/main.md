@@ -1,336 +1,265 @@
-# Helm Install 
+# Helm on Kubernetes
+> Helm is the package manager for Kubernetes. Charts bundle all the Kubernetes manifests for an application. This guide covers the core CLI workflow, creating your own chart, and deploying charts via Terraform.
 
-## Step-02: List, Add and Search Helm Repository
-- [Bitnami Applications packaged using Helm](https://bitnami.com/stacks/helm)
-- [Search for Helm Charts at Artifacthub.io](https://artifacthub.io/)
-```t
-# List Helm Repositories
+---
+
+## 1. Manage Helm Repositories
+
+```bash
+# List configured repositories
 helm repo list
 
-# Add Helm Repository
-helm repo add <DESIRED-NAME> <HELM-REPO-URL>
-helm repo add mybitnami https://charts.bitnami.com/bitnami
-
-# List Helm Repositories
-helm repo list
-
-# Search Helm Repository
-helm search repo <KEY-WORD>
-helm search repo nginx
-helm search repo apache
-helm search repo wildfly
-```
-
-## Step-03: Install Helm Chart
-
-```t
-# Update Helm Repo
-helm repo update  # Make sure we get the latest list of charts
-
-# Install Helm Chart
-helm install <RELEASE-NAME> <repo_name_in_your_local_desktop/chart_name>
-helm install mynginx mybitnami/nginx
-```
-
-## Step-04: List Helm Releases
-
-```t
-# List Helm Releases (Default Table Output)
-helm list 
-helm ls
--
-
-# List Helm Releases (YAML Output)
-helm list --output=yaml
-
-# List Helm Releases (JSON Output)
-helm list --output=json
-
-# List Helm Releases with namespace flag
-helm list --namespace=default
-helm list -n default
-```
-
-## Step-05: List Kubernetes Resources
-```t
-# List Kubernetes Pods
-kubectl get pods
-
-# List Kubernetes Services
-kubectl get svc
-Observation: Review the EXTERNAL-IP field and you will see it as localhost. Access the nginx page from local desktop localhost
-
-# Access Nginx Application on local desktop browser
-http://localhost:80
-http://127.0.0.1:80
-
-# Access Application using curl command
-curl http://localhost:80
-curl http://127.0.0.1:80
-```
-## Step-06: Uninstall Helm Release - NO FLAGS
-```t
-# List Helm Releases
-helm ls
-
-# Uninstall Helm Release
-helm uninstall <RELEASE-NAME>
-helm uninstall mynginx 
-```
-# Helm Upgrade with set option
-
-
-
-## Step-02: Custom Helm Repo
-
-- [StackSimplify Helm Repo hosted on GitHub](https://stacksimplify.github.io/helm-charts/)
-- [GitHub Repository for StackSimplify Helm Repo](https://github.com/stacksimplify/helm-charts)
-- [artifacthub.io](https://artifacthub.io): Search for `stacksimplify`
-- [mychart1 from artifacthub.io](https://artifacthub.io/packages/helm/stacksimplify/mychart1)
-
-
-### Step-02-02: Add Custom Helm Repo
-```t
-# List Helm Repositories
-helm repo list
-
-# Add Helm Repository
-helm repo add <DESIRED-NAME> <HELM-REPO-URL>
+# Add a repository
+helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo add stacksimplify https://stacksimplify.github.io/helm-charts/
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
-# List Helm Repositories
-helm repo list
+# Update all repositories (fetch latest chart index)
+helm repo update
 
-# Search Helm Repository
-helm search repo <KEY-WORD>
+# Search for a chart
+helm search repo nginx
 helm search repo mychart1
+helm search repo mychart2 --versions   # show all available chart versions
 ```
 
-## Step-03: Install Helm Chart from our Custom Helm Repository
-```t
-# Install myapp1 Helm Chart
-helm install <RELEASE-NAME> <repo_name_in_your_local_desktop/chart_name>
-helm install myapp1 stacksimplify/mychart1 
+---
+
+## 2. Install a Chart
+
+```bash
+# Install with auto-generated release name
+helm install my-nginx bitnami/nginx
+
+# Install a specific chart version
+helm install myapp stacksimplify/mychart2 --version "0.1.0"
+
+# Install into a specific namespace (creates it if it doesn't exist)
+helm install myapp stacksimplify/mychart1 --namespace demo --create-namespace
+
+# Override a value at install time
+helm install myapp stacksimplify/mychart1 --set image.tag=2.0.0
+
+# Install from a local chart directory
+helm install myapp ./myapp --namespace demo --create-namespace
 ```
-## Step-04: List Resources and Access Application in Browser
-```t
-# List Helm Release
-helm ls 
-or 
+
+---
+
+## 3. List and Inspect Releases
+
+```bash
+# List all releases (current namespace)
 helm list
+helm list --namespace demo
 
-# List Pods
-kubectl get pods
-
-# List Services 
-kubectl get svc
-
-# Access Application
-http://localhost:<NODE-PORT>
-http://localhost:31231
-```
-
-## Step-04: Helm Upgrade
-- [kubenginx Docker Image with 1.0.0, 2.0.0, 3.0.0, 4.0.0](https://github.com/users/stacksimplify/packages/container/package/kubenginx)
-```t
-# Review the Docker Image Versions we are using
-https://github.com/users/stacksimplify/packages/container/package/kubenginx
-Image Tags: 1.0.0, 2.0.0, 3.0.0, 4.0.0
-
-# Helm Upgrade
-helm upgrade <RELEASE-NAME> <repo_name_in_your_local_desktop/chart_name> --set <OVERRIDE-VALUE-FROM-values.yaml>
-helm upgrade myapp1 stacksimplify/mychart1 --set "image.tag=2.0.0"
-```
-## Step-05: List Resources after helm upgrade
-```t
-# List Helm Releases
-helm list 
-Observation: We should see Revision as 2
-
-# Additional List commands
-helm list --superseded
+# Filter by state
 helm list --deployed
+helm list --superseded
+helm list --failed
 
-# List and Describe Pod
-kubectl get pods
-kubectl describe pod <POD-NAME> 
-Observation: In the Pod Events you should find that "ghcr.io/stacksimplify/kubenginx:2.0.0" is pulled or if already exists on desktop it will be used to create this new pod
+# Show release status and deployed resources
+helm status myapp
+helm status myapp --show-resources
 
-# Access Application
-http://localhost:<NODE-PORT>
-http://localhost:31231
-Observation: Version 2 of application should be displayed
+# Show full revision history
+helm history myapp
 ```
 
-## Step-06: Do two more helm upgrades - For practice purpose
-```t
-# Helm Upgrade to 3.0.0
-helm upgrade myapp1 kalyan-repo/myapp1 --set "image.tag=3.0.0"
+---
 
-# Access Application
-http://localhost:<NODE-PORT>
-http://localhost:31231
+## 4. Upgrade a Release
 
-# Helm Upgrade to 4.0.0
-helm upgrade myapp1 kalyan-repo/myapp1 --set "image.tag=4.0.0"
+```bash
+# Upgrade to a newer chart version
+helm upgrade myapp stacksimplify/mychart2 --version "0.2.0"
 
-# Access Application
-http://localhost:<NODE-PORT>
-http://localhost:31231
+# Upgrade and override a value
+helm upgrade myapp stacksimplify/mychart1 --set "image.tag=3.0.0"
+
+# Upgrade to the latest chart version (no --version flag)
+helm upgrade myapp stacksimplify/mychart2
 ```
 
-## Step-07: Helm History
-- History prints historical revisions for a given release.
-```t
-# helm history
-helm history RELEASE_NAME
-helm history myapp1
+---
+
+## 5. Rollback a Release
+
+```bash
+# Roll back to the previous revision
+helm rollback myapp
+
+# Roll back to a specific revision number
+helm rollback myapp 1
+
+# Confirm the revision after rollback
+helm history myapp
+helm status myapp --show-resources
 ```
 
-## Step-08: Helm Status
-- This command shows the status of a named release. 
-```t
-# Helm Status
-helm status RELEASE_NAME
-helm status myapp1
+---
 
-# Helm Status - Show Description (display the description message of the named release)
-helm status myapp1 --show-desc    
+## 6. Uninstall a Release
 
-# Helm Status - Show Resources (display the resources of the named release)
-helm status myapp1  --show-resources   
-
-# Helm Status - revision (display the status of the named release with revision)
-helm status RELEASE_NAME --revision int
-helm status myapp1 --revision 2
+```bash
+helm uninstall myapp
+helm uninstall myapp --namespace demo
 ```
 
+---
 
+## 7. Creating a Local Chart
 
-# Helm Upgrade with Chart Versions
+### Scaffold a new chart
 
-
-
-## Step-02: Search Helm Repo for mychart2
-- [Review mychart2 in Github Repo](https://github.com/stacksimplify/helm-charts/tree/main)
-- mychart2 has 4 chart versions (0.1.0, 0.2.0, 0.3.0, 0.4.0)
-- mychart2 Chart Versions -> App Version
-- 0.1.0 -> 1.0.0
-- 0.2.0 -> 2.0.0
-- 0.3.0 -> 3.0.0
-- 0.4.0 -> 4.0.0
-- [Review Artifacthub.io](https://artifacthub.io/packages/helm/stacksimplify/mychart2/)
-```t
-# Search Helm Repo
-helm search repo mychart2
-Observation: Should display latest version of mychart2 from stacksimplify helm repo
-
-# Search Helm Repo with --versions
-helm search repo mychart2 --versions
-Observation: Should display all versions of mychart2
-
-# Search Helm Repo with --version
-helm search repo mychart2 --version "CHART-VERSIONS"
-helm search repo mychart2 --version "0.2.0"
-Observation: Should display specified version of helm chart 
+```bash
+mkdir helm-demo && cd helm-demo
+helm create myapp
 ```
 
-## Step-03: Install Helm Chart by specifying Chart Version
-```t
-# Install Helm Chart by specifying Chart Version
-helm install myapp101 stacksimplify/mychart2 --version "CHART-VERSION"
-helm install myapp101 stacksimplify/mychart2 --version "0.1.0"
+Helm generates this structure:
 
-# List Helm Release
-helm list 
-
-# List Kubernetes Resources Deployed as part of this Helm Release
-helm status myapp101 --show-resources
-
-# Access Application
-http://localhost:31232
-
-# View Pod logs
-kubectl get pods
-kubectl logs -f POD-NAME
+```
+myapp/
+├── Chart.yaml          # chart metadata (name, version, appVersion)
+├── values.yaml         # default values
+└── templates/
+    ├── deployment.yaml
+    ├── service.yaml
+    ├── hpa.yaml
+    ├── ingress.yaml
+    ├── _helpers.tpl    # shared template helpers
+    └── tests/
+        └── test-connection.yaml
 ```
 
-## Step-04: Helm Upgrade using Chart Version
-```t
-# Helm Upgrade using Chart Version
-helm upgrade myapp101 stacksimplify/mychart2 --version "0.2.0"
+### Minimal `Chart.yaml`
 
-# List Helm Release
-helm list 
-
-# List Kubernetes Resources Deployed as part of this Helm Release
-helm status myapp101 --show-resources
-
-# Access Application
-http://localhost:31232
-
-# List Release History
-helm history myapp101
+```yaml
+apiVersion: v2
+name: myapp
+description: Simple NGINX deployment demo
+type: application
+version: 0.1.0       # chart version (bump on chart changes)
+appVersion: "1.25.2" # app image tag
 ```
 
-## Step-05: Helm Upgrade without Chart Version
-```t
-# Helm Upgrade using Chart Version
-helm upgrade myapp101 stacksimplify/mychart2
+### Minimal `values.yaml`
 
-# List Helm Release
-helm list 
-
-# List Kubernetes Resources Deployed as part of this Helm Release
-helm status myapp101 --show-resources
-
-# Access Application
-http://localhost:31232
-Observation: Should take the latest release which is Appversion 4.0.0, Chart Version 0.4.0 (Which is default or latest Chart version)
-
-# List Release History
-helm history myapp101
+```yaml
+image:
+  repository: nginx
+  tag: "1.25.2"
+service:
+  type: ClusterIP
+  port: 80
 ```
 
-## Step-06: Helm Rollback
-- Roll back a release to a previous revision or a specific revision
-```t
-# Rollback to previous version
-helm rollback RELEASE-NAME 
-helm rollback myapp101
+### `templates/deployment.yaml`
 
-# List Helm Release
-helm list 
-
-# List Kubernetes Resources Deployed as part of this Helm Release
-helm status myapp101 --show-resources
-
-# Access Application
-http://localhost:31232
-Observation: Should see V2 version of Application (Chart Version 0.2.0, AppVersion 2.0.0)
-
-# List Release History
-helm history myapp101
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "myapp.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "myapp.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "myapp.name" . }}
+    spec:
+      containers:
+        - name: nginx
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 80
 ```
 
-## Step-07: Helm Rollback to specific Revision
-- Roll back a release to a previous revision or a specific revision
-```t
-# Rollback to previous version
-helm rollback RELEASE-NAME REVISION
-helm rollback myapp101 1
+### `templates/service.yaml`
 
-# List Helm Release
-helm list 
-
-# List Kubernetes Resources Deployed as part of this Helm Release
-helm status myapp101 --show-resources
-
-# Access Application
-http://localhost:31232
-Observation: Should see V1 version of Application (Chart Version 0.1.0, AppVersion 1.0.0)
-
-# List Release History
-helm history myapp101
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "myapp.fullname" . }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 80
+  selector:
+    app: {{ include "myapp.name" . }}
 ```
 
+### `templates/tests/test-connection.yaml`
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "myapp.fullname" . }}-test"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  restartPolicy: Never
+  containers:
+    - name: wget
+      image: busybox:1.36
+      command: ['sh', '-c', 'wget -qO- http://{{ include "myapp.fullname" . }}:{{ .Values.service.port }}']
+```
+
+### Lint, render, install, test
+
+```bash
+# Static validation
+helm lint myapp
+
+# Render templates locally without touching the cluster (useful for GitOps/diffs)
+helm template myapp ./myapp | tee rendered.yaml
+
+# Install
+helm install myapp ./myapp --namespace demo --create-namespace
+kubectl get all -n demo
+
+# Port-forward and verify
+kubectl port-forward svc/myapp 8080:80 -n demo
+curl http://localhost:8080
+
+# Run the bundled Helm test
+helm test myapp -n demo
+
+# Upgrade (e.g. bump the image tag)
+helm upgrade myapp ./myapp --set image.tag=1.27.0 -n demo
+
+# Rollback to revision 1
+helm rollback myapp 1 -n demo
+
+# Clean up
+helm uninstall myapp -n demo
+kubectl delete namespace demo
+```
+
+### Helm feature summary
+
+| Step | Feature |
+|------|---------|
+| `helm create` | Scaffolds chart boilerplate |
+| `.Values.*` + Go templating | Parameterise manifests |
+| `helm lint` | Static validation |
+| `helm template` | Offline render for GitOps / diffs |
+| `helm install` / `upgrade` / `rollback` | Release lifecycle |
+| `helm test` | Chart-bundled smoke test |
+| `helm package` + `helm push` | Publish to OCI registry |
+
+---
+
+## 8. Terraform Examples
+
+| Directory | Description |
+|-----------|-------------|
+| [helm-long/](helm-long/) | Full AKS cluster + multiple Helm releases (nginx-ingress, Prometheus, ArgoCD, Harbor, Redis) via Terraform with AAD / kubelogin auth |
+| [helm-local/](helm-local/) | Deploy a local Helm chart with Kustomize post-rendering via Terraform |

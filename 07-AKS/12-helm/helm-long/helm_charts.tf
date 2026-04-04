@@ -142,36 +142,32 @@ resource "helm_release" "harbor" {
     value = "ingress"
   }
   set {
-    name = "harborAdminPassword"
+    name  = "harborAdminPassword"
     value = var.harbor_admin_password
   }
   set {
-    name = "expose.ingress.className"
-    value ="nginx"
+    name  = "expose.ingress.className"
+    value = "nginx"
   }
   set {
-    name = "trace.enabled"
+    name  = "trace.enabled"
     value = "true"
   }
   set {
-    name = "persistence.enabled"
-    value ="true"
+    name  = "persistence.enabled"
+    value = "true"
   }
   set {
-    name = "clair.enabled"
-    value ="true"
+    name  = "clair.enabled"
+    value = "true"
   }
   set {
-    name = "notary.enabled"
-    value ="true"
+    name  = "notary.enabled"
+    value = "true"
   }
   set {
-    name = "trivy.enabled"
-    value ="true"
-  }
-  set {
-    name = "notary.enabled"
-    value ="true"
+    name  = "trivy.enabled"
+    value = "true"
   }
 }
 
