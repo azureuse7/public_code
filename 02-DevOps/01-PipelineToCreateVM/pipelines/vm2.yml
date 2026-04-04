@@ -15,8 +15,6 @@ jobs:
         azurePowerShellVersion: latestVersion
         pwsh: true
 
-
-  - job: Deploy_Virtual_Machines
   - deployment: VirtualMachines
     displayName: Virtual Machines
     environment: ${{ parameters.gagan_Environment }}
@@ -27,18 +25,10 @@ jobs:
           steps:
           - checkout: self
 
-          # - task: InstallSSHKey@0
-            # inputs:
-            #   knownHostsEntry: ''
-            #   sshPublicKey: ''
-            #   sshKeySecureFile: ''
-  
-
           - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
             displayName: "Install Terraform"
             inputs:
-              terraformVersion: $(TF_VERSION)   
-      
+              terraformVersion: $(TF_VERSION)
 
           - task: AzureCLI@2
             displayName: "Terraform Init"
@@ -50,11 +40,9 @@ jobs:
               scriptType: bash
               workingDirectory: $(System.DefaultWorkingDirectory)/gagan_code/vm/
               inlineScript: |
-
-                echo  $(SUBSCRIPTION)
                 TERRAFORM_BACKEND_SUBSCRIPTION_ID=$(az account show --subscription $(SUBSCRIPTION) --query id --output tsv)
                 subId=$(az account show --subscription $(SUBSCRIPTION) --query id --output tsv)
-                
+
                 export ARM_ACCESS_KEY=$ACCOUNT_KEY
                 echo "##vso[task.setvariable variable=ARM_ACCESS_KEY]$ACCOUNT_KEY"
 
@@ -78,8 +66,7 @@ jobs:
                 -backend-config="container_name=tfstate" \
                 -backend-config="key=gagansingh.tfstte" \
                 -backend-config=use_azuread_auth=true \
-                -backend-config="access_key=$(sa01-azdo-accesskey)" 
-
+                -backend-config="access_key=$(sa01-azdo-accesskey)"
 
           - task: AzureCLI@2
             displayName: "Terraform Plan"
@@ -90,21 +77,11 @@ jobs:
               scriptLocation: inlineScript
               scriptType: bash
               workingDirectory: '$(System.DefaultWorkingDirectory)/gagan_code/vm'
-
               inlineScript: |
                 az account set --subscription $(SUBSCRIPTION)
-                TERRAFORM_BACKEND_SUBSCRIPTION_ID=$(az account show --subscription $(SUBSCRIPTION) --query id --output tsv)
-                subId=$(az account show --subscription $(SUBSCRIPTION) --query id --output tsv)
-
-                terraform plan  \
-                -input=false \
-                -out=tfplan
-
-
-
+                terraform plan -input=false -out=tfplan
 
           - task: AzureCLI@2
-
             displayName: "Terraform Apply"
             condition: |
               and
