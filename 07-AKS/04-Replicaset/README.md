@@ -1,12 +1,18 @@
-## Step-02: Create ReplicaSet
+# Kubernetes ReplicaSet - Step-by-Step Guide
 
-### Create ReplicaSet
-- Create ReplicaSet
-```
+A ReplicaSet ensures a specified number of pod replicas are running at any time. This guide covers creating, scaling, testing, and deleting ReplicaSets.
+
+## Step-02: Create a ReplicaSet
+
+Create the ReplicaSet from a manifest file:
+
+```bash
 kubectl create -f replicaset-demo.yml
 ```
-- **replicaset-demo.yml**
-```yml
+
+**`replicaset-demo.yml`:**
+
+```yaml
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
@@ -29,118 +35,122 @@ spec:
 ```
 
 ### List ReplicaSets
-- Get list of ReplicaSets
-```
+
+```bash
 kubectl get replicaset
 kubectl get rs
 ```
 
-### Describe ReplicaSet
-- Describe the newly created ReplicaSet
-```
-kubectl describe rs/<replicaset-name>
+### Describe the ReplicaSet
 
+```bash
+kubectl describe rs/<replicaset-name>
 kubectl describe rs/my-helloworld-rs
-[or]
+# or
 kubectl describe rs my-helloworld-rs
 ```
 
-### List of Pods
-- Get list of Pods
-```
-#Get list of Pods
+### List Pods
+
+```bash
+# List all pods
 kubectl get pods
 kubectl describe pod <pod-name>
 
-# Get list of Pods with Pod IP and Node in which it is running
+# List pods with IP and node information
 kubectl get pods -o wide
 ```
 
-### Verify the Owner of the Pod
-- Verify the owner reference of the pod.
-- Verify under **"name"** tag under **"ownerReferences"**. We will find the replicaset name to which this pod belongs to. 
-```
+### Verify the Owner of a Pod
+
+Check the `ownerReferences` section under `name` to find the ReplicaSet that owns a pod:
+
+```bash
 kubectl get pods <pod-name> -o yaml
-kubectl get pods my-helloworld-rs-c8rrj -o yaml 
+kubectl get pods my-helloworld-rs-c8rrj -o yaml
 ```
 
-## Step-03: Expose ReplicaSet as a Service
-- Expose ReplicaSet with a service (Load Balancer Service) to access the application externally (from internet)
-```
-# Expose ReplicaSet as a Service
-kubectl expose rs <ReplicaSet-Name>  --type=LoadBalancer --port=80 --target-port=8080 --name=<Service-Name-To-Be-Created>
-kubectl expose rs my-helloworld-rs  --type=LoadBalancer --port=80 --target-port=8080 --name=my-helloworld-rs-service
+## Step-03: Expose the ReplicaSet as a Service
 
-# Get Service Info
+Expose the ReplicaSet with a LoadBalancer service to make it accessible from the internet:
+
+```bash
+# Expose as a service
+kubectl expose rs <replicaset-name> --type=LoadBalancer --port=80 --target-port=8080 --name=<service-name>
+kubectl expose rs my-helloworld-rs --type=LoadBalancer --port=80 --target-port=8080 --name=my-helloworld-rs-service
+
+# Get service info
 kubectl get service
 kubectl get svc
-
 ```
-- **Access the Application using External or Public IP**
+
+Access the application using the external IP:
+
 ```
 http://<External-IP-from-get-service-output>/hello
 ```
 
-## Step-04: Test Replicaset Reliability or High Availability 
-- Test how the high availability or reliability concept is achieved automatically in Kubernetes
-- Whenever a POD is accidentally terminated due to some application issue, ReplicaSet should auto-create that Pod to maintain desired number of Replicas configured to achive High Availability.
-```
-# To get Pod Name
+## Step-04: Test ReplicaSet High Availability
+
+ReplicaSet automatically recreates pods that are accidentally terminated. This verifies the high availability behavior:
+
+```bash
+# Get pod names
 kubectl get pods
 
-# Delete the Pod
-kubectl delete pod <Pod-Name>
+# Delete a pod
+kubectl delete pod <pod-name>
 
-# Verify the new pod got created automatically
-kubectl get pods   (Verify Age and name of new pod)
-``` 
-
-## Step-05: Test ReplicaSet Scalability feature 
-- Test how scalability is going to seamless & quick
-- Update the **replicas** field in **replicaset-demo.yml** from 3 to 6.
+# Verify a new pod was created automatically (check the Age and Name columns)
+kubectl get pods
 ```
-# Before change
+
+## Step-05: Test ReplicaSet Scalability
+
+To scale out, update the `replicas` field in `replicaset-demo.yml` from 3 to 6:
+
+```yaml
+# Before
 spec:
   replicas: 3
 
-# After change
+# After
 spec:
   replicas: 6
 ```
-- Update the ReplicaSet
-```
-# Apply latest changes to ReplicaSet
+
+Apply the change and verify:
+
+```bash
+# Apply the updated manifest
 kubectl replace -f replicaset-demo.yml
 
-# Verify if new pods got created
+# Verify new pods were created
 kubectl get pods -o wide
 ```
 
-## Step-06: Delete ReplicaSet & Service
-### Delete ReplicaSet
-```
-# Delete ReplicaSet
-kubectl delete rs <ReplicaSet-Name>
+## Step-06: Delete the ReplicaSet and Service
 
-# Sample Commands
+### Delete the ReplicaSet
+
+```bash
+kubectl delete rs <replicaset-name>
 kubectl delete rs/my-helloworld-rs
-[or]
+# or
 kubectl delete rs my-helloworld-rs
 
-# Verify if ReplicaSet got deleted
+# Verify deletion
 kubectl get rs
 ```
 
-### Delete Service created for ReplicaSet
-```
-# Delete Service
-kubectl delete svc <service-name>
+### Delete the Service
 
-# Sample Commands
+```bash
+kubectl delete svc <service-name>
 kubectl delete svc my-helloworld-rs-service
-[or]
+# or
 kubectl delete svc/my-helloworld-rs-service
 
-# Verify if Service got deleted
+# Verify deletion
 kubectl get svc
 ```

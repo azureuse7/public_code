@@ -1,6 +1,8 @@
-10 AI Tools to replace your tedious work:
+# Useful AI Tools by Category
 
-1. Research
+A curated list of AI tools organized by use case to help replace or augment tedious work.
+
+## 1. Research
 
 - ChatGPT
 - YouChat
@@ -9,21 +11,21 @@
 - Copilot
 - Gemini
 
-2. Image
+## 2. Image
 
 - Fotor
 - Stability AI
 - Midjourney
 - Microsoft Designer
 
-3. CopyWriting
+## 3. Copywriting
 
 - Rytr
 - Copy AI
 - Writesonic
 - Adcreative AI
 
-4. Writing
+## 4. Writing
 
 - Jasper
 - HIX AI
@@ -31,14 +33,14 @@
 - Textblaze
 - Quillbot
 
-5. Website
+## 5. Website
 
 - 10Web
 - Durable
 - Framer
 - Style AI
 
-6. Video
+## 6. Video
 
 - Klap
 - Opus
@@ -47,30 +49,30 @@
 - HeyGen
 - Runway
 - ImgCreator AI
-- Morphstudio .xyz
+- Morphstudio.xyz
 
-7. Meeting
+## 7. Meeting
 
 - Tldv
 - Otter
 - Noty AI
 - Fireflies
 
-8. SEO
+## 8. SEO
 
 - VidIQ
 - Seona AI
 - BlogSEO
-- Keywrds ai
+- Keywrds AI
 
-9. Chatbot
+## 9. Chatbot
 
 - Droxy
 - Chatbase
-- Mutual info
+- Mutual Info
 - Chatsimple
 
-10. Presentation
+## 10. Presentation
 
 - Decktopus
 - Slides AI
@@ -78,14 +80,14 @@
 - Designs AI
 - Beautiful AI
 
-11. Automation
+## 11. Automation
 
 - Make
 - Zapier
 - Xembly
 - Bardeen
 
-12. Prompts
+## 12. Prompts
 
 - FlowGPT
 - Alicent AI
@@ -93,23 +95,23 @@
 - Promptbase
 - Snack Prompt
 
-13. UI/UX
+## 13. UI/UX
 
 - Figma
 - Uizard
 - UiMagic
 - Photoshop
 
-14. Design
+## 14. Design
 
 - Canva
 - Flair AI
 - Designify
 - Clipdrop
 - Autodraw
-- Magician design
+- Magician Design
 
-15. Logo Generator
+## 15. Logo Generator
 
 - Looka
 - Designs AI
@@ -117,22 +119,22 @@
 - Stockimg AI
 - Namecheap
 
-16. Audio
+## 16. Audio
 
-- Lovo ai
-- Eleven labs
+- Lovo AI
+- Eleven Labs
 - Songburst AI
 - Adobe Podcast
 
-17. Marketing
+## 17. Marketing
 
 - Pencil
-- Ai-Ads
+- AI-Ads
 - AdCopy
 - Simplified
 - AdCreative
 
-18. Startup
+## 18. Startup
 
 - Tome
 - Ideas AI
@@ -140,7 +142,7 @@
 - Pitchgrade
 - Validator AI
 
-19. Productivity
+## 19. Productivity
 
 - Merlin
 - Tinywow
@@ -148,7 +150,7 @@
 - Adobe Sensei
 - Personal AI
 
-20. Social media management
+## 20. Social Media Management
 
 - Tapilo
 - Typefully

@@ -1,131 +1,192 @@
-### Configure Cluster Creds (kube config) for Azure AKS Clusters →
-```t
+# Common kubectl Commands for AKS
+
+A quick-reference guide for frequently used `kubectl` and `az aks` commands when working with Azure Kubernetes Service clusters.
+
+## Cluster Access
+
+### Configure Cluster Credentials (kubeconfig)
+
+```bash
 az aks get-credentials --resource-group aks-rg1 --name aksdemo1 --overwrite-existing && kubelogin convert-kubeconfig
 ```
-### Node Status →
 
-```t
-kubectl get nodes/   -o wide
-```
+### Node Status
 
-### List Pods → 
-```t                                          
-kubectl get pods/ po  -n <namespace> / -o wide
+```bash
+kubectl get nodes -o wide
 ```
 
-### Describe the pod →  
-```t                       
-Kubectl describe pod <pod name> -n <namespace>
-```
-### Delete Pod →  
-```t                                   
-kubectl delete pod <Pod name> -n <namespace>
-```
-### Create a Pod →   
-```t                               
-kubectl run <desired-pod-name> --image <Container-Image> 
-```
-### Get Pods from Namespace → 
-```t       
-kubectl get pods -n <namespace> (kubectl get namespace/ns)
-```
-### Logs→   
-```t                                                
-k logs <pod-name> -n <namespace>
-```
-### Stream pod logs with -f-->      
-```t        
-k logs -f <pod-name>
-```
-# Services 
+## Pods
 
-### Service Info →      
-```t                                  
-kubectl get service  -n <namespace>  /svc.    /-o wide
-```
-### Delete Service->   
-```t                           
-delete svc <YourServiceName>
-```
-### Verify if Service got deleted →     
-```t   
-kubectl get svc.   -n <namespace>
-```
- 
-# Replicaset 
+### List Pods
 
-### Replicaset Info →       
-```t                             
-kubectl get replicaset /  rs
+```bash
+kubectl get pods -n <namespace>
+kubectl get po -o wide
 ```
-### Describe  ReplicaSet-> 
-```t                     
+
+### Describe a Pod
+
+```bash
+kubectl describe pod <pod-name> -n <namespace>
+```
+
+### Delete a Pod
+
+```bash
+kubectl delete pod <pod-name> -n <namespace>
+```
+
+### Create a Pod
+
+```bash
+kubectl run <desired-pod-name> --image <container-image>
+```
+
+### Get Pods from a Namespace
+
+```bash
+kubectl get pods -n <namespace>
+kubectl get namespace
+kubectl get ns
+```
+
+### View Pod Logs
+
+```bash
+kubectl logs <pod-name> -n <namespace>
+```
+
+### Stream Pod Logs
+
+```bash
+kubectl logs -f <pod-name>
+```
+
+## Services
+
+### Service Info
+
+```bash
+kubectl get service -n <namespace>
+kubectl get svc -o wide
+```
+
+### Delete a Service
+
+```bash
+kubectl delete svc <service-name>
+```
+
+### Verify Service Deletion
+
+```bash
+kubectl get svc -n <namespace>
+```
+
+## ReplicaSets
+
+### ReplicaSet Info
+
+```bash
+kubectl get replicaset
+kubectl get rs
+```
+
+### Describe a ReplicaSet
+
+```bash
 kubectl describe rs/<replicaset-name>
 ```
-### Delete ReplicaSet->    
-```                         
-kubectl delete rs <ReplicaSet-Name>
+
+### Delete a ReplicaSet
+
+```bash
+kubectl delete rs <replicaset-name>
 ```
 
-### Verify if ReplicaSet got deleted-> 
-```   
+### Verify ReplicaSet Deletion
+
+```bash
 kubectl get rs
-``` 
-# Namespace
+```
 
-### Namespace Info →    
-```                                 
-kubectl get namespace 
-``` 
-### Get all Objects in  namespace-->   
-```      
-kubectl get all. 
-kubectl get all --namespace <external-dns>
-``` 
-### Create name space →     
-```                        
-kubectl create ns <name space>
-``` 
-# Deployment 
+## Namespaces
 
-### Deployments->  
-```                                     
+### List Namespaces
+
+```bash
+kubectl get namespace
+```
+
+### Get All Objects in a Namespace
+
+```bash
+kubectl get all
+kubectl get all --namespace <namespace>
+```
+
+### Create a Namespace
+
+```bash
+kubectl create ns <namespace-name>
+```
+
+## Deployments
+
+### List All Deployments
+
+```bash
 kubectl get deployments --all-namespaces
-``` 
-###  Delete →   
-```                                                     
-kubectl delete -n NAMESPACE deployment DEPLOYMENT
-``` 
+```
 
-### NetworkPolicies-->  
-```                              
-k get NetworkPolicies -n gatekeeper-system
-k edit NetworkPolicies -n gatekeeper-system
-k apply -f <file> -n <namespace>
-``` 
+### Delete a Deployment
 
-###  rolebindings
-``` 
+```bash
+kubectl delete -n <namespace> deployment <deployment-name>
+```
+
+## Network Policies
+
+```bash
+kubectl get NetworkPolicies -n gatekeeper-system
+kubectl edit NetworkPolicies -n gatekeeper-system
+kubectl apply -f <file> -n <namespace>
+```
+
+## RBAC - Role Bindings
+
+List all role bindings and cluster role bindings with their associated service accounts:
+
+```bash
 kubectl get rolebindings,clusterrolebindings \
---all-namespaces  \
--o custom-columns='KIND:kind,NAMESPACE:metadata.namespace,NAME:metadata.name,SERVICE_ACCOUNTS:subjects[?(@.kind=="ServiceAccount")].name
-``` 
-``` 
+  --all-namespaces \
+  -o custom-columns='KIND:kind,NAMESPACE:metadata.namespace,NAME:metadata.name,SERVICE_ACCOUNTS:subjects[?(@.kind=="ServiceAccount")].name'
+```
+
+```bash
 kubectl get clusterroles
 kubectl get clusterrolebindings
-``` 
-#### find your role name and then delete
-``` 
-kubectl delete clusterrolebinding name
-kubectl delete clusterrole name
-``` 
+```
 
-###  log into pod gagan
-``` 
-k  exec -it <pod> /bin/sh
-``` 
-### list the taints
-```t
+Find a role binding by name and delete it:
+
+```bash
+kubectl delete clusterrolebinding <name>
+kubectl delete clusterrole <name>
+```
+
+## Exec into a Pod
+
+```bash
+kubectl exec -it <pod-name> -- /bin/sh
+```
+
+## Taints
+
+List node taints:
+
+```bash
 kubectl get nodes -o json | jq '.items[].spec'
 kubectl get nodes -o json | jq '.items[].spec.taints'
 ```

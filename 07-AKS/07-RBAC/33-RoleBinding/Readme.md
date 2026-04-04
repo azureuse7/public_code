@@ -2,15 +2,13 @@
 
 ## Introduction
 
-Kubernetes exposes a REST API to manage its objects like pods, deployments, services, secrets, ingress, etc.
-It uses the RBAC model to create and assign roles to users, groups and service accounts.
+Kubernetes exposes a REST API to manage its objects such as pods, deployments, services, secrets, and ingress resources. It uses the RBAC model to create and assign roles to users, groups, and service accounts.
 
-
-## 1. Explore Kbernetes API Resources
+## 1. Explore Kubernetes API Resources
 
 <details><summary>kubectl api-resources</summary>
 
-```powershell
+```bash
 kubectl api-resources
 # NAME                              SHORTNAMES          APIVERSION                             NAMESPACED   KIND
 # bindings                                              v1                                     true         Binding
@@ -74,13 +72,14 @@ kubectl api-resources
 # storageclasses                    sc                  storage.k8s.io/v1                      false        StorageClass
 # volumeattachments                                     storage.k8s.io/v1                      false        VolumeAttachment
 ```
+
 </details>
 
-View Kubernetes existing roles
+View existing Kubernetes roles:
 
 <details><summary>kubectl get roles -A</summary>
 
-```powershell
+```bash
 kubectl get roles -A
 # NAMESPACE     NAME                                             CREATED AT
 # kube-public   system:controller:bootstrap-signer               2023-01-01T17:52:17Z
@@ -92,11 +91,12 @@ kubectl get roles -A
 # kube-system   system:controller:token-cleaner                  2023-01-01T17:52:17Z
 # kube-system   system:metrics-server                            2023-01-01T17:52:40Z
 ```
+
 </details>
 
 <details><summary>kubectl get clusterroles -A</summary>
 
-```powershell
+```bash
 kubectl get clusterroles -A
 # NAME                                                                   CREATED AT
 # admin                                                                  2023-01-01T17:52:15Z
@@ -174,13 +174,14 @@ kubectl get clusterroles -A
 # system:volume-scheduler                                                2023-01-01T17:52:16Z
 # view                                                                   2023-01-01T17:52:15Z
 ```
+
 </details>
 
-View Kubernetes existing rolebindings
+View existing role bindings:
 
 <details><summary>kubectl get rolebindings -A</summary>
 
-```powershell
+```bash
 kubectl get rolebindings -A
 # NAMESPACE     NAME                                                ROLE                                                  AGE
 # default       pod-reader-binding                                  Role/pod-reader                                       11m
@@ -194,11 +195,12 @@ kubectl get rolebindings -A
 # kube-system   system:controller:cloud-provider                    Role/system:controller:cloud-provider                 3h40m
 # kube-system   system:controller:token-cleaner                     Role/system:controller:token-cleaner                  3h40m
 ```
+
 </details>
 
 <details><summary>kubectl get clusterrolebindings -A</summary>
 
-```powershell
+```bash
 kubectl get clusterrolebindings -A
 # NAME                                                   ROLE                                                                               AGE
 # aks-cluster-admin-binding                              ClusterRole/cluster-admin                                                          3h40m
@@ -265,18 +267,21 @@ kubectl get clusterrolebindings -A
 # system:service-account-issuer-discovery                ClusterRole/system:service-account-issuer-discovery                                3h40m
 # system:volume-scheduler                                ClusterRole/system:volume-scheduler                                                3h40m
 ```
+
 </details>
 
-## 2. Using Role and RoleBinding to assign roles to users and groups
+## 2. Using Role and RoleBinding to Assign Roles to Users and Groups
 
-```powershell
+Create a namespace for the example:
+
+```bash
 kubectl create namespace my-namespace
 # namespace/my-namespace created
 ```
 
-Create a role for only listing pods
+Create a role that only allows listing pods:
 
-```powershell
+```bash
 kubectl create role pod-reader-role --verb=get --verb=list --verb=watch --resource=pods -n my-namespace -o yaml --dry-run=client > pod-reader-role.yaml
 
 cat pod-reader-role.yaml
@@ -299,9 +304,9 @@ cat pod-reader-role.yaml
 kubectl apply -f pod-reader-role.yaml
 ```
 
-## 3. Create a role binding for user1, user2, and group1 using the pod reader role
+## 3. Create a RoleBinding for user1, user2, and group1
 
-```powershell
+```bash
 kubectl create rolebinding user-pod-reader-binding --role=pod-reader-role --user=user1 --user=user2 --group=group1 -n my-namespace -o yaml --dry-run=client > user-pod-reader-binding.yaml
 
 cat user-pod-reader-binding.yaml
@@ -328,26 +333,26 @@ kubectl apply -f user-pod-reader-binding.yaml
 # rolebinding.rbac.authorization.k8s.io/user-pod-reader-binding created
 ```
 
-Verify the created role and role binding
+Verify the created role and role binding:
 
-```powershell
+```bash
 kubectl get role,rolebinding -n my-namespace
 # NAME                                             CREATED AT
 # role.rbac.authorization.k8s.io/pod-reader-role   2023-01-02T11:00:29Z
-# 
+#
 # NAME                                                            ROLE                   AGE
 # rolebinding.rbac.authorization.k8s.io/user-pod-reader-binding   Role/pod-reader-role   22m
 ```
 
-## 4. Verify user access using impersonation
+## 4. Verify User Access Using Impersonation
 
-Check with the right action, namespace and user
+Check access with the correct action, namespace, and user:
 
-```powershell
+```bash
 kubectl auth can-i get pods --namespace my-namespace --as user1
 # yes
 
-kubectl create deployment nginx --image=nginx -n my-namespace --replicas=2 # as myself
+kubectl create deployment nginx --image=nginx -n my-namespace --replicas=2
 # deployment.apps/nginx created
 
 kubectl get pods --namespace my-namespace --as user1
@@ -356,9 +361,9 @@ kubectl get pods --namespace my-namespace --as user1
 # nginx-76d6c9b8c-wst6z   1/1     Running   0          9s
 ```
 
-Verify with not allowed user
+Verify that an unauthorized user is denied:
 
-```powershell
+```bash
 kubectl auth can-i get pods --namespace my-namespace --as user3
 # no
 
@@ -366,15 +371,16 @@ kubectl get pods --namespace my-namespace --as user3
 # Error from server (Forbidden): pods is forbidden: User "user3" cannot list resource "pods" in API group "" in the namespace "my-namespace"
 ```
 
-Verify with not allowed resource
+Verify that an authorized user cannot access a resource outside their role:
 
-```powershell
+```bash
 kubectl auth can-i get secrets --namespace my-namespace --as user1
 # no
 ```
 
-Verify with not allowed namespace
-```powershell
+Verify that an authorized user cannot access a different namespace:
+
+```bash
 kubectl auth can-i get pods --namespace default --as user1
 # no
 ```

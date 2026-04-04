@@ -1,9 +1,13 @@
-There may be times when the nginx ingress external IP (load balancer) is needed while configuring deployments. Below is example code showing how to retrieve it using a terraform data call:
+# Ingress - Basics
 
+## Retrieving the Ingress Controller External IP (Terraform)
 
+There may be times when the NGINX Ingress external IP (load balancer) is needed while configuring deployments. Below is example code showing how to retrieve it using a Terraform data call:
+
+```hcl
 data "kubernetes_service" "example" {
   metadata {
-    name = "ingress-nginx-controller"
+    name      = "ingress-nginx-controller"
     namespace = "ingress-nginx"
   }
 }
@@ -11,32 +15,34 @@ data "kubernetes_service" "example" {
 output "test" {
   value = data.kubernetes_service.example.status[0].load_balancer[0].ingress[0].ip
 }
+```
 
-# Ingress - Basics
+## Step-01: Introduction
 
-### Ingress Basic Architecture
 [![Image](https://www.stacksimplify.com/course-images/azure-aks-ingress-basic.png "Azure AKS Kubernetes - Masterclass")](https://www.udemy.com/course/aws-eks-kubernetes-masterclass-devops-microservices/?referralCode=257C9AD5B5AF8D12D1E1)
 
+## Step-02: Create a Static Public IP
 
-## Step-02: Create Static Public IP
-```t
-# Get the resource group name of the AKS cluster 
+```bash
+# Get the resource group name of the AKS cluster
 az aks show --resource-group aks-rg1 --name aksdemo1 --query nodeResourceGroup -o tsv
 
-# TEMPLATE - Create a public IP address with the static allocation
+# Template - create a public IP address with static allocation
 az network public-ip create --resource-group <REPLACE-OUTPUT-RG-FROM-PREVIOUS-COMMAND> --name myAKSPublicIPForIngress --sku Standard --allocation-method static --query publicIp.ipAddress -o tsv
 
-# REPLACE - Create Public IP: Replace Resource Group value
+# Example - replace the resource group value
 az network public-ip create --resource-group MC_aks-rg1_aksdemo1_centralus --name myAKSPublicIPForIngress --sku Standard --allocation-method static --query publicIp.ipAddress -o tsv
 ```
-- Make a note of Static IP which we will use in next step when installing Ingress Controller
-```t
-# Make a note of Public IP created for Ingress
+
+Make a note of the static IP, which will be used in the next step when installing the Ingress Controller:
+
+```
 52.154.156.139
 ```
 
-## Step-03: Install Ingress Controller
-```t
+## Step-03: Install the Ingress Controller
+
+```bash
 # Install Helm3 (if not installed)
 brew install helm
 
@@ -47,139 +53,105 @@ kubectl create namespace ingress-basic
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 
-#  Customizing the Chart Before Installing. 
+# Inspect available values before installing
 helm show values ingress-nginx/ingress-nginx
 
-# Use Helm to deploy an NGINX ingress controller
+# Template - deploy NGINX ingress controller using Helm
 helm install ingress-nginx ingress-nginx/ingress-nginx \
     --namespace ingress-basic \
     --set controller.replicaCount=2 \
     --set controller.nodeSelector."kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux \
     --set controller.service.externalTrafficPolicy=Local \
-    --set controller.service.loadBalancerIP="REPLACE_STATIC_IP" 
+    --set controller.service.loadBalancerIP="REPLACE_STATIC_IP"
 
-# Replace Static IP captured in Step-02 (without beta for NodeSelectors)
+# Example - replace with the static IP captured in Step-02
 helm install ingress-nginx ingress-nginx/ingress-nginx \
     --namespace ingress-basic \
     --set controller.replicaCount=2 \
     --set controller.nodeSelector."kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux \
     --set controller.service.externalTrafficPolicy=Local \
-    --set controller.service.loadBalancerIP="52.154.156.139"     
+    --set controller.service.loadBalancerIP="52.154.156.139"
 
-
-# List Services with labels
+# List services with labels
 kubectl get service -l app.kubernetes.io/name=ingress-nginx --namespace ingress-basic
 
-# List Pods
+# List pods
 kubectl get pods -n ingress-basic
 kubectl get all -n ingress-basic
 
+# Access the public IP — expect a 404 Not Found response from Nginx
+# http://<Public-IP-created-for-Ingress>
 
-# Access Public IP
-http://<Public-IP-created-for-Ingress>
-
-# Output should be
-404 Not Found from Nginx
-
-# Verify Load Balancer on Azure Mgmt Console
-Primarily refer Settings -> Frontend IP Configuration
+# Verify the load balancer in the Azure Portal under Settings -> Frontend IP Configuration
 ```
 
-## Step-05: Deploy Application k8s manifests and verify
-```t
+## Step-05: Deploy Application Manifests and Verify
+
+```bash
 # Deploy
 kubectl apply -f kube-manifests/
 
-# List Pods
+# List pods
 kubectl get pods
 
-# List Services
+# List services
 kubectl get svc
 
-# List Ingress
+# List ingress resources
 kubectl get ingress
 
-# Access Application
-http://<Public-IP-created-for-Ingress>/app1/index.html
-http://<Public-IP-created-for-Ingress>
+# Access the application
+# http://<Public-IP-created-for-Ingress>/app1/index.html
+# http://<Public-IP-created-for-Ingress>
 
-# Verify Ingress Controller Logs
+# Verify Ingress Controller logs
 kubectl get pods -n ingress-basic
 kubectl logs -f <pod-name> -n ingress-basic
 ```
 
-## Step-06: Clean-Up Apps
-```t
-# Delete Apps
+## Step-06: Clean Up Apps
+
+```bash
 kubectl delete -f kube-manifests/
 ```
 
-Ingress:
+## How Ingress Works
 
-So generally we have the below setup: 
+A typical setup without Ingress looks like this:
 
 <img src="images/1.png">
 
-
-
-One is fine but what if we had more examples:
+When you have multiple services, each needing its own load balancer, the cost and complexity grows:
 <img src="images/2.png">
 
-
-This is not good. we can use Ingress
+Ingress solves this by acting as a single entry point that routes traffic to multiple services:
 <img src="images/3.png">
 
 <img src="images/4.png">
 
-So how does it tie up:
+The routing chain works as follows:
 <img src="images/5.png">
 
+- **Deployment** has a label: `app: app1-nginx`
+- **Service** uses a selector: `app: app1-nginx`
+- **Ingress** defines a path and points to the service `app1-nginx-clusterip-service`
 
-Deployment--> Label      → app -> app1-nginx 
+In short, the Ingress rule says:
+- For path `/`, route to service `app1-nginx-clusterip-service`
+- The service then forwards to the pod matching its selector
+- A DNS record maps a hostname to the Ingress IP address
 
-Service.       --> Selector--> app → app1-nginx
-
-Ingress: 
-
-- Annotation:
-
-- path:
-
-- Service: Its tells which service to use i.e. app1-nginx-clusterip-service
-
-So in short Ingress tell:
-
-what my path here,  its /
-
-Route  to service, here the service is  app1-nginx-clusterip-service
-
-The service knows which deployment to go to:  here its app1-nginx 
-
-We define an ingress rule that forwards the request based on one name and DNS maps name with IP 
-
-This is how the Service will know where to forward the request to which pod
-
-Now the question comes if  a Pod has two containers how does it know which port to forward 
-
+When a pod has multiple containers, the service uses the `targetPort` to forward to the correct container port:
 <img src="images/6.png">
-
-
-
-This is done using the Target port as below
 
 <img src="images/7.png">
 
+The target port (for example, `3000`) is matched using labels:
 
-
-It will look at label and then the target port example 3000 here
-
-As below:
-
-path / goes to -->
-
-path /track-joker goes to →
+- Path `/` routes to one service
+- Path `/track-joker` routes to another
 
 <img src="images/8.png">
 <img src="images/9.png">

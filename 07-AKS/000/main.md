@@ -1,133 +1,91 @@
-(https://www.youtube.com/watch?v=_pBYrm_CNrQ)
+# Azure Policy and OPA Gatekeeper on AKS
 
-- Create a Cluster with policy add-on enabled.
+Reference video: [Azure Policy with OPA Gatekeeper on AKS](https://www.youtube.com/watch?v=_pBYrm_CNrQ)
+
+## Step-01: Create a Cluster with Policy Add-On
+
+- Create a cluster with the policy add-on enabled.
 <img src="images/a.png">
 
-- Log in to the to the cluster.
-- You can see that the policy is running.
+## Step-02: Log In and Verify
+
+- Log in to the cluster.
+- Confirm that the policy pods are running.
 <img src="images/2.png">
-You can also see gatekeeper namespace has been created and pods
+
+You can also see that the `gatekeeper` namespace has been created and its pods are running.
 <img src="images/3.png">
 
-Check what constraints are running.
-``` 
- k get constraint template
-``` 
-- https://open-policy-agent.github.io/gatekeeper/website/docs/constrainttemplates/
-``` 
- k get constraint
-``` 
-- These constraints can't be changed, using Kubectl; you have to edit the Azure policy.
--These are dry runs.
+## Step-03: Review Existing Constraints
 
-Now let's check a constrainttemplate
- and view the definition.
-```  
-kubcetl get constrainttemplate <>
-``` 
-### Now let's test this
+Check what constraint templates are currently running:
 
-Let's create a pod with privileges.
+```bash
+kubectl get constrainttemplate
+```
+
+Reference: [OPA Gatekeeper Constraint Templates](https://open-policy-agent.github.io/gatekeeper/website/docs/constrainttemplates/)
+
+```bash
+kubectl get constraint
+```
+
+- These constraints cannot be changed using `kubectl`; you must edit them from Azure Policy.
+- These are dry-run mode by default.
+
+View the definition of a specific constraint template:
+
+```bash
+kubectl get constrainttemplate <name>
+```
+
+### Step-04: Test the Policy
+
+Let's create a pod with elevated privileges.
 <img src="images/4.png">
-Let's apply this and run.
+
+Apply and run it:
 <img src="images/5.png">
-Lets check,
+
+Check the result:
 <img src="images/6.png">
-We were able to create the pod because the Constrait policy allowed us
+
+We were able to create the pod because the constraint policy allowed it (dry-run mode).
 <img src="images/7.png">
-Now we can't change this from Kubectl, but we need to do it from Azure Policy.
-- Notice we have two agreements now.
+
+Note that constraints cannot be changed from `kubectl` — changes must be made through Azure Policy. Notice there are two assignments now.
 <img src="images/20.png">
 
+## Step-05: Create a Policy Definition to Enforce Denial
 
-Let's create a definition.
+Let's create a new policy definition.
 <img src="images/8.png">
+
 Select Kubernetes.
 <img src="images/9.png">
-Select the pod security baseline.
+
+Select the Pod Security Baseline.
 <img src="images/10.png">
-Let's assign it
+
+Assign it to your scope.
 <img src="images/11.png">
-Select Scope, and let's add the scope.
+
+Select the scope and add it.
 <img src="images/12.png">
-From audit, apply to deny
+
+Change the effect from **Audit** to **Deny**.
 <img src="images/13.png">
-- Notice we have two agreements now.
+
+Notice there are now two assignments.
 <img src="images/15.png">
-We can see we have two
+
+We can confirm both assignments are active.
 <img src="images/16.png">
 
-- Let's check the enforcings. notice is denied now.
+## Step-06: Verify Enforcement
+
+Check the enforcements — the policy effect is now **Deny**.
 <img src="images/17.png">
 
-
-Let's try to apply the pod now.
-Notice it fails.
+Try to apply the privileged pod again. Notice it now fails as expected.
 <img src="images/18.png">
-
-
-
-
-
-
-<!-- 
-(https://www.youtube.com/watch?v=_pBYrm_CNrQ)
-
-- Create a clsuter with policy add on enabled 
-<img src="images/a.png">
-
-- Log in cluster and run 
-- You can se pod with policy are running 
-<img src="images/2.png">
-- You can also see gatekeeper namespace is created and pods 
-<img src="images/3.png">
-
-- check what constrainys are running 
-- k get constrainttemplate
-- https://open-policy-agent.github.io/gatekeeper/website/docs/constrainttemplates/
-- 
-- k get constraint
-These constrain can 't be changed husng kubectl, you have to edit from azure policy 
-These are dry run 
-
-Now lets check a constrait and view the deintaion 
-- kubcetl get constrainttemplate <>
-### Now lets Test This
-
-- Lets create a pod with privilege 
-<img src="images/4.png">
-- Lets aapply this and run 
-<img src="images/5.png">
-- lets check,
-<img src="images/6.png">
-- we were able to create the pod becuase the constrait policy allowed us 
-<img src="images/7.png">
-- Now we can't change this from kubectl but we need to do it from azure policy 
-- Notice we have two assigmnets now
-<img src="images/20.png">
-
-
-- Lets create a defination
-<img src="images/8.png">
-- Select Kubernetes 
-<img src="images/9.png">
-- Select Pod security baseline
-<img src="images/10.png">
-- Let assign it 
-<img src="images/11.png">
-- Select Scope and lets aadd the scop
-<img src="images/12.png">
-- From audit apply to deny
-<img src="images/13.png">
-- Notice we have two assigmnets now
-<img src="images/15.png">
-- we can see we have two co
-<img src="images/16.png">
-
-- let check the enforments. notice is deny now
-<img src="images/17.png">
-
-
-- Let try to apply now the pod
-- Notice it fails 
-<img src="images/18.png"> -->

@@ -1,155 +1,136 @@
-### Create a Pod
-- Create a Pod
-```
+# Kubernetes Pods - Getting Started
+
+A Pod is the smallest deployable unit in Kubernetes. This guide covers creating, inspecting, exposing, and cleaning up pods.
+
+## Step-01: Create a Pod
+
+```bash
 # Template
-kubectl run <desired-pod-name> --image <Container-Image> 
+kubectl run <desired-pod-name> --image <container-image>
 
-# Replace Pod Name, Container Image
+# Example
 kubectl run my-first-pod --image stacksimplify/kubenginx:1.0.0
-```  
-
-### List Pods
-- Get the list of pods
 ```
-# List Pods
+
+## Step-02: List Pods
+
+```bash
+# List pods
 kubectl get pods
 
-# Alias name for pods is po
+# Short alias for pods
 kubectl get po
 ```
 
-### List Pods with wide option
-- List pods with wide option which also provide Node information on which Pod is running
-```
+List pods with the wide option to also see which node each pod is running on:
+
+```bash
 kubectl get pods -o wide
 ```
 
-### To get list of pod names
-kubectl get pods
+## Step-03: Describe a Pod
 
-### Describe the Pod
-kubectl describe pod <Pod-Name>
-kubectl describe pod my-first-pod 
+```bash
+kubectl describe pod <pod-name>
+kubectl describe pod my-first-pod
 ```
 
-### Access Application
-- Currently we can access this application only inside worker nodes. 
-- To access it externally, we need to create a **NodePort or Load Balancer Service**. 
-- **Services** is one very very important concept in Kubernetes. 
+## Step-04: Expose a Pod with a Service
 
-### Delete Pod
-```
-### To get list of pod names
-kubectl get pods
+Currently the application is only accessible inside worker nodes. To access it externally, you need to create a **NodePort** or **Load Balancer** service.
 
-### Delete Pod
-kubectl delete pod <Pod-Name>
-kubectl delete pod my-first-pod
-```
+Before creating the service, verify the Azure Standard Load Balancer configuration in the Azure portal:
+- Frontend IP Configuration
+- Load Balancing Rules
+- Azure Public IP
 
+```bash
+# Create a pod
+kubectl run <desired-pod-name> --image <container-image>
+kubectl run my-first-pod --image stacksimplify/kubenginx:1.0.0
 
-## Step-04: Demo - Expose Pod with a Service
-- Expose pod with a service (Load Balancer Service) to access the application externally (from internet)
-- **Ports**
-  - **port:** Port on which node port service listens in Kubernetes cluster internally
-  - **targetPort:** We define container port here on which our application is running.
-- Verify the following before LB Service creation
-  - Azure Standard Load Balancer created for Azure AKS Cluster
-    - Frontend IP Configuration
-    - Load Balancing Rules
-  - Azure Public IP 
-```
-# Create  a Pod
-kubectl run <desired-pod-name> --image <Container-Image> 
-kubectl run my-first-pod --image stacksimplify/kubenginx:1.0.0 
+# Expose the pod as a LoadBalancer service
+kubectl expose pod <pod-name> --type=LoadBalancer --port=80 --name=<service-name>
+kubectl expose pod my-first-pod --type=LoadBalancer --port=80 --name=my-first-service
 
-### Expose Pod as a Service
-kubectl expose pod <Pod-Name>  --type=LoadBalancer --port=80 --name=<Service-Name>
-kubectl expose pod my-first-pod  --type=LoadBalancer --port=80 --name=my-first-service
-
-### Get Service Info
+# Get service info
 kubectl get service
 kubectl get svc
 
-### Describe Service
+# Describe the service
 kubectl describe service my-first-service
 
-### Access Application
-http://<External-IP-from-get-service-output>
+# Access the application
+# http://<External-IP-from-get-service-output>
 ```
-- Verify the following after LB Service creation
-  - Azure Standard Load Balancer created for Azure AKS Cluster
-    - Frontend IP Configuration
-    - Load Balancing Rules
-  - Azure Public IP
-- View the resources in Azure AKS Cluster - Resources section from Azure Portal Management Console  
 
-
+After creating the service, verify in the Azure portal:
+- Azure Standard Load Balancer: Frontend IP Configuration and Load Balancing Rules
+- Azure Public IP
+- Resources section of the AKS cluster in the Azure Portal Management Console
 
 ## Step-05: Interact with a Pod
 
-### Verify Pod Logs
-```
-### Get Pod Name
+### View Pod Logs
+
+```bash
+# Get pod name
 kubectl get po
 
-### Dump Pod logs
+# Dump pod logs
 kubectl logs <pod-name>
 kubectl logs my-first-pod
 
-### Stream pod logs with -f option and access application to see logs
-kubectl logs <pod-name>
+# Stream pod logs with -f option
 kubectl logs -f my-first-pod
 ```
-- **Important Notes**
-  - Refer below link and search for **Interacting with running Pods** for additional log options
-  - Troubleshooting skills are very important. So please go through all logging options available and master them.
-  - **Reference:** https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
-### Connect to Container in a POD
-- **Connect to a Container in POD and execute commands**
-```
-### Connect to Nginx Container in a POD
+> **Note:** Refer to the [kubectl cheat sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/) and search for "Interacting with running Pods" for additional log options.
+
+### Connect to a Container in a Pod
+
+```bash
+# Connect to the Nginx container in a pod
 kubectl exec -it <pod-name> -- /bin/bash
 kubectl exec -it my-first-pod -- /bin/bash
 
-### Execute some commands in Nginx container
+# Execute commands inside the Nginx container
 ls
 cd /usr/share/nginx/html
 cat index.html
 exit
 ```
 
-- **Running individual commands in a Container**
-```
-kubectl exec -it <pod-name> -- env
+Run individual commands in a container without opening an interactive shell:
 
-### Sample Commands
+```bash
 kubectl exec -it my-first-pod -- env
 kubectl exec -it my-first-pod -- ls
 kubectl exec -it my-first-pod -- cat /usr/share/nginx/html/index.html
 ```
-## Step-06: Get YAML Output of Pod & Service
-### Get YAML Output
-```
-# Get pod definition YAML output
-kubectl get pod my-first-pod -o yaml   
 
-# Get service definition YAML output
-kubectl get service my-first-service -o yaml   
+## Step-06: Get YAML Output of Pod and Service
+
+```bash
+# Get pod definition as YAML
+kubectl get pod my-first-pod -o yaml
+
+# Get service definition as YAML
+kubectl get service my-first-service -o yaml
 ```
 
-## Step-07: Clean-Up
-```
-# Get all Objects in default namespace
+## Step-07: Clean Up
+
+```bash
+# Get all objects in the default namespace
 kubectl get all
 
-# Delete Services
+# Delete the service
 kubectl delete svc my-first-service
 
-# Delete Pod
+# Delete the pod
 kubectl delete pod my-first-pod
 
-# Get all Objects in default namespace
+# Verify all objects are deleted
 kubectl get all
 ```

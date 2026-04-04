@@ -1,19 +1,29 @@
-https://genekuo.medium.com/using-hashicorp-vault-as-certificate-manager-on-a-kubernetes-cluster-155604d39a60
-https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-azure-aks
-https://aperogeek.fr/hashicorp-vault-pki-cert-manager/
-https://www.ibm.com/docs/en/cloud-private/3.2.x?topic=manager-using-vault-issue-certificates
+# Vault as Certificate Issuer on a Kubernetes Cluster
 
-# Installing HashiCorp Vault
+This guide demonstrates how to use HashiCorp Vault as a Certificate Authority (CA) integrated with cert-manager on a Kubernetes cluster.
 
-Unseal and log in 
-```t
+**References:**
+- [Using HashiCorp Vault as Certificate Manager on a Kubernetes Cluster](https://genekuo.medium.com/using-hashicorp-vault-as-certificate-manager-on-a-kubernetes-cluster-155604d39a60)
+- [HashiCorp Vault on Azure AKS Tutorial](https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-azure-aks)
+- [HashiCorp Vault PKI with cert-manager](https://aperogeek.fr/hashicorp-vault-pki-cert-manager/)
+- [IBM Cloud Private: Using Vault to Issue Certificates](https://www.ibm.com/docs/en/cloud-private/3.2.x?topic=manager-using-vault-issue-certificates)
+
+## Installing HashiCorp Vault
+
+### Unseal and Log In
+
+After deploying Vault, unseal it and log in using the root token:
+
+```bash
 kubectl exec vault-0 -- vault login $VAULT_ROOT_TOKEN
 kubectl exec --stdin=true --tty=true vault-0 -- /bin/sh
 vault secrets enable pki
 vault secrets tune -max-lease-ttl=8760h pki
 ```
-To configure the PKI engine as CA, we will generate a self-signed root certificate for signing certificates and set its ttl to 8760 hours, and write to a file called demo-root-ca.json.
-```t
+
+To configure the PKI engine as CA, generate a self-signed root certificate for signing certificates, set its TTL to 8760 hours, and write to a file called `demo-root-ca.json`.
+
+```bash
 vault write -format=json pki/root/generate/internal \
     common_name="Demo Root Certificate Authority" > /tmp/demo-root-ca.json
 
@@ -23,22 +33,27 @@ vault write pki/root/generate/internal \
     common_name=example.com ttl=8760h
 ```
 
-We will then configure the PKI engine certificate issuing and certificate revocation list (CRL) endpoints of the vault services in the default namespace.
-```t
+Configure the PKI engine certificate issuing and certificate revocation list (CRL) endpoints for the vault services in the default namespace.
+
+```bash
 vault write pki/config/urls \
     issuing_certificates="http://vault.default:8200/v1/pki/ca" \
     crl_distribution_points="http://vault.default:8200/v1/pki/crl"
 ```
-According to the architecture shown at the beginning of the article, we need to create a role that enables the creation of the certificates under the condition for example.com domain with any subdomains, and a policy that defines finer-grained permissions.
-```t
+
+Create a role that enables the creation of certificates under the `example.com` domain with any subdomains, and a policy that defines finer-grained permissions.
+
+```bash
 vault write pki/roles/example-dot-com \
     key_type=any \
     allowed_domains=example.com \
     allow_subdomains=true \
     max_ttl=5m
 ```
-Once we have the role created, we can proceed to make a policy named pki for the corresponding vault PKI role.
-```t
+
+Once the role is created, create a policy named `pki` for the corresponding Vault PKI role.
+
+```bash
 vault policy write pki - <<EOF
 path "pki*" { capabilities = ["read", "list"] }
 path "pki/roles/example-dot-com"   { capabilities = ["create", "update"] }
@@ -46,13 +61,16 @@ path "pki/sign/example-dot-com"    { capabilities = ["create", "update"] }
 path "pki/issue/example-dot-com"   { capabilities = ["create"] }
 EOF
 ```
-### Enable the Kubernetes authentication method
-To simplify how applications interact with Vault, we will use Kubernetes auth method. Kubernetes auth method makes use of JWT associated with Kubernetes Service Account.
 
-To configure the auth method, we will use the local token and CA certificate created when the vault pod is started, which is located on the default mount folder /var/run/secrets/kubernetes.io/serviceaccount/ . Vault will periodically re-read the files in this folder to support short-lived tokens.
+## Enable the Kubernetes Authentication Method
 
-When an application tries to interact with Vault, Vault uses this configuration to verify and retrieve the application’s identity with the Kubernetes API server and its TokenReview API.
-```t
+To simplify how applications interact with Vault, use the Kubernetes auth method. The Kubernetes auth method makes use of JWT tokens associated with Kubernetes Service Accounts.
+
+To configure the auth method, use the local token and CA certificate created when the Vault pod starts, located at `/var/run/secrets/kubernetes.io/serviceaccount/`. Vault periodically re-reads the files in this folder to support short-lived tokens.
+
+When an application tries to interact with Vault, Vault uses this configuration to verify and retrieve the application's identity with the Kubernetes API server and its TokenReview API.
+
+```bash
 vault auth enable kubernetes
 
 vault write auth/kubernetes/config \
@@ -60,22 +78,30 @@ vault write auth/kubernetes/config \
     kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443" \
     kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 ```
-We will then create a Kubernetes authentication role named issuer that binds the pki the policy defined earlier with a Kubernetes service account name and namespaces.
-```t
+
+Create a Kubernetes authentication role named `issuer` that binds the `pki` policy defined earlier with a Kubernetes service account name and namespaces.
+
+```bash
 vault write auth/kubernetes/role/issuer \
     bound_service_account_names=issuer \
     bound_service_account_namespaces=cert-manager,default \
     policies=pki \
     ttl=20m
 ```
+
+```bash
 exit
-After the above configuration, the Vault with the PKI engine can act as CA and for the application (cert-manager) to interact with Vault and authenticate through Kubernetes auth method (TokenReviewer API).
+```
 
-Upon authentication, Vault will retrieve the policy defined for the role of the service account issuer. Vault can then issue certificates according to the permissions in the policy.
+After the above configuration, Vault with the PKI engine can act as CA, and the application (cert-manager) can interact with Vault and authenticate through the Kubernetes auth method (TokenReviewer API).
 
-Installing cert-manager, configuring issuer, and creating a certificate
-We will install Cert-Manager to interact with the vault PKI to issue certificates. After installation, we can check the custom resource definitions and pod created.
-```t
+Upon authentication, Vault retrieves the policy defined for the role of the service account `issuer`. Vault can then issue certificates according to the permissions in the policy.
+
+## Installing cert-manager, Configuring the Issuer, and Creating a Certificate
+
+Install cert-manager to interact with the Vault PKI to issue certificates. After installation, check the custom resource definitions and pods created.
+
+```bash
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
 helm install \
@@ -85,8 +111,10 @@ helm install \
 kubectl get crds
 kubectl get po -n cert-manager
 ```
-We will then create a service account called issuer and service account token as a Secret resource. This secret will be referenced in the cert-manager Issuer resource to authenticate with Vault via Kubernetes auth method when generating and issuing certificates.
-```t
+
+Create a service account called `issuer` and a service account token as a Secret resource. This secret will be referenced in the cert-manager Issuer resource to authenticate with Vault via the Kubernetes auth method when generating and issuing certificates.
+
+```bash
 kubectl create serviceaccount issuer
 kubectl get sa
 kubectl apply -f secret.yaml
@@ -94,6 +122,10 @@ kubectl get secrets
 kubectl describe secret issuer-token
 kubectl get secret issuer-token -o jsonpath={.data.token} | base64 -d
 ```
+
+The `secret.yaml` manifest defines the service account token secret:
+
+```yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -101,9 +133,11 @@ metadata:
   annotations:
     kubernetes.io/service-account.name: issuer
 type: kubernetes.io/service-account-token
+```
 
-We can now create a cert-manager Issuer resource that references the issuer token and role for authentication against Vault, Vault PKI certificate issuing endpoint, and Vault server URL, as in the following.
-```t
+Create a cert-manager Issuer resource that references the issuer token and role for authentication against Vault, the Vault PKI certificate issuing endpoint, and the Vault server URL:
+
+```yaml
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
@@ -121,13 +155,16 @@ spec:
           name: issuer-token
           key: token
 ```
-```t
+
+```bash
 kubectl apply -f issuer.yaml
 kubectl get issuer
 kubectl describe issuer vault-issuer
 ```
-Finally, we can create a cert-manger Certificate resource with a created secret containing a certificate that is issued by Vault. The Certificate resource is managed by the cert-manager.
-```t
+
+Create a cert-manager Certificate resource. This will create a secret containing a certificate issued by Vault. The Certificate resource is managed by cert-manager.
+
+```yaml
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -141,7 +178,8 @@ spec:
   dnsNames:
   - demo.example.com
 ```
-```t
+
+```bash
 kubectl apply -f certificate.yaml
 kubectl get certificate
 kubectl describe certificate demo-example-com
@@ -149,21 +187,28 @@ kubectl describe certificate demo-example-com
 kubectl get secrets example-com-tls
 kubectl describe secrets example-com-tls
 ```
-Install ingress-nginx controller
-To demonstrate applications deployed on the Kubernetes cluster to make use of Vault and cert-manager to issue and manage certificates, we will deploy a demo web application and enable TLS through an ingress resource. First, we will deploy an ingress-nginx controller to the Kubernetes cluster using Helm.
-```t
+
+## Install the ingress-nginx Controller
+
+To demonstrate applications deployed on the Kubernetes cluster making use of Vault and cert-manager to issue and manage certificates, deploy a demo web application and enable TLS through an ingress resource. First, deploy an `ingress-nginx` controller to the Kubernetes cluster using Helm.
+
+```bash
 helm upgrade --install ingress-nginx ingress-nginx \
     --repo https://kubernetes.github.io/ingress-nginx \
     --namespace ingress-nginx --create-namespace
 ```
-We then create a deployment and a service for the web application.
-```t
+
+Create a deployment and a service for the web application.
+
+```bash
 kubectl create deployment web --image=gcr.io/google-samples/hello-app:1.0
 kubectl expose deployment web --port=8080
 kubectl get svc web
 ```
-Within the ingress manifest, we enable TLS by including a tls section in the manifest file to reference the secret containing the certificate issued.
-```t
+
+Within the ingress manifest, enable TLS by including a `tls` section to reference the secret containing the issued certificate.
+
+```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -187,27 +232,30 @@ spec:
             port:
               number: 8080
 ```
-```t
+
+```bash
 kubectl apply -f ingress.yaml
 kubectl get ingress
 ```
 
-To simulate the domain name resolution on the local machine. We can edit the hosts file with sudo vi /etc/hosts .
+To simulate domain name resolution on the local machine, edit the hosts file with `sudo vi /etc/hosts` and add:
 
+```
 127.0.0.1 demo.example.com
-We can test the application by browsing https://demo.example.com and verifying the certificate according to your browser.
+```
 
-We can also verify and show TLS handshake details by running the following command. From the output of this command, we can see the start date, expire date, and issuer info of the issued certificate is correct based on our configuration (valid for 5 minutes).
+Test the application by browsing `https://demo.example.com` and verifying the certificate in your browser.
 
+You can also verify and show TLS handshake details by running the following command. The output shows the start date, expire date, and issuer info of the issued certificate (valid for 5 minutes based on the configuration).
+
+```bash
 curl -kivL https://demo.example.com
-Either from the browser window or curl command, we can also demonstrate the automatic certificate renewal by refreshing the browser or rerunning the curl command after 5 minutes according to our setup. We can see that it has automatically renewed values for start date and expire date.
+```
 
-Conclusion
-The Kubernetes auth method simplifies how an application (cert-manager) uses Kubernetes Service Account to authenticate and interact with HashiCorp Vault. HashiCorp Vault PKI engine act as a Certificate Authority to simplify the issuing process of certificates which can be managed by the cert-manager automatically and efficiently, such as certificate renewal.
+You can demonstrate automatic certificate renewal by refreshing the browser or rerunning the `curl` command after 5 minutes. The start date and expire date will have automatically renewed.
 
-The are many other use cases from HashiCorp Vault in cloud-native platforms or applications that we can apply, such as application secret injection and management.
+## Conclusion
 
-Thanks for reading.
+The Kubernetes auth method simplifies how an application (cert-manager) uses a Kubernetes Service Account to authenticate and interact with HashiCorp Vault. The HashiCorp Vault PKI engine acts as a Certificate Authority to simplify the issuing process of certificates, which can be managed by cert-manager automatically and efficiently, including certificate renewal.
 
-
-
+There are many other use cases for HashiCorp Vault in cloud-native platforms or applications, such as application secret injection and management.

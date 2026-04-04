@@ -1,24 +1,27 @@
 # How to Perform Multi-Staged Builds in Docker
 
+A multi-staged build uses multiple `FROM` instructions in a single `Dockerfile`, allowing you to copy artifacts from one build stage into another. This keeps the final image small by discarding everything that was only needed during the build.
 
-To create an image where the application runs in production mode, you can take the following steps:
+## Why Use Multi-Stage Builds?
 
-- Use node as the base image and build the application.
+To create an image where a JavaScript application runs in production mode, you could:
 
-- Install nginx inside the node image and use that to serve the static files.
+- Use `node` as the base image and build the application.
+- Install NGINX inside the `node` image and use it to serve the static files.
 
-This approach is completely valid. But the problem is that the node image is big and most of the stuff it carries is unnecessary to serve your static files. A better approach to this scenario is as follows:
+This approach is valid, but the `node` image is large and most of its contents are unnecessary just to serve static files. A better approach is:
 
-- Use node image as the base and build the application.
+1. Use the `node` image as the base and build the application.
+2. Copy the built files from the `node` stage into an `nginx` image.
+3. Create the final image based on `nginx` and discard all Node.js-related content.
 
-- Copy the files created using the node image to an nginx image.
+This results in a much smaller and more focused image.
 
-- Create the final image based on nginx and discard all node related stuff.
+## Writing the Multi-Stage Dockerfile
 
-This way your image only contains the files that are needed and becomes really handy.
+Create a new `Dockerfile` inside your `hello-dock` project directory with the following content:
 
-This approach is a multi-staged build. To perform such a build, create a new Dockerfile inside your hello-dock project directory and put the following content in it:
-```bash
+```dockerfile
 FROM node:lts-alpine as builder
 
 WORKDIR /app
@@ -35,25 +38,23 @@ EXPOSE 80
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 ```
-As you can see the Dockerfile looks a lot like your previous ones with a few oddities. The explanation for this file is as follows:
 
-Line 1 starts the first stage of the build using node:lts-alpine as the base image. The as builder syntax assigns a name to this stage so that it can be referred to later on.
+### Explanation
 
-From line 3 to line 9, it's standard stuff that you've seen many times before. The RUN npm run build command actually compiles the entire application and tucks it inside /app/dist directory where /app is the working directory and /dist is the default output directory for vite applications.
+- **Line 1** starts the first build stage using `node:lts-alpine` as the base image. The `as builder` syntax assigns a name to this stage so it can be referenced later.
+- **Lines 3–9** are standard setup steps. The `RUN npm run build` command compiles the entire application and outputs it to the `/app/dist` directory (the default output directory for Vite applications).
+- **Line 11** starts the second build stage using `nginx:stable-alpine` as the base image.
+- **`EXPOSE 80`** documents the port the NGINX server listens on.
+- The final **COPY** instruction uses `--from=builder` to copy files from the first stage. `/app/dist` is the source and `/usr/share/nginx/html` is the destination — the default site path for NGINX, so any static files placed there are automatically served.
 
-Line 11 starts the second stage of the build using nginx:stable-alpine as the base image.
+## Building the Production Image
 
-The NGINX server runs on port 80 by default so the line EXPOSE 80 is added.
-
-The last line is a COPY instruction. The --from=builder part indicates that you want to copy some files from the builder stage. After that it's a standard copy instruction where /app/dist is the source and /usr/share/nginx/html is the destination. The destination used here is the default site path for NGINX so any static file you put inside there will be automatically served.
-
-As you can see, the resulting image is a nginx base image containing only the files necessary for running the application. To build this image execute the following command:
 ```bash
 docker image build --tag hello-dock:prod .
 ```
 
+## Running the Production Container
 
-Once the image has been built, you may run a new container by executing the following command:
 ```bash
 docker container run \
     --rm \
@@ -63,7 +64,6 @@ docker container run \
     hello-dock:prod
 ```
 
+The running application should be available at `http://127.0.0.1:8080`.
 
-The running application should be available on http://127.0.0.1:8080:
-
-Here you can see my hello-dock application in all its glory. Multi-staged builds can be very useful if you're building large applications with a lot of dependencies. If configured properly, images built in multiple stages can be very optimized and compact.
+Multi-staged builds are very useful when building large applications with many dependencies. When configured properly, the resulting image contains only what is needed to run the application, making it compact and efficient.

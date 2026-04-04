@@ -1,14 +1,22 @@
-#### Logging commands
+# Azure DevOps Logging Commands
 
-- Logging commands are how tasks and scripts communicate with the agent. They cover actions like creating new variables, marking a step as failed, and uploading artifacts.
+Logging commands are how tasks and scripts communicate with the Azure Pipelines agent. They cover actions like creating new variables, marking a step as failed, and uploading artifacts.
 
-#### To invoke a logging command, echo the command via standard output.
+Reference: [Azure DevOps Logging Commands Documentation](https://learn.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash)
+
+## Invoking a Logging Command
+
+To invoke a logging command, write the command to standard output using the `##vso[...]` syntax.
+
+**Bash:**
+
+```bash
 #!/bin/bash
 echo "##vso[task.setvariable variable=testvar;]testvalue"
+```
 
-Powershell
+**PowerShell:**
+
+```powershell
 Write-Host "##vso[task.setvariable variable=testvar;]testvalue"
-
-https://learn.microsoft.com/en-us/azure/devops/pipelines/scripts/logging-commands?view=azure-devops&tabs=bash
-
-
+```

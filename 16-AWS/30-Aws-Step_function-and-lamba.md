@@ -1,12 +1,20 @@
-https://www.youtube.com/watch?v=s0XFX3WHg0w
+# AWS Step Functions and Lambda
 
+This guide demonstrates how to create a simple AWS Step Functions state machine that orchestrates two Lambda functions to process transactions.
 
-Create two lambda functions.
+**Reference:** [AWS Step Functions and Lambda Tutorial](https://www.youtube.com/watch?v=s0XFX3WHg0w)
+
+## Create Two Lambda Functions
+
+Create two Lambda functions: `ProcessPurchase` and `ProcessRefund`.
 
 <img src="images/a1.jpg">
 
-Add the code
-```
+### ProcessPurchase Lambda
+
+Add the following code to the first Lambda function:
+
+```python
 import json
 import datetime
 import urllib
@@ -14,9 +22,7 @@ import boto3
 
 
 def lambda_handler(message, context):
-    # TODO implement
-
-    print("received messsage from step fn")
+    print("received message from step fn")
     print(message)
 
     response = {}
@@ -24,52 +30,60 @@ def lambda_handler(message, context):
     response['Timestamp'] = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
     response['Message'] = "Hello from process purchase lambda"
 
-
     return response
 ```
 
 <img src="images/a2.jpg">
-Save
 
-Now Create the second function; just call it ProcessRefund.
+Save the function.
 
-We need to create the role.
+### ProcessRefund Lambda
+
+Create the second function and name it `ProcessRefund`.
+
 <img src="images/a3.jpg">
 
+## Create the IAM Role
 
+Create an IAM role that grants Step Functions the ability to invoke the Lambda functions.
 
-
-This gives the ability to involve the function.
 <img src="images/a4.jpg">
-as you can see line 7
+
+As shown on line 7, the role grants invocation permissions:
+
 <img src="images/a5.jpg">
-Create your state machine. Step function 
+
+## Create the State Machine
+
+Create your state machine in Step Functions.
+
 <img src="images/a6.jpg">
 
 <img src="images/a7.jpg">
 
-add the json but change the arm
-```
+Add the following JSON definition, replacing the `arn` placeholders with the ARNs from your Lambda functions:
+
+```json
 {
   "Comment": "A simple AWS Step Functions state machine that automates a call center support session.",
   "StartAt": "ProcessTransaction",
   "States": {
     "ProcessTransaction": {
-        "Type" : "Choice",
-        "Choices": [ 
-          {
-            "Variable": "$.TransactionType",
-            "StringEquals": "PURCHASE",
-            "Next": "ProcessPurchase"
-          },
-          {
-            "Variable": "$.TransactionType",
-            "StringEquals": "REFUND",
-            "Next": "ProcessRefund"
-          }
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.TransactionType",
+          "StringEquals": "PURCHASE",
+          "Next": "ProcessPurchase"
+        },
+        {
+          "Variable": "$.TransactionType",
+          "StringEquals": "REFUND",
+          "Next": "ProcessRefund"
+        }
       ]
     },
-     "ProcessRefund": {
+    "ProcessRefund": {
       "Type": "Task",
       "Resource": "arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME",
       "End": true
@@ -82,11 +96,11 @@ add the json but change the arm
   }
 }
 ```
-Grab the arm from the lambda function.
 
-
+Grab the ARN from each Lambda function's configuration page.
 
 <img src="images/a8.jpg">
 
 <img src="images/a9.jpg">
+
 <img src="images/a10.jpg">

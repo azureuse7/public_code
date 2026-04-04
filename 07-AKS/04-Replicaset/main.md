@@ -1,1 +1,3 @@
-# Replicaset is an kubernetes object which is used make your pod highly available and any point time it will make sure sepcified replicas are up and running
+# Kubernetes ReplicaSet
+
+A ReplicaSet is a Kubernetes object used to make pods highly available. At any point in time, it ensures that the specified number of pod replicas are up and running.

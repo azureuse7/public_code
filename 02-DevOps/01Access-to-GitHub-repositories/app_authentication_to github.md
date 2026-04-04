@@ -1,68 +1,79 @@
-Access to GitHub repositories thee are thee way. 
+# GitHub App Authentication for Azure DevOps
 
-<img src="images/a.png">
+There are three ways to access GitHub repositories from Azure DevOps. This document covers GitHub App authentication.
 
-#### GitHub app authentication
-- After you install the GitHub App in your GitHub account or organization, your pipeline will run without using your personal GitHub identity. 
- 
-- Builds and GitHub status updates will be performed using the Azure Pipelines identity. 
+![Authentication methods overview](images/a.png)
 
+## GitHub App Authentication
+
+- After you install the GitHub App in your GitHub account or organization, your pipeline will run without using your personal GitHub identity.
+- Builds and GitHub status updates will be performed using the Azure Pipelines identity.
 - To use the GitHub App, install it in your GitHub organization or user account.
-
 - After installation, the GitHub App will become Azure Pipelines' default method of authentication to GitHub (instead of OAuth) when pipelines are created for the repositories.
 
+## How to Configure
 
+Reference: [GitHub App Authentication Setup (YouTube)](https://www.youtube.com/watch?v=YZlaoNPzaxA)
 
-### How to configure.
-https://www.youtube.com/watch?v=YZlaoNPzaxA
+1. Create a new GitHub account and a new Azure DevOps project. There is no connection at present.
 
-- I have created a new github and azure devops project.
-There is no connection at present 
+2. Install the GitHub App via the Marketplace: search for "Azure Pipelines" and add it.
 
-- Install the Github App --> Market place --> serach --> add
-<img src="images/b.png">
+   ![Install GitHub App](images/b.png)
 
-- What access you want to give 
-<img src="images/c.png">
-- Now its taking me to Azure DevOps side
-<img src="images/d.png">
-- Now it wants to authorize
-<img src="images/e.png">
-- Go to started pipeline in Devops and create pipeline, save and run  
+3. Select the repositories you want to grant access to.
 
-- Notice a build has started and its also created that pipeline in our gihub repo 
-<img src="images/f.png">
-- Notice The app is created in github
-<img src="images/g.png">
-- also created in Azure devops
-<img src="images/h.png">
+   ![Select repository access](images/c.png)
 
+4. You will be redirected to the Azure DevOps side to complete the setup.
 
+   ![Azure DevOps redirect](images/d.png)
 
+5. Authorize the connection when prompted.
 
-- Lets delete the service and let seee what happends 
-<img src="images/11.png">
+   ![Authorize connection](images/e.png)
 
+6. Go to the starter pipeline in Azure DevOps, create a pipeline, then save and run it.
 
-Now How would this be used in DevOps
-,Each pipeline has .yml files that has a reference to one repo that contains all the templates for build and release. Like this:
+7. A build will start, and the pipeline will also be created in your GitHub repository.
+
+   ![Pipeline created in GitHub](images/f.png)
+
+8. The GitHub App will appear in your GitHub account settings.
+
+   ![App in GitHub](images/g.png)
+
+9. The service connection will also appear in Azure DevOps.
+
+   ![Service connection in Azure DevOps](images/h.png)
+
+## Deleting the Service Connection
+
+To see what happens when the service connection is removed, delete it and observe the effect on pipelines.
+
+![Delete service connection](images/11.png)
+
+## Using the GitHub App in Azure DevOps Pipelines
+
+Each pipeline has a `.yml` file that references a repository containing all build and release templates. For example:
+
 ```yaml
-resources:  
-   repositories:    
-   - repository: templates      
-     type: github    
-     name: MyGitHubOrg/MyTemplatesRepo    
-     ref: refs/heads/master    
-     endpoint: MyGitHubOrg
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: MyGitHubOrg/MyTemplatesRepo
+      ref: refs/heads/master
+      endpoint: MyGitHubOrg
+
 stages:
-   - template: build.yml@templates
-     parameters:
-        ...
+  - template: build.yml@templates
+    parameters:
+      ...
 ```
-- The main character in this story is the endpoint **MyGitHubOrg**. This is the name of a service connection created by the Azure Pipelines GitHub App mentioned above.
 
-- When you install the Azure Pipelines app it will create the Service Connection for you. In whatever team project you supply during installation.
+The key field here is the `endpoint` value — **`MyGitHubOrg`**. This is the name of the service connection created by the Azure Pipelines GitHub App.
 
-Once it’s installed and working for one Team Project in Azure DevOps you can share it with other projects so they can also use it. To do this go to that Service Connection in Azure DevOps and select Security. If you are not sure where this is it’s under Project Settings — Service Connections in Azure DevOps.
+When you install the Azure Pipelines app, it will automatically create the service connection for you in whichever team project you supply during installation.
 
-
+Once it is installed and working for one Team Project in Azure DevOps, you can share it with other projects so they can also use it. To do this, go to that service connection in Azure DevOps and select **Security**. This is found under **Project Settings > Service Connections** in Azure DevOps.

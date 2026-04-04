@@ -1,34 +1,37 @@
-https://www.youtube.com/watch?v=u1X5Rf7fWwM
+# Custom Resource Definitions (CRDs) in Kubernetes
 
-### Custom Resource Definition 
+Reference video: [Custom Resource Definitions in Kubernetes](https://www.youtube.com/watch?v=u1X5Rf7fWwM)
 
-#### Resource in K8S
-Resource is an edpoint in K8s API that stores collection of APi objects 
+## What is a Resource in Kubernetes?
 
-K api-resources 
+A resource is an endpoint in the Kubernetes API that stores a collection of API objects. You can list all available resources with:
 
-list all the rescources in the Kub
+```bash
+kubectl api-resources
+```
 
-that how we use "k appy pods" this hits the api in the list 
+This is how commands like `kubectl apply` work — they hit a registered API endpoint from this list.
 
-### Now what if we want to create our own resource ?
+## What is a Custom Resource?
 
-#### Custome Rescource
+Custom Resources are extensions of the Kubernetes API. They allow you to define your own resource types beyond the built-in ones.
 
-Custome Rescource are extension og kub api 
+For example, if you try to get a resource that does not exist:
 
-k get greeting --> errr --> no rescource 
+```bash
+kubectl get greeting
+```
 
-if you looo at the api-resources  there is no greeting 
+You will receive an error because `greeting` is not a registered API resource.
 
-### Definition 
+## What is a Definition?
 
-Its commnds to the API server in form of yaml consrtuct 
+A definition is a command sent to the API server in the form of a YAML construct. You can view the definition of any existing object with:
 
-You can view the defintaion example
+```bash
+kubectl get pod <pod-name> -o yaml
+```
 
-k get pod <abc> -o yaml 
+## How CRDs Work in Kubernetes
 
-### How CRD will wokr in Kub 
-
-
+A Custom Resource Definition (CRD) tells the Kubernetes API server about a new resource type. Once a CRD is registered, you can create, list, and manage custom objects of that type using standard `kubectl` commands — just as you would with built-in resources like pods or deployments.

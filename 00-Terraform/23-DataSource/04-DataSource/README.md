@@ -1,26 +1,36 @@
----
-title: Terraform External Provider and Datasource
-description: Learn about Terraform External Provider and Datasource
----
+# Terraform External Provider and Datasource
 
 ## Step-01: Introduction
-- [Terraform External Provider and Datasource](https://registry.terraform.io/providers/hashicorp/external/latest)
+
+The Terraform external provider allows you to integrate arbitrary external programs as data sources. This is useful for generating dynamic values (such as SSH keys) that Terraform itself cannot produce natively.
+
+- Reference: [Terraform External Provider and Datasource](https://registry.terraform.io/providers/hashicorp/external/latest)
 
 ## Step-02: Pre-requisite Installs
-- ssh-keygen
-- jq
-```t
-# ssh-keygen
+
+The following tools must be installed and available in your `PATH` before proceeding:
+
+- `ssh-keygen`
+- `jq`
+
+```bash
+# Verify ssh-keygen is available
 which ssh-keygen
 
-# jq
+# Verify jq is available
 which jq
+
+# Install jq on macOS using Homebrew
 brew install jq
 ```
 
-## Step-03: ssh_key_generator.sh
-- File Location: terraform-manifests/shell-scripts
-```t
+## Step-03: `ssh_key_generator.sh`
+
+This shell script generates an SSH key pair and returns the public key, private key, and private key file path as JSON output. It is designed to be called by the Terraform external datasource.
+
+- **File location:** `terraform-manifests/shell-scripts/`
+
+```bash
 function error_exit() {
   echo "$1" 1>&2
   exit 1
@@ -69,98 +79,105 @@ create_ssh_key
 produce_output
 ```
 
-## Step-04: Test Shell Script
-```t
-# Test Shell Script
+## Step-04: Test the Shell Script
+
+```bash
+# Test the shell script directly
 echo '{"key_name": "terraformdemo", "key_environment": "dev"}' | ./ssh_key_generator.sh
 
-# Verify the files created
-File Location: terraform-manifests/shell-scripts/
-1. terraformdemodev: Private key file created
-2. terraformdemodev.pub: Public Key file created
+# Verify the files created in terraform-manifests/shell-scripts/
+# 1. terraformdemodev       - Private key file
+# 2. terraformdemodev.pub   - Public key file
 ```
 
-## Step-05: c1-versions.tf
-```t
+## Step-05: `c1-versions.tf`
+
+```hcl
 # Terraform Block
 terraform {
   required_version = ">= 1.0.0"
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
-      version = ">= 2.0" 
+      source  = "hashicorp/azurerm"
+      version = ">= 2.0"
     }
     external = {
-      source = "hashicorp/external"
+      source  = "hashicorp/external"
       version = ">= 2.0"
-    }       
+    }
   }
 }
 
 # Provider Block
 provider "azurerm" {
- features {}          
+  features {}
 }
 ```
 
-## Step-06: c2-external-datasource.tf
-```t
-# External Datasource
+## Step-06: `c2-external-datasource.tf`
+
+This data source calls the shell script and passes input parameters as a JSON query.
+
+```hcl
+# External datasource
 data "external" "ssh_key_generator" {
   program = ["bash", "${path.module}/shell-scripts/ssh_key_generator.sh"]
-  
+
   query = {
-    key_name = "terraformdemo"
+    key_name        = "terraformdemo"
     key_environment = "dev"
   }
 }
 ```
 
-## Step-07: c2-external-datasource.tf - Outputs
-- Terraform Outputs for the External Datasource. 
-```t
+## Step-07: `c2-external-datasource.tf` - Outputs
 
+Define Terraform outputs to expose the results from the external datasource.
+
+```hcl
 # Outputs
 output "public_key" {
   description = "public_key"
-  value = data.external.ssh_key_generator.result.public_key
+  value       = data.external.ssh_key_generator.result.public_key
 }
 
 output "private_key" {
   description = "private_key"
-  value = data.external.ssh_key_generator.result.private_key
+  value       = data.external.ssh_key_generator.result.private_key
 }
 
 output "private_key_file" {
   description = "private_key_file"
-  value = data.external.ssh_key_generator.result.private_key_file 
+  value       = data.external.ssh_key_generator.result.private_key_file
 }
 ```
 
 ## Step-08: Execute Terraform Commands
-```t
-# Terraform Initialize
+
+```bash
+# Terraform initialize
 terraform init
 
-# Terraform Validate
+# Terraform validate
 terraform validate
 
-# Terraform Plan
+# Terraform plan
 terraform plan
+# Observation:
+# Because this is just a datasource, the shell script "ssh_key_generator.sh" will be
+# triggered during either plan or apply, and the public/private key pair will be generated.
 
-# Observation
-1. Its just datasource, so either we execute terraform plan or apply, shell script "ssh_key_generator.sh" will be triggered  and Public and Private Keys are generated
-
-# Terraform Apply (Optional)
-terraform apply 
+# Terraform apply (optional)
+terraform apply
 ```
 
-## Step-09: Clean-Up
-```t
-# Destroy Resources (Optional if terraform apply not executed)
-terraform destroy -auto-approve 
+## Step-09: Clean Up
 
-# Delete Files
-rm -rf .terraform* 
+```bash
+# Destroy resources (optional, only if terraform apply was executed)
+terraform destroy -auto-approve
+
+# Delete local Terraform files
+rm -rf .terraform*
 rm -rf terraform.tfstate*
 ```

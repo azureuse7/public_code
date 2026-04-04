@@ -1,69 +1,58 @@
 # Ingress - Domain Name Based Routing
 
 ## Step-01: Introduction
-- We are going to implement Domain Name based routing using Ingress
-- We are going to use 3 applications for this.
+
+This guide demonstrates how to implement domain name based routing using Ingress. Three separate applications are served on different subdomains, with ExternalDNS automatically creating the DNS records.
 
 [![Image](https://www.stacksimplify.com/course-images/azure-aks-ingress-domain-name-based-routing.png "Azure AKS Kubernetes - Masterclass")](https://www.udemy.com/course/aws-eks-kubernetes-masterclass-devops-microservices/?referralCode=257C9AD5B5AF8D12D1E1)
 
-
 ## Step-04: Deploy and Verify
-```t
-# Deploy Apps
+
+```bash
+# Deploy all applications
 kubectl apply -R -f kube-manifests/
 
-# List Pods
+# List pods
 kubectl get pods
 
-# List Services
+# List services
 kubectl get svc
 
-# List Ingress
+# List ingress resources
 kubectl get ingress
 
-# Verify Ingress Controller Logs
+# Verify Ingress Controller logs
 kubectl get pods -n ingress-basic
 kubectl logs -f <pod-name> -n ingress-basic
 
-# Verify External DNS pod to ensure record set got deleted
+# Verify ExternalDNS pod logs to ensure DNS record sets were created
 kubectl logs -f $(kubectl get po | egrep -o 'external-dns[A-Za-z0-9-]+')
 
-
-# Verify Record set got automatically deleted in DNS Zones
-# Template Command
-az network dns record-set a list -g <Resource-Group-dnz-zones> -z <yourdomain.com>
-
-# Replace DNS Zones Resource Group and yourdomain
+# Verify DNS record sets in Azure DNS Zones
 az network dns record-set a list -g dns-zones -z kubeoncloud.com
 ```
 
 ## Step-05: Access Applications
-```t
+
+```bash
 # Access App1
-http://eapp1.kubeoncloud.com/app1/index.html
+# http://eapp1.kubeoncloud.com/app1/index.html
 
 # Access App2
-http://eapp2.kubeoncloud.com/app2/index.html
+# http://eapp2.kubeoncloud.com/app2/index.html
 
-# Access Usermgmt Web App
-http://eapp3.kubeoncloud.com
-Username: admin101
-Password: password101
-
+# Access the User Management Web App
+# http://eapp3.kubeoncloud.com
+# Username: admin101
+# Password: password101
 ```
 
-## Step-06: Clean-Up Applications
-```t
-# Delete Apps
+## Step-06: Clean Up Applications
+
+```bash
+# Delete all deployed applications
 kubectl delete -R -f kube-manifests/
 
-# Verify Record set got automatically deleted in DNS Zones
-# Template Command
-az network dns record-set a list -g <Resource-Group-dnz-zones> -z <yourdomain.com>
-
-# Replace DNS Zones Resource Group and yourdomain
+# Verify that DNS record sets were automatically deleted from Azure DNS Zones
 az network dns record-set a list -g dns-zones -z kubeoncloud.com
 ```
-
-
-

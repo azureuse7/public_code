@@ -1,12 +1,14 @@
-# Ingress - SSL
+# Ingress - SSL with Cert Manager and Let's Encrypt
 
 ## Step-01: Introduction
-- Implement SSL using Lets Encrypt
+
+This guide demonstrates how to implement SSL/TLS for Kubernetes Ingress using [Let's Encrypt](https://letsencrypt.org/) and cert-manager.
 
 [![Image](https://www.stacksimplify.com/course-images/azure-aks-ingress-ssl-letsencrypt.png "Azure AKS Kubernetes - Masterclass")](https://www.udemy.com/course/aws-eks-kubernetes-masterclass-devops-microservices/?referralCode=257C9AD5B5AF8D12D1E1)
 
 ## Step-02: Install Cert Manager
-```t
+
+```bash
 # Label the ingress-basic namespace to disable resource validation
 kubectl label namespace ingress-basic cert-manager.io/disable-validation=true
 
@@ -22,13 +24,11 @@ helm install \
   --namespace ingress-basic \
   --version v1.8.2 \
   --set installCRDs=true
+```
 
-## SAMPLE OUTPUT
-Kalyans-MacBook-Pro:12-ExternalDNS-for-AzureDNS-on-AKS kdaida$ helm install \
->   cert-manager jetstack/cert-manager \
->   --namespace ingress-basic \
->   --version v1.8.2 \
->   --set installCRDs=true
+Sample output from a successful installation:
+
+```
 NAME: cert-manager
 LAST DEPLOYED: Mon Jul 11 17:26:31 2022
 NAMESPACE: ingress-basic
@@ -47,23 +47,23 @@ can be found in our documentation:
 https://cert-manager.io/docs/configuration/
 
 For information on how to configure cert-manager to automatically provision
-Certificates for Ingress resources, take a look at the `ingress-shim`
-documentation:
+Certificates for Ingress resources, take a look at the ingress-shim documentation:
 
 https://cert-manager.io/docs/usage/ingress/
-Kalyans-MacBook-Pro:12-ExternalDNS-for-AzureDNS-on-AKS kdaida$ 
+```
 
-
-# Verify Cert Manager pods
+```bash
+# Verify cert-manager pods
 kubectl get pods --namespace ingress-basic
 
-# Verify Cert Manager Services
+# Verify cert-manager services
 kubectl get svc --namespace ingress-basic
 ```
 
-## Step-06: Review or Create Cluster Issuer Kubernetes Manifest
-### Review Cluster Issuer Kubernetes Manifest
-- Create or Review Cert Manager Cluster Issuer Kubernetes Manigest
+## Step-06: Create the ClusterIssuer Manifest
+
+Create or review the ClusterIssuer resource that tells cert-manager how to obtain certificates from Let's Encrypt:
+
 ```yaml
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -84,70 +84,71 @@ spec:
             class: nginx
 ```
 
-### Deploy Cluster Issuer
-```t
-# Deploy Cluster Issuer
+### Deploy the ClusterIssuer
+
+```bash
+# Apply the ClusterIssuer manifest
 kubectl apply -f kube-manifests/01-CertManager-ClusterIssuer/cluster-issuer.yml
 
-# List Cluster Issuer
+# List cluster issuers
 kubectl get clusterissuer
 
-# Describe Cluster Issuer
+# Describe the cluster issuer
 kubectl describe clusterissuer letsencrypt
 ```
 
+## Step-08: Review the Ingress SSL Manifest
 
-## Step-08: Create or Review Ingress SSL Kubernetes Manifest
-- 01-Ingress-SSL.yml
+Review the file `01-Ingress-SSL.yml` to ensure the correct TLS configuration and annotations are in place.
 
-## Step-09: Deploy All Manifests & Verify
-- Certificate Request, Generation, Approal and Download and be ready might take from 1 hour to couple of days if we make any mistakes and also fail.
-- For me it took, only 5 minutes to get the certificate from **https://letsencrypt.org/**
-```t
-# Deploy
+## Step-09: Deploy All Manifests and Verify
+
+> **Note:** Certificate request, generation, approval, and download may take from 5 minutes to a couple of days, depending on configuration. Mistakes during setup can cause delays or failures.
+
+```bash
+# Deploy all manifests
 kubectl apply -R -f kube-manifests/
 
-# Verify Pods
+# Verify pods
 kubectl get pods
 
-# Verify Cert Manager Pod Logs
+# Verify cert-manager pod logs
 kubectl get pods -n ingress-basic
-kubectl  logs -f <cert-manager-55d65894c7-sx62f> -n ingress-basic #Replace Pod name
+kubectl logs -f <cert-manager-pod-name> -n ingress-basic
 
-# Verify SSL Certificates (It should turn to True)
+# Verify SSL certificates (READY should be True)
 kubectl get certificate
 ```
-```log
-stack@Azure:~$ kubectl get certificate
+
+Expected output once certificates are issued:
+
+```
 NAME                      READY   SECRET                    AGE
 app1-kubeoncloud-secret   True    app1-kubeoncloud-secret   45m
 app2-kubeoncloud-secret   True    app2-kubeoncloud-secret   45m
-stack@Azure:~$
 ```
+
+Sample success log from cert-manager:
 
 ```log
-# Sample Success Log
-I0824 13:09:00.495721       1 controller.go:129] cert-manager/controller/orders "msg"="syncing item" "key"="default/app2-kubeoncloud-secret-2792049964-67728538" 
-I0824 13:09:00.495900       1 sync.go:102] cert-manager/controller/orders "msg"="Order has already been completed, cleaning up any owned Challenge resources" "resource_kind"="Order" "resource_name"="app2-kubeoncloud-secret-2792049964-67728538" "resource_namespace"="default" 
-I0824 13:09:00.496904       1 controller.go:135] cert-manager/controller/orders "msg"="finished processing work item" "key"="default/app2-kubeoncloud-secret-2792049964-67728538
+I0824 13:09:00.495721       1 controller.go:129] cert-manager/controller/orders "msg"="syncing item" "key"="default/app2-kubeoncloud-secret-2792049964-67728538"
+I0824 13:09:00.495900       1 sync.go:102] cert-manager/controller/orders "msg"="Order has already been completed, cleaning up any owned Challenge resources" "resource_kind"="Order" "resource_name"="app2-kubeoncloud-secret-2792049964-67728538" "resource_namespace"="default"
+I0824 13:09:00.496904       1 controller.go:135] cert-manager/controller/orders "msg"="finished processing work item" "key"="default/app2-kubeoncloud-secret-2792049964-67728538"
 ```
 
-## Step-10: Access Application
-```t
-# URLs
-http://sapp1.kubeoncloud.com/app1/index.html
-http://sapp2.kubeoncloud.com/app2/index.html
+## Step-10: Access the Application
+
+```
+https://sapp1.kubeoncloud.com/app1/index.html
+https://sapp2.kubeoncloud.com/app2/index.html
 ```
 
-## Step-11: Verify Ingress logs for Client IP
-```t
-# List Pods
+## Step-11: Verify Ingress Logs for Client IP
+
+```bash
+# List pods in the ingress-basic namespace
 kubectl -n ingress-basic get pods
 
-# Check logs
+# Check Ingress Controller logs
 kubectl -n ingress-basic logs -f nginx-ingress-controller-xxxxxxxxx
 ```
-
-
-
-  

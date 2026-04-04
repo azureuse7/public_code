@@ -1,15 +1,34 @@
-# Kubernetes Persistent Volumes, Claims and Storage Classes
+# Kubernetes Persistent Volumes, Claims, and Storage Classes
 
-- Kubernetes uses the concept of volumes. At its core, a volume is just a directory, possibly with some data in it, which is accessible to a pod. How that directory comes to be, the medium that backs it, and its contents are determined by the particular volume type used.
+Kubernetes provides a rich storage model to support stateful applications. This document covers the core concepts: Volumes, PersistentVolumes, PersistentVolumeClaims, and StorageClasses.
 
-- Kubernetes has a number of storage types, and these can be mixed and matched within a pod (see above illustration). Storage in a pod can be consumed by any containers in the pod. Storage survives pod restarts, but what happens after pod deletion is dependent on the specific storage type.
+## Volumes
 
-- There are many options for mounting both file and block storage to a pod. The most common ones are public cloud storage services, like AWS EBS and gcePersistentDisk, or types that hook into a physical storage infrastructure, like CephFS, Fibre Channel, iSCSI, NFS, Flocker or glusterFS.
+Kubernetes uses the concept of volumes. At its core, a volume is a directory — possibly containing data — that is accessible to a pod. How that directory is created, the medium that backs it, and its contents are determined by the volume type used.
 
-- There are a few special kinds, like configMap and Secrets, used for injecting information stored within Kubernetes into the pod or emptyDir, commonly used as scratch space.
+Kubernetes supports many storage types that can be mixed and matched within a pod. Storage in a pod can be consumed by any container in that pod. Storage survives pod restarts, but what happens after pod deletion depends on the specific storage type.
 
-- PersistentVolumes (PVs) tie into an existing storage resource, and are generally provisioned by an administrator. They’re cluster-wide objects linked to the backing storage provider that make these resources available for consumption.
+Common options for mounting file and block storage into a pod include:
 
-- For each pod, a PersistentVolumeClaim makes a storage consumption request within a namespace. Depending on the current usage of the PV, it can have different phases or states: available, bound (unavailable to others), released (needs manual intervention) and failed (Kubernetes could not reclaim the PV).
+- Public cloud storage services such as AWS EBS and `gcePersistentDisk`
+- Infrastructure-backed types such as CephFS, Fibre Channel, iSCSI, NFS, and GlusterFS
+- Special types such as `configMap` and `Secrets` (used for injecting Kubernetes-stored data into a pod) and `emptyDir` (used as scratch space)
 
-- Finally, StorageClasses are an abstraction layer to differentiate the quality of underlying storage. They can be used to separate out different characteristics, such as performance. StorageClasses are not unlike labels; operators use them to describe different types of storage, so that storage can be dynamically be provisioned based on incoming claims from pods. They’re used in conjunction with PersistentVolumeClaims, which is how pods dynamically request new storage. This type of dynamic storage allocation is commonly used where storage is a service, as in public cloud providers or storage systems like CEPH.
+## PersistentVolumes (PVs)
+
+PersistentVolumes tie into an existing storage resource and are generally provisioned by an administrator. They are cluster-wide objects linked to the backing storage provider that make these resources available for consumption by pods.
+
+## PersistentVolumeClaims (PVCs)
+
+For each pod, a PersistentVolumeClaim makes a storage consumption request within a namespace. Depending on the current usage of the PV, it can have different phases or states:
+
+- **Available** — not yet bound to a claim
+- **Bound** — claimed and unavailable to others
+- **Released** — the claim has been deleted, but the resource has not yet been reclaimed
+- **Failed** — Kubernetes could not automatically reclaim the PV
+
+## StorageClasses
+
+StorageClasses are an abstraction layer used to differentiate the quality and characteristics of underlying storage (for example, performance tiers). They are similar to labels: operators use them to describe different types of storage so that storage can be dynamically provisioned based on incoming claims from pods.
+
+StorageClasses are used in conjunction with PersistentVolumeClaims, which is how pods dynamically request new storage. This type of dynamic storage allocation is common where storage is offered as a service, such as with public cloud providers or storage systems like Ceph.

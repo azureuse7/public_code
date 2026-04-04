@@ -1,87 +1,92 @@
----
-title: Terraform Null Resource
-description: Learn Terraform Null Resource
----
+# Terraform Null Resource, Time Provider, and Triggers
 
 ## Step-01: Introduction
-- Understand about [Null Provider](https://registry.terraform.io/providers/hashicorp/null/latest/docs)
-- Understand about [Null Resource](https://www.terraform.io/docs/language/resources/provisioners/null_resource.html)
-- Understand about [Time Provider](https://registry.terraform.io/providers/hashicorp/time/latest/docs)
-- **Usecase:** Force a resource to update based on a changed null_resource
-- Create `time_sleep` resource to wait for 90 seconds after Azure Linux VM Instance creation
-- Create Null resource with required provisioners
-1. File Provisioner: Copy apps/app1 folder to /tmp
-2. Remote Exec Provisioner: Copy app1 folder from /tmp to /var/www/htnl
-- Over the process we will learn about
-1. null_resource
-2. time_sleep resource
-3. We will also learn how to Force a resource to update based on a changed null_resource using `timestamp function` and `triggers` in `null_resource`
 
+This section demonstrates how to use the `null_resource` with provisioners and the `time` provider to sync content to a VM after it is created. A `null_resource` with a `timestamp()` trigger is used to force re-execution on every `terraform apply`.
 
-## Step-02: Define null provider in Terraform Settings Block
-- Update null provider info listed below in **c1-versions.tf**
-```t
-    null = {
-      source = "hashicorp/null"
-      version = ">= 3.0.0"
-    }
+- Understand the [Null Provider](https://registry.terraform.io/providers/hashicorp/null/latest/docs)
+- Understand the [Null Resource](https://www.terraform.io/docs/language/resources/provisioners/null_resource.html)
+- Understand the [Time Provider](https://registry.terraform.io/providers/hashicorp/time/latest/docs)
+- **Use case:** Force a resource to update based on a changed `null_resource`
+- Create a `time_sleep` resource to wait 90 seconds after an Azure Linux VM instance is created
+- Create a `null_resource` with the following provisioners:
+  1. **File Provisioner:** Copy the `apps/app1` folder to `/tmp`
+  2. **Remote-Exec Provisioner:** Copy the `app1` folder from `/tmp` to `/var/www/html`
+- Topics covered:
+  1. `null_resource`
+  2. `time_sleep` resource
+  3. How to force a resource to update based on a changed `null_resource` using the `timestamp()` function and `triggers`
+
+## Step-02: Define the Null Provider in the Terraform Settings Block
+
+Update the null provider info in `c1-versions.tf`:
+
+```hcl
+null = {
+  source  = "hashicorp/null"
+  version = ">= 3.0.0"
+}
 ```
 
-## Step-03: Define Time Provider in Terraform Settings Block
-- Update time provider info listed below in **c1-versions.tf**
-```t
-    time = {
-      source = "hashicorp/time"
-      version = ">= 0.6.0"
-    }  
+## Step-03: Define the Time Provider in the Terraform Settings Block
+
+Update the time provider info in `c1-versions.tf`:
+
+```hcl
+time = {
+  source  = "hashicorp/time"
+  version = ">= 0.6.0"
+}
 ```
 
-## Step-04: Create / Review the c8-null-resource.tf terraform configuration
-### Step-04-01: Create Time Sleep Resource
-- This resource will wait for 90 seconds after VM Instance creation.
-- This wait time will give VM Instance to provision the Apache Webserver and create all its relevant folders
-- Primarily if we want to copy static content we need Apache webserver static folder `/var/www/html`
-```t
-# Wait for 90 seconds after creating the above Azure Virtual Machine Instance 
+## Step-04: Create/Review the `c8-null-resource.tf` Terraform Configuration
+
+### Step-04-01: Create the Time Sleep Resource
+
+This resource waits 90 seconds after the VM instance is created. The wait time allows the VM to finish provisioning the Apache web server and creating all its relevant folders. The static content folder `/var/www/html` must exist before it can be used as a copy destination.
+
+```hcl
+# Wait for 90 seconds after creating the Azure Virtual Machine instance
 resource "time_sleep" "wait_90_seconds" {
-  depends_on = [azurerm_linux_virtual_machine.mylinuxvm]
+  depends_on      = [azurerm_linux_virtual_machine.mylinuxvm]
   create_duration = "90s"
 }
 ```
-### Step-04-02: Create Null Resource
-- Create Null resource with `triggers` with `timestamp()` function which will trigger for every `terraform apply`
-- This `Null Resource` will help us to sync the static content from our local folder to VM Instnace as and when required.
-- Also only changes will applied using only `null_resource` when `terraform apply` is run. In other words, when static content changes, how will we sync those changes to VM Instance using terraform - This is one simple solution.
-- Primarily the focus here is to learn the following
-  - null_resource
-  - null_resource trigger
-  - How trigger works based on timestamp() function ?
-  - Provisioners in Null Resource
-```t
 
-# Terraform NULL RESOURCE
-# Sync App1 Static Content to Webserver using Provisioners
+### Step-04-02: Create the Null Resource
+
+- The `null_resource` uses a `triggers` block with `timestamp()`, which causes it to be replaced on every `terraform apply`.
+- This allows static content to be synced to the VM instance whenever `terraform apply` is run.
+- Key concepts:
+  - `null_resource` and how it executes provisioners
+  - `null_resource` triggers
+  - How a trigger based on `timestamp()` works
+  - Provisioners inside a `null_resource`
+
+```hcl
+# Terraform null_resource - sync app1 static content to webserver using provisioners
 resource "null_resource" "sync_app1_static" {
-  depends_on = [ time_sleep.wait_90_seconds ]
+  depends_on = [time_sleep.wait_90_seconds]
+
   triggers = {
-    always-update =  timestamp()
+    always-update = timestamp()
   }
 
-  # Connection Block for Provisioners to connect to Azure VM Instance
+  # Connection block for provisioners to connect to the Azure VM instance
   connection {
-    type = "ssh"
-    host = azurerm_linux_virtual_machine.mylinuxvm.public_ip_address 
-    user = azurerm_linux_virtual_machine.mylinuxvm.admin_username
+    type        = "ssh"
+    host        = azurerm_linux_virtual_machine.mylinuxvm.public_ip_address
+    user        = azurerm_linux_virtual_machine.mylinuxvm.admin_username
     private_key = file("${path.module}/ssh-keys/terraform-azure.pem")
-  }  
+  }
 
- # Copies the app1 folder to /tmp
+  # Copies the app1 folder to /tmp
   provisioner "file" {
     source      = "apps/app1"
     destination = "/tmp"
   }
 
-# Copies the /tmp/app1 folder to Apache Webserver /var/www/html directory
+  # Copies the /tmp/app1 folder to the Apache webserver /var/www/html directory
   provisioner "remote-exec" {
     inline = [
       "sudo cp -r /tmp/app1 /var/www/html"
@@ -91,46 +96,55 @@ resource "null_resource" "sync_app1_static" {
 ```
 
 ## Step-05: Execute Terraform Commands
-```t
-# Terraform Initialize
+
+```bash
+# Terraform initialize
 terraform init
 
-# Terraform Validate
+# Terraform validate
 terraform validate
 
-# Terraform Format
+# Terraform format
 terraform fmt
 
-# Terraform Plan
+# Terraform plan
 terraform plan
 
-# Terraform Apply
+# Terraform apply
 terraform apply -auto-approve
 
-# Verify
+# Verify files on the VM
 ssh -i ssh-keys/terraform-azure.pem azureuser@<PUBLIC-IP>
 ls -lrt /tmp
 ls -lrt /tmp/app1
 ls -lrt /var/www/html
 ls -lrt /var/www/html/app1
-http://<public-ip>/app1/app1-file1.html
-http://<public-ip>/app1/app1-file2.html
+
+# Verify web content (replace <public-ip> with the actual IP)
+# http://<public-ip>/app1/app1-file1.html
+# http://<public-ip>/app1/app1-file2.html
 ```
 
-## Step-06: Create new file locally in app1 folder
+## Step-06: Create a New File Locally in the `app1` Folder
+
 - Create a new file named `app1-file3.html`
-- Also updated `app1-file1.html` with some additional info
-- **file3.html**
+- Update `app1-file1.html` with some additional content
+
+**`file3.html`:**
+
 ```html
-<h1>>App1 File3</h1
+<h1>App1 File3</h1>
 ```
-- **file1.html**
+
+**`file1.html`:**
+
 ```html
-<h1>>App1 File1 - Updated</h1
+<h1>App1 File1 - Updated</h1>
 ```
-- Sample `terraform plan` Output
+
+Sample `terraform plan` output showing the null resource will be replaced:
+
 ```log
-# Terraform Plan Output
 Terraform used the selected providers to generate the following execution plan. Resource actions
 are indicated with the following symbols:
 -/+ destroy and then create replacement
@@ -146,46 +160,50 @@ Terraform will perform the following actions:
     }
 
 Plan: 1 to add, 0 to change, 1 to destroy.
-
-───────────────────────────────────────────────────────────────
 ```
 
-## Step-07: Execute Terraform plan and apply commands
-```t
-# Terraform Plan
-terraform plan
-Observation: You should see changes for "null_resource.sync_app1_static" because trigger will have new timestamp when you fired the terraform plan command
+## Step-07: Execute Terraform Plan and Apply Commands
 
-# Terraform Apply
+```bash
+# Terraform plan
+# Observation: You should see changes for "null_resource.sync_app1_static" because
+# the trigger will have a new timestamp value
+terraform plan
+
+# Terraform apply
 terraform apply -auto-approve
 
-# Verify
+# Verify files on the VM
 ssh -i ssh-keys/terraform-azure.pem azureuser@<PUBLIC-IP>
 ls -lrt /tmp
 ls -lrt /tmp/app1
 ls -lrt /var/www/html
 ls -lrt /var/www/html/app1
-http://<public-ip>/app1/app1-file1.html
-http://<public-ip>/app1/app1-file3.html
+
+# Verify web content (replace <public-ip> with the actual IP)
+# http://<public-ip>/app1/app1-file1.html
+# http://<public-ip>/app1/app1-file3.html
 ```
 
-## Step-08: Clean-Up Resources & local working directory
-```t
-# Terraform Destroy
+## Step-08: Clean Up Resources and Local Working Directory
+
+```bash
+# Terraform destroy
 terraform destroy -auto-approve
 
-# Delete Terraform files 
+# Delete Terraform files
 rm -rf .terraform*
 rm -rf terraform.tfstate*
 ```
 
-## Step-09: Roll back to Demo State
-```t
-# Change-1: Delete app1-file3.html in apps/app1 folder
-# Change-2: app1-file1.html - Remove updated text
+## Step-09: Roll Back to Demo State
+
+```bash
+# Change-1: Delete app1-file3.html from the apps/app1 folder
+# Change-2: Remove the updated text from app1-file1.html
 ```
 
-
 ## References
+
 - [Resource: time_sleep](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep)
 - [Time Provider](https://registry.terraform.io/providers/hashicorp/time/latest/docs)

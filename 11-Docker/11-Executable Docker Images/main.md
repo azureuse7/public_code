@@ -1,33 +1,30 @@
 # How to Create Executable Docker Images
 
+An executable Docker image is one where the `ENTRYPOINT` is set to a custom program rather than a shell. This allows you to run the container like a command-line tool, passing arguments directly to the program.
 
+## Design Plan for the Image
 
-#  In my opinion it should be like something like this:
+The image for the `rmbyext` script should be designed as follows:
 
-- The image should have Python pre-installed.
+- Have Python pre-installed.
+- Contain a copy of the `rmbyext` script.
+- Have a working directory set where the script will be executed.
+- Have `rmbyext` set as the entry-point so the image can accept file extension names as arguments.
 
-- It should contain a copy of my rmbyext script.
+To build this image, take the following steps:
 
-- A working directory should be set where the script will be executed.
+1. Get a good base image for running Python scripts, like `python`.
+2. Set up the working directory to an easily accessible directory.
+3. Install Git so the script can be installed from a GitHub repository.
+4. Install the script using Git and `pip`.
+5. Remove the build-only packages.
+6. Set `rmbyext` as the entry-point for this image.
 
-- The rmbyext script should be set as the entry-point so the image can take extension names as arguments.
+## Writing the Dockerfile
 
-- To build the above mentioned image, take the following steps:
+Create a new `Dockerfile` inside the `rmbyext` directory with the following content:
 
-- Get a good base image for running Python scripts, like python.
-
-- Set-up the working directory to an easily accessible directory.
-
-- Install Git so that the script can be installed from my GitHub repository.
-
-- Install the script using Git and pip.
-
-- Get rid of the build's unnecessary packages.
-
-- Set rmbyext as the entry-point for this image.
-
-Now create a new Dockerfile inside the rmbyext directory and put the following code in it:
-```bash
+```dockerfile
 FROM python:3-alpine
 
 WORKDIR /zone
@@ -38,22 +35,22 @@ RUN apk add --no-cache git && \
 
 ENTRYPOINT [ "rmbyext" ]
 ```
-The explanation for the instructions in this file is as follows:
 
-The FROM instruction sets python as the base image, making an ideal environment for running Python scripts. The 3-alpine tag indicates that you want the Alpine variant of Python 3.
+### Explanation of Instructions
 
-The WORKDIR instruction sets the default working directory to /zone here. The name of the working directory is completely random here. I found zone to be a fitting name, you may use anything you want.
+- **FROM** sets `python:3-alpine` as the base image, providing an ideal environment for running Python scripts. The `3-alpine` tag indicates the Alpine variant of Python 3.
+- **WORKDIR** sets the default working directory to `/zone`. The name of the working directory is arbitrary; `zone` is simply a fitting choice here.
+- **RUN** installs `git` (needed to install the script from GitHub), installs `rmbyext` using `pip`, and then removes `git` to keep the image lean.
+- **ENTRYPOINT** sets `rmbyext` as the entry-point for the image. This is what makes the image executable — anything written after the image name in a `docker container run` command gets passed as arguments to `rmbyext`.
 
-Given the rmbyext script is installed from GitHub, git is an install time dependency. The RUN instruction on line 5 installs git then installs the rmbyext script using Git and pip. It also gets rid of git afterwards.
+## Building and Verifying the Image
 
-Finally on line 9, the ENTRYPOINT instruction sets the rmbyext script as the entry-point for this image.
+Build the image:
 
-In this entire file, line 9 is the magic that turns this seemingly normal image into an executable one. Now to build the image you can execute following command:
 ```bash
 docker image build --tag rmbyext .
 
 docker image ls
 ```
 
-
-Here I haven't provided any tag after the image name, so the image has been tagged as latest by default. You should be able to run the image as you saw in the previous section. Remember to refer to the actual image name you've set, instead of fhsinchy/rmbyext here.
+No tag was provided after the image name, so the image is tagged as `latest` by default. You should now be able to run the image as described in the previous section. Remember to use the actual image name you set, instead of `fhsinchy/rmbyext`.
