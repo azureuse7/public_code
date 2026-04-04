@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 
 # filename="example.tfvars"
 
@@ -7,8 +7,6 @@
 # else
 #     echo "File '$filename' does not exist."
 # fi
-
-# !/bin/bash
 
 filename="example.tfvars"
 

@@ -19,7 +19,7 @@ jobs:
   - job: Deploy_Virtual_Machines
   - deployment: VirtualMachines
     displayName: Virtual Machines
-    environment: ${{ parameters.gagan_Envioremnt }}
+    environment: ${{ parameters.gagan_Environment }}
     continueOnError: false
     strategy:
       runOnce:

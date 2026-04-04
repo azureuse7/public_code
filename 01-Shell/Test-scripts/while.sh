@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 
 # filename="example.tfvars"
 
@@ -24,7 +24,6 @@
 # done <  a.tfvars
 
 ###############################
-!/bin/bash
 
 filename="a.tfvars"
 

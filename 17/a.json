@@ -5,7 +5,7 @@
       "Sid": "EksDescribeClusterSingle",
       "Effect": "Allow",
       "Action": "eks:DescribeCluster",
-      "Resource": "arn:aws:eks:eu-north-1:471112873657:cluster/gautam"
+      "Resource": "arn:aws:eks:eu-north-1:<YOUR_AWS_ACCOUNT_ID>:cluster/<YOUR_CLUSTER_NAME>"
     }
   ]
 }

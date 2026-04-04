@@ -1,7 +1,7 @@
 # Services with YAML
 
 ## Step-01: Introduction to Services
-- We are going to look in to below two services in detail with a frotnend and backend example
+- We are going to look in to below two services in detail with a frontend and backend example
   - LoadBalancer Service
   - ClusterIP Service
 
