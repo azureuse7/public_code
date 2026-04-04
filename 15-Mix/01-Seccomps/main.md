@@ -1,4 +1,7 @@
-###  Seccomp
+# Seccomp Profiles in Kubernetes
+> Seccomp (Secure Computing Mode) is a Linux kernel feature that restricts the system calls a container process can make. Applying a seccomp profile to a Kubernetes pod reduces the attack surface by blocking syscalls that the application does not need.
+
+### Seccomp
 With Seccomp, you can restrict container process calls made from pods to kernel.
 
 Enable at Kubelet

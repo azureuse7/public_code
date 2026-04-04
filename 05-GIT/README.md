@@ -1,90 +1,119 @@
-https://devconnected.com/create-git-branch/#:~:text=The%20easiest%20way%20to%20create,branch%20you%20want%20to%20create.&text=To%20achieve%20that%2C%20you%20will,feature%E2%80%9D%20as%20the%20branch%20name.
+# Git Version Control
 
-#### Get the remote URL  
-```                         
+> Essential Git commands for everyday development — branching, remotes, rebasing, resetting, tagging, and comparing branches.
+
+---
+
+## Remote Operations
+
+Get the remote URL:
+```bash
 git config --get remote.origin.url
-``` 
-#### To remove a remote repository  
-```                  
+```
+
+Remove a remote:
+```bash
 git remote rm origin
-``` 
-#### Update your local master with the origin/master
-``` 
+```
+
+Update local master from origin:
+```bash
 git pull origin master:master
-``` 
-#### Now your origin/masteris up to date, so you can rebase or merge your local branch with these changes.
-``` 
-git fetch
-``` 
-#### And your develop branch will be up:   
-```        
-git rebase origin/master
-``` 
-#### To go back to pervious commit     
-```             
-git reset --hard 7d2838af6180183c05969e0d1a18b4fed53682c7 (old reference)
-``` 
+```
 
-#### To clone a branch:  
-```                        
+---
+
+## Branching
+
+Create and switch to a new branch:
+```bash
+git checkout -b feature/my-feature
+# or (Git 2.23+)
+git switch -c feature/my-feature
+```
+
+Clone a specific branch:
+```bash
 git clone -b <branch> <remote_repo>
-``` 
-#### checkout a new branch:  
-```                      
-git checkout -b <branch>
-``` 
-#### get local branches of your repo.         
-```        
-git branch
-``` 
-#### To push Tags
-``` 
-git add .
-git commit -m "w"
-git tag v.02 
-git push --tags
-``` 
+```
 
-#### To push Changes
-``` 
-git add .
-git commit -m "w"
-git push
-``` 
+List all branches (including remote):
+```bash
+git branch -a
+```
 
-### To find the differnce 
-``` 
-$ git diff branch1..branch2
-$ git diff master..feature
-``` 
+---
 
-### Comparing two branches using triple dot syntax
-``` 
-$ git diff branch1...branch2
-#Using “git diff” with three dots compares the top of the right branch (the HEAD) with the common ancestor of the two branches.
-``` 
-#### https://devconnected.com/how-to-compare-two-git-branches/
+## Syncing and Rebasing
 
-#### git rev-parse is an ancillary plumbing command primarily used for manipulation.
-``` 
-git rev-parse --symbolic-full-name HEAD
-output: refs/heads/cazr6855
-``` 
+Fetch latest changes without merging:
+```bash
+git fetch
+```
 
-#### To display only the name of the current branch you're on:
-``` 
-git rev-parse --abbrev-ref HEAD
+Rebase your branch onto origin/master:
+```bash
+git rebase origin/master
+```
 
-Output:cazr6855
-``` 
+---
 
+## Undoing Changes
 
+Reset to a specific commit (destructive — discards local changes):
+```bash
+git reset --hard <commit-hash>
+```
 
-https://devconnected.com/how-to-compare-two-git-branches/
+Undo the last commit but keep changes staged:
+```bash
+git reset --soft HEAD~1
+```
 
+---
 
+## Tags
 
-``` 
-- git fetch origin            # Updates origin/master
-- git rebase origin/master    # Rebases current branch onto origin/master
-``` 
+Create a tag:
+```bash
+git tag v1.0.0
+git tag -a v1.0.0 -m "Release 1.0.0"
+```
+
+Push tags to remote:
+```bash
+git push origin --tags
+```
+
+---
+
+## Branch Comparison
+
+Two-dot diff — changes reachable from B but not A:
+```bash
+git diff main..feature
+```
+
+Three-dot diff — changes on feature since it diverged from main:
+```bash
+git diff main...feature
+```
+
+Get the SHA of the current branch HEAD:
+```bash
+git rev-parse HEAD
+```
+
+---
+
+## Common Workflow
+
+```bash
+git fetch                          # get latest remote state
+git checkout -b feature/my-work    # create feature branch
+# ... make changes ...
+git add -p                         # stage interactively
+git commit -m "describe the why"
+git rebase origin/main             # rebase before PR
+git push origin feature/my-work
+```

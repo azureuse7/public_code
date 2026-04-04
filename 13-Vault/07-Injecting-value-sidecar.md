@@ -1,3 +1,6 @@
+# Vault: Injecting Secrets into Pods via the Agent Sidecar
+> The Vault Agent Injector automatically injects a sidecar container into annotated pods. The sidecar authenticates with Vault and writes secrets to a shared in-memory volume — your app reads secrets from a file without ever calling the Vault API directly.
+
 ### Injecting vault secret into Pods using Sidecar
 
 - Injector → fetches secrets from the vault to pods.  

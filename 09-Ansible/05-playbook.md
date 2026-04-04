@@ -1,4 +1,7 @@
-# playbook 
+# Ansible Step 5: Writing a Playbook
+> A playbook is a YAML file that defines an ordered list of tasks to run on one or more hosts. This example creates a playbook that installs and starts Apache on all managed nodes.
+
+# Playbook
 
 install_apache.yml
  ---

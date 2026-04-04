@@ -1,4 +1,7 @@
-# install_apache.yml
+# Ansible Step 6: Conditional Task Execution with `when`
+> The `when` clause makes a task conditional — it only runs when the specified expression is true. This is commonly used to handle differences between OS families (Ubuntu vs CentOS) within the same playbook.
+
+# install_apache.yml — with OS-conditional tasks
  ---
  
  - hosts: all

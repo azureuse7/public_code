@@ -1,4 +1,7 @@
-# update 
+# Ansible Step 3: Installing Ansible and Creating an Inventory
+> Install Ansible on the control node and define which hosts it will manage using an inventory file.
+
+# update
 - install ansible 
   
 

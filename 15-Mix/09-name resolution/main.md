@@ -1,3 +1,6 @@
+# DNS and Name Resolution
+> Name resolution is the process of translating a human-readable hostname (e.g. `myapp.internal`) into an IP address that the network can route to. In Linux and Kubernetes, this is handled by `/etc/resolv.conf`, `/etc/hosts`, and DNS servers (CoreDNS in Kubernetes).
+
 #### Name resolution is the process of associating names and IP addresses.
 
 

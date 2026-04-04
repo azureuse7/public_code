@@ -1,5 +1,8 @@
-- An SSH key consists of two components: 
-- A **public** **key** and a **private** **key**. These keys are generated using cryptographic algorithms, and they work together as a pair. 
+# SSH: Secure Shell Key Authentication
+> SSH (Secure Shell) provides encrypted remote access to servers. Key-based authentication is more secure than passwords — you generate a key pair, place the public key on the server, and keep the private key on your machine.
+
+- An SSH key consists of two components:
+- A **public key** and a **private key**. These keys are generated using cryptographic algorithms, and they work together as a pair.
 - The public key is meant to be shared with others,(like on the VM) while the private key must be kept secret and protected. 
 - Therefore, the private key remains securely stored on the developer's local machine & the public key can be safely shared with GitHub.
 

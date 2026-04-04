@@ -1,3 +1,6 @@
+# nslookup: DNS Query Tool
+> `nslookup` is a command-line tool for querying DNS servers to look up domain names, IP addresses, and DNS record types. It is available on Linux, macOS, and Windows and is useful for diagnosing DNS issues.
+
 - The **nslookup** command is a network administration tool used for querying the Domain Name System (DNS) to obtain domain name or IP address mapping information.
 
 #### Overview

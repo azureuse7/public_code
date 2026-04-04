@@ -1,3 +1,6 @@
+# Vault PKI Secret Engine: Internal Certificate Authority
+> The PKI secret engine turns Vault into a Certificate Authority (CA). It dynamically issues X.509 TLS certificates with configurable TTLs, enabling automated certificate rotation without long-lived static certs.
+
 #### PKI Secret Engine Overview
 - The PKI (Public Key Infrastructure) secret engine in Vault allows you to create and manage Certificate Authorities (CAs) and issue certificates. 
 - It provides a simple way to generate dynamic X.509 certificates, which are often used for TLS (Transport Layer Security) and other cryptographic protocols.

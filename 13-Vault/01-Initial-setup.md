@@ -1,6 +1,11 @@
-https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-azure-aks
-https://developer.hashicorp.com/vault/docs?product_intent=vault
-## Initial setup 
+# Vault Initial Setup on AKS
+> Deploy HashiCorp Vault on an Azure Kubernetes Service cluster using Helm, initialise the Vault, unseal it, and access the UI.
+
+**References:**
+- https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-azure-aks
+- https://developer.hashicorp.com/vault/docs?product_intent=vault
+
+## Initial setup
 - Create an AKS cluster and Connect it to the AKS cluster 
 
 #### check helm if it's installed 

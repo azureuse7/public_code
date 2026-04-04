@@ -1,3 +1,6 @@
+# Vault SSH Secret Engine: Dynamic SSH Keys
+> The Vault SSH secret engine generates short-lived, time-bound SSH credentials on demand. Instead of distributing static private keys, Vault issues signed certificates valid for a specific duration — automatically revoking access when the lease expires.
+
 #### Time-bound SSH keys
 
 - Generating time-bound SSH keys using HashiCorp Vault with Terraform involves a few steps. 

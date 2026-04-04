@@ -1,4 +1,7 @@
-# how would be install some thing on other servers 
+# Ansible Step 4: Ad-Hoc Commands
+> Ad-hoc commands let you run a single Ansible task without writing a playbook. They are useful for quick one-off operations like package installation, service checks, or running shell commands across all hosts.
+
+# How to install something on other servers using ad-hoc commands
 
 # Tell ansible to use sudo (become)
 ansible all -m apt -a update_cache=true --become --ask-become-pass

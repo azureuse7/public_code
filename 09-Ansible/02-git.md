@@ -1,4 +1,7 @@
-# Install git 
+# Ansible Step 2: Install Git and Configure GitHub SSH Access
+> Git is needed on the Ansible control node to clone playbooks and roles from a repository. This guide covers installation and setting up an SSH key for GitHub.
+
+# Install git
 - git 
 
 # create an account if you don't have one. 

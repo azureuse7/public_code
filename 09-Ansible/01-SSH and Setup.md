@@ -1,4 +1,7 @@
-# You would need least two server to test this, one anisble server and one work server
+# Ansible Step 1: SSH Key Setup and Server Preparation
+> Before Ansible can manage remote servers, you need SSH key-based authentication between the control node and all managed nodes. This guide walks through generating a key pair, distributing the public key, and caching the passphrase.
+
+# You need at least two servers: one Ansible control node and one managed (worker) node
 
 - ip a --> get the IP address 
 - Make sure you can ssh to the work server --> ssh<ip>
