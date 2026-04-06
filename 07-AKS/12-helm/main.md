@@ -1,5 +1,5 @@
 # Helm on Kubernetes
-> Helm is the package manager for Kubernetes. Charts bundle all the Kubernetes manifests for an application. This guide covers the core CLI workflow, creating your own chart, and deploying charts via Terraform.
+
 
 ---
 
@@ -10,17 +10,11 @@
 helm repo list
 
 # Add a repository
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo add stacksimplify https://stacksimplify.github.io/helm-charts/
+
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
 # Update all repositories (fetch latest chart index)
 helm repo update
-
-# Search for a chart
-helm search repo nginx
-helm search repo mychart1
-helm search repo mychart2 --versions   # show all available chart versions
 ```
 
 ---
