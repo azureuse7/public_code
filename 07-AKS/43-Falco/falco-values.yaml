@@ -2,14 +2,14 @@
 # Reference: https://github.com/falcosecurity/charts/blob/master/charts/falco/values.yaml
 
 # ──────────────────────────────────────────────
-# Private registry — all Falco images are pulled from gautam/docker
+# Private registry — all Falco images are pulled from gagan/docker
 # ──────────────────────────────────────────────
 image:
-  registry: gautam/docker
+  registry: gagan/docker
 
 # Pull secret for the private registry (create this secret beforehand):
 #   kubectl create secret docker-registry jfrog-pull-secret \
-#     --docker-server=gautam/docker \
+#     --docker-server=gagan/docker \
 #     --docker-username=<user> \
 #     --docker-password=<token> \
 #     -n falco
@@ -51,7 +51,7 @@ falco:
 # ──────────────────────────────────────────────
 falcoctl:
   image:
-    registry: gautam/docker
+    registry: gagan/docker
   imagePullSecrets:
     - name: jfrog-pull-secret
   artifact:
