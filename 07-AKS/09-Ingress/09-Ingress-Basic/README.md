@@ -1,22 +1,5 @@
 # Ingress - Basics
 
-## Retrieving the Ingress Controller External IP (Terraform)
-
-There may be times when the NGINX Ingress external IP (load balancer) is needed while configuring deployments. Below is example code showing how to retrieve it using a Terraform data call:
-
-```hcl
-data "kubernetes_service" "example" {
-  metadata {
-    name      = "ingress-nginx-controller"
-    namespace = "ingress-nginx"
-  }
-}
-
-output "test" {
-  value = data.kubernetes_service.example.status[0].load_balancer[0].ingress[0].ip
-}
-```
-
 ## Step-01: Introduction
 
 [![Image](https://www.stacksimplify.com/course-images/azure-aks-ingress-basic.png "Azure AKS Kubernetes - Masterclass")](https://www.udemy.com/course/aws-eks-kubernetes-masterclass-devops-microservices/?referralCode=257C9AD5B5AF8D12D1E1)
