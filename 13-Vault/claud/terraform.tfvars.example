@@ -1,0 +1,39 @@
+# ---------------------------------------------------------------------------
+# terraform.tfvars.example
+#
+# Copy this file to terraform.tfvars and fill in your values.
+# NEVER commit terraform.tfvars to version control — add it to .gitignore.
+#
+# Sensitive values (vault_root_token) should be supplied via:
+#   export TF_VAR_vault_root_token=<token>
+# ---------------------------------------------------------------------------
+
+# --- Cluster ---
+kubeconfig_path    = "~/.kube/config"
+kubeconfig_context = "my-cluster-context"   # kubectl config get-contexts
+
+# --- Vault ---
+vault_address       = "http://localhost:8200"   # Use port-forward during bootstrap
+vault_namespace     = "vault"
+vault_chart_version = "0.27.0"
+vault_ha_enabled    = false                     # Set true for production (3 replicas)
+vault_ha_replicas   = 3
+vault_storage_class = "default"
+
+vault_pki_root_cn      = "My Internal Root CA"
+vault_pki_organisation = "My Organisation"
+vault_pki_country      = "GB"
+
+# --- cert-manager ---
+cert_manager_namespace     = "cert-manager"
+cert_manager_chart_version = "v1.14.5"
+
+# --- Ingress ---
+ingress_namespace    = "ingress-nginx"
+ingress_service_type = "LoadBalancer"   # Use NodePort for local/kind clusters
+
+# --- Application / Certificate ---
+app_domain       = "demo.example.com"
+cert_duration    = "8760h"   # 1 year
+cert_renew_before = "720h"   # Renew 30 days before expiry
+pki_max_ttl      = "8760h"
