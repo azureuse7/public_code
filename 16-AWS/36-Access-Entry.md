@@ -1,124 +1,149 @@
-- I have one IAM user 
+# EKS Access Entry
 
+> EKS Access Entries are the modern way to grant IAM principals (users and roles) access to a Kubernetes cluster. They replace the need to manually edit the `aws-auth` ConfigMap — providing API-driven, auditable, and namespace-scoped access control.
 
-<img src="images/accessentry/3.png">
+---
 
-- I have one EKS clustre 
-- You can see the User can't see the node of the EKS 
-<img src="images/accessentry/4.png">
+## What Is an Access Entry?
 
-- Go to access and either use EKS API or ConfigMap
+An access entry maps an IAM principal (user or role) to Kubernetes permissions. It has two parts:
 
-<img src="images/accessentry/5.png">
+1. **Authentication** — the access entry itself proves the IAM principal is allowed to authenticate to the cluster
+2. **Authorization** — attach EKS access policies (AWS-managed Kubernetes RBAC) or map to Kubernetes groups
 
-- How can we provide access 
+```
+IAM Principal (User / Role)
+        │
+        ▼
+  EKS Access Entry (authentication)
+        │
+        ├── EKS Access Policy (e.g., AmazonEKSAdminPolicy)
+        │     scoped to: cluster | namespace
+        │
+        └── Kubernetes Group mapping
+              → standard RBAC via ClusterRoleBinding / RoleBinding
+```
 
-- Log into as admin 
+---
 
-- Create a acess entry 
-<img src="images/accessentry/5a.png">
+## Access Entry Types
 
-<img src="images/accessentry/6.png">
+| Type | Used For |
+|---|---|
+| **STANDARD** | Human users, automation, service accounts — attach access policies and/or K8s groups |
+| **EC2_LINUX** | EC2 worker nodes (Linux) — EKS auto-grants required node permissions |
+| **EC2_WINDOWS** | EC2 worker nodes (Windows) |
+| **FARGATE_LINUX** | Fargate pods |
+| **EC2** | EKS Auto Mode nodes |
 
+---
 
-- Select the user 
-- Create a access entry 
+## AWS-Managed Access Policies
 
-- Add a policy name 
-<img src="images/accessentry/7.png">
-- Add another policy 
-<img src="images/accessentry/8.png">
-- Confirm 
-<img src="images/accessentry/9.png">
-- Log in as that user
-<img src="images/accessentry/10.png">
-- You can see access has been granted
+| Policy | Kubernetes Equivalent |
+|---|---|
+| `AmazonEKSClusterAdminPolicy` | `cluster-admin` — full cluster access |
+| `AmazonEKSAdminPolicy` | Admin — typically scoped to a namespace |
+| `AmazonEKSEditPolicy` | Edit — read/write resources in a namespace |
+| `AmazonEKSViewPolicy` | View-only access |
+| `AmazonEKSAutoNodePolicy` | Required for EKS Auto Mode nodes |
 
+---
 
+## Authentication Modes
 
+| Mode | Description |
+|---|---|
+| `API` | Access entries only — no `aws-auth` ConfigMap |
+| `API_AND_CONFIG_MAP` | Both — useful during migration from ConfigMap to access entries |
+| `CONFIG_MAP` | Legacy — `aws-auth` ConfigMap only |
 
+---
 
-An access entry allows an IAM principal (user or role) to access your cluster. Access entries can replace the need to maintain the aws-auth ConfigMap for authentication. 
+## CLI: Create and Configure Access Entries
 
-####  How it works 
--  Create an access entry for an IAM user/role (the “principal”). This establishes authentication. 
+### Grant a developer namespace-scoped admin access
 
-
-- Authorize it by either:
-
-- ###### Attaching EKS access policies (AWS-managed sets of Kubernetes permissions) and scoping them to the cluster or specific namespaces, or
-- ###### Mapping to Kubernetes groups you bind via normal RBAC. 
-
-
-- You can mix both (policies + RBAC groups). 
-
-
-#### Access entry types (most common)
-
-- STANDARD — for humans/automation; you attach access policies and/or k8s groups.
-
-- Node types like EC2_LINUX, EC2_WINDOWS, FARGATE_LINUX, HYBRID_LINUX, and EC2 (Auto Mode); EKS auto-grants the permissions nodes need. 
-AWS Documentation
-
-#### Why use it instead of aws-auth?
-
-- Central, API-driven management (console/CLI/IaC), easier scoping to namespaces, and no editing of a cluster ConfigMap. You can also run in dual mode (API_AND_CONFIG_MAP) during migration. 
-
--  If you delete and later recreate the same IAM principal, the old access entry won’t work—delete/recreate the entry because the internal role/user ID has changed. 
-
-
-- EKS Auto Mode depends on access entries and you can’t disable them there (you may still enable aws-auth if needed). 
-
-
-### Common AWS-managed access policies
-
-Examples you can attach:
-
-- AmazonEKSClusterAdminPolicy (cluster-wide admin)
-
-- AmazonEKSAdminPolicy (typically namespace-scoped admin)
-
-- AmazonEKSViewPolicy (view-only)
-  
-Attach them with a cluster or namespace access scope. 
-
-
-
-
-# 1) Create the entry (authentication)
-``` 
+```bash
+# Step 1: Create the access entry (authentication)
 aws eks create-access-entry \
   --cluster-name my-eks \
-  --principal-arn arn:aws:iam::111122223333:role/dev-team
-``` 
-# 2) Grant admin to just the 'dev' namespace (authorization)
-``` 
+  --principal-arn arn:aws:iam::111122223333:role/dev-team \
+  --type STANDARD
+
+# Step 2: Attach an access policy (authorization) scoped to the 'dev' namespace
 aws eks associate-access-policy \
   --cluster-name my-eks \
   --principal-arn arn:aws:iam::111122223333:role/dev-team \
   --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy \
   --access-scope type=namespace,namespaces=dev
-``` 
-# Or cluster-wide admin
-``` 
+```
+
+### Grant cluster-wide admin access
+
+```bash
+aws eks create-access-entry \
+  --cluster-name my-eks \
+  --principal-arn arn:aws:iam::111122223333:role/platform-admin \
+  --type STANDARD
+
 aws eks associate-access-policy \
   --cluster-name my-eks \
   --principal-arn arn:aws:iam::111122223333:role/platform-admin \
   --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy \
   --access-scope type=cluster
-``` 
+```
 
+### Register EC2 worker nodes (Auto Mode)
 
+```bash
+aws eks create-access-entry \
+  --cluster-name my-eks \
+  --principal-arn arn:aws:iam::111122223333:role/NodeRole \
+  --type EC2
 
-Terraform
-``` 
+aws eks associate-access-policy \
+  --cluster-name my-eks \
+  --principal-arn arn:aws:iam::111122223333:role/NodeRole \
+  --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSAutoNodePolicy \
+  --access-scope type=cluster
+```
+
+### List and inspect access entries
+
+```bash
+# List all access entries
+aws eks list-access-entries --cluster-name my-eks
+
+# Describe a specific entry
+aws eks describe-access-entry \
+  --cluster-name my-eks \
+  --principal-arn arn:aws:iam::111122223333:role/dev-team
+
+# List associated policies
+aws eks list-associated-access-policies \
+  --cluster-name my-eks \
+  --principal-arn arn:aws:iam::111122223333:role/dev-team
+
+# Delete an access entry
+aws eks delete-access-entry \
+  --cluster-name my-eks \
+  --principal-arn arn:aws:iam::111122223333:role/dev-team
+```
+
+---
+
+## Terraform
+
+```hcl
+# Create the access entry
 resource "aws_eks_access_entry" "dev" {
   cluster_name  = aws_eks_cluster.this.name
   principal_arn = aws_iam_role.dev.arn
   type          = "STANDARD"
 }
-``` 
-``` 
+
+# Associate an access policy scoped to a namespace
 resource "aws_eks_access_policy_association" "dev_admin_ns" {
   cluster_name  = aws_eks_cluster.this.name
   principal_arn = aws_iam_role.dev.arn
@@ -128,10 +153,34 @@ resource "aws_eks_access_policy_association" "dev_admin_ns" {
     type       = "namespace"
     namespaces = ["dev"]
   }
+
+  depends_on = [aws_eks_access_entry.dev]
 }
-``` 
+```
 
-Terraform Registry
-+1
+---
 
-If you want, I can also show the eksctl commands or a minimal migration plan from aws-auth to access entries for your clusters.
+## Access Entries vs aws-auth ConfigMap
+
+| | Access Entry | aws-auth ConfigMap |
+|---|---|---|
+| Management | AWS API / console / IaC | Manual `kubectl edit configmap` |
+| Audit trail | CloudTrail | None (direct etcd edit) |
+| Namespace scoping | Native | Requires additional RBAC objects |
+| Risk | Low | Misconfiguration can lock out all users |
+| EKS Auto Mode | Required | Not supported |
+| Migration | Run in `API_AND_CONFIG_MAP` mode | — |
+
+---
+
+## Important Notes
+
+- If you **delete and recreate** an IAM principal, the old access entry will not work — the internal IAM ID changes. Delete the access entry and recreate it.
+- Access entries are **required** for EKS Auto Mode — you cannot disable them.
+- You can mix both policies (EKS access policies) and Kubernetes group mappings on the same access entry.
+
+---
+
+## Summary
+
+Access Entries are the recommended and future-proof way to manage EKS cluster access. They provide centralized, auditable, API-driven access management with fine-grained namespace scoping — eliminating the fragility and manual overhead of editing the `aws-auth` ConfigMap.

@@ -1,113 +1,105 @@
-Kube-proxy is a network component that runs on each node in your EKS cluster and maintains network rules to enable communication to your Pods. Here's how it works specifically on Amazon EKS:
+# kube-proxy on Amazon EKS
 
-## Core Function
+> kube-proxy is a DaemonSet that runs on every node in your EKS cluster. It translates Kubernetes `Service` objects into host-level network rules (iptables or IPVS), enabling pods and external clients to reach services via their virtual ClusterIP or NodePort.
 
-Kube-proxy implements part of the Kubernetes Service concept by maintaining network rules that allow network communication to your Pods from inside or outside the cluster. When you create a Service in Kubernetes, kube-proxy configures the node to handle traffic routing to the appropriate Pod endpoints.
+---
+
+## What kube-proxy Does
+
+```
+Kubernetes API Server
+        │  (watches Service + Endpoints objects)
+        ▼
+    kube-proxy (on every node)
+        │
+        ▼
+  iptables / IPVS rules in the Linux kernel
+        │
+        ▼
+Traffic to ClusterIP:port → forwarded to one of the healthy Pod IPs
+```
+
+kube-proxy does **not** handle Pod-to-Pod networking — that is the responsibility of the CNI plugin (AWS VPC CNI on EKS). kube-proxy handles **Service-level** routing only.
+
+---
 
 ## Proxy Modes on EKS
 
-Amazon EKS supports two proxy modes:
+### iptables Mode (default)
 
-**iptables mode** (default for most EKS versions)
+- Programs Linux `iptables` NAT rules for each Service and its endpoints
+- DNAT rules rewrite packets destined for a ClusterIP to a backend Pod IP
+- Works well for clusters with up to ~10,000 Services
+- Mature and widely tested
 
-*   Uses iptables rules to redirect traffic to backend Pods
-*   More mature and widely tested
-*   Random selection of backend Pods for load balancing
-*   Lower overhead for smaller clusters
+### IPVS Mode (optional, high scale)
 
-**IPVS mode** (available but requires configuration)
+- Uses the Linux kernel's IP Virtual Server (IPVS) module
+- Better performance at scale — no linear rule scan per packet
+- More load-balancing algorithms: round-robin, least connection, shortest expected delay
+- Requires `ipvsadm` kernel modules to be loaded on nodes
+- Recommended for clusters with thousands of Services
 
-*   Uses IP Virtual Server for load balancing
-*   Better performance at scale with large numbers of Services
-*   More load balancing algorithms available (round-robin, least connection, etc.)
-*   Requires IPVS kernel modules to be loaded
+---
 
-## EKS-Specific Considerations
+## EKS-Specific Details
 
-**Daemonset Deployment**: On EKS, kube-proxy runs as a DaemonSet in the `kube-system` namespace, meaning one instance per node.
+| Detail | Description |
+|---|---|
+| **DaemonSet** | One kube-proxy pod per node in `kube-system` namespace |
+| **Not on Fargate** | Fargate nodes do not run kube-proxy; AWS manages their routing |
+| **EKS Add-on** | Managed via the EKS add-on framework — AWS provides security-patched builds |
+| **Version matching** | kube-proxy version should match your cluster's Kubernetes version |
+| **Auto Mode** | AWS fully manages kube-proxy in EKS Auto Mode — no manual intervention needed |
 
-**VPC CNI Integration**: Kube-proxy works alongside the AWS VPC CNI plugin. While the VPC CNI handles Pod IP address assignment from your VPC, kube-proxy handles Service-level routing and load balancing.
+---
 
-**EKS Auto Mode**: In EKS Auto Mode (which you're working with), AWS manages the kube-proxy deployment and configuration automatically, including updates and version compatibility with your cluster version.
+## Traffic Flows
 
-**Version Management**: The kube-proxy version should match your EKS cluster version. EKS automatically updates the kube-proxy add-on during cluster upgrades.
+### ClusterIP Service
 
-## Key Traffic Flows
-
-1.  **ClusterIP Services**: kube-proxy intercepts traffic to the Service's virtual IP and forwards it to one of the backend Pods
-2.  **NodePort Services**: kube-proxy configures each node to listen on a specific port and forward traffic to the Service
-3.  **LoadBalancer Services**: Works with AWS Load Balancers, where kube-proxy handles the node-level routing after traffic reaches the node
-
-You can check your kube-proxy configuration with:
-
-bash
-
-    kubectl get daemonset kube-proxy -n kube-system
-    kubectl logs -n kube-system -l k8s-app=kube-proxy
-
-Since you're working with EKS Auto Mode, AWS handles most of the kube-proxy management, but understanding its role is important for troubleshooting networking issues or understanding how Service traffic flows through your cluster.
-
-
-
-**What Is kube-proxy on Amazon EKS?**
-
--   **Network proxy DaemonSet**\
-    On each EC2 node in your EKS cluster, Amazon deploys a
-    **kube-proxy** pod (as a DaemonSet in the kube-system namespace).
-    It's *not* deployed to Fargate nodes by default. Its job is to
-    reflect every Kubernetes Service and Endpoint into host-level
-    networking rules so that ServiceIP:port and NodePort traffic gets
-    forwarded to the right Pods
-    ([[docs.aws.amazon.com]{.underline}](https://docs.aws.amazon.com/eks/latest/userguide/managing-kube-proxy.html?utm_source=chatgpt.com)).
-
--   **EKS Add-on**\
-    Starting with recent EKS versions you can install and manage
-    kube-proxy using the Amazon EKS **add-on** framework. That ensures
-    you get AWS-curated, security-patched builds (based on the minimal
-    EKS Distro image) and automatic compatibility with your cluster's
-    Kubernetes version
-    ([[docs.aws.amazon.com]{.underline}](https://docs.aws.amazon.com/eks/latest/userguide/eks-add-ons.html?utm_source=chatgpt.com)).
-
--   **iptables (default) vs. IPVS mode**\
-    By default kube-proxy programs Linux iptables rules. In very large
-    clusters, you can switch to IPVS mode to avoid per-packet rule
-    scans---IPVS offers lower latency when you have thousands of
-    Services
-    ([[docs.aws.amazon.com]{.underline}](https://docs.aws.amazon.com/eks/latest/best-practices/ipvs.html?utm_source=chatgpt.com)).
-
-**How kube-proxy Actually Works**
-
-1.  **Watches the API server**\
-    It keeps open watches on Service and Endpoints objects.
-
-2.  **Calculates desired rules**
-
-    -   For each Service it creates chains in the nat table
-        (KUBE-SERVICES, KUBE-NODEPORTS, etc.).
-
-    -   For each Endpoint it updates KUBE-SEP-\<hash\> chains pointing
-        to Pod IPs.
-
-3.  **Programs the kernel**
-
-    -   **iptables mode**: inserts DNAT rules so packets sent to a
-        Service IP get rewritten and sent to one of the healthy Pod IPs.
-
-    -   **IPVS mode**: adds virtual server entries so that the kernel's
-        IPVS module load-balances in-kernel.
-
-4.  **Keeps them in sync**\
-    Whenever a Pod comes up or dies, kube-proxy atomically updates the
-    chains so that traffic shifts without a hitch.
-
-**End-to-End Example**
-
-Let's deploy a simple **nginx** app and expose it via a Kubernetes
-Service. Then we'll see how kube-proxy on each node makes it reachable.
-
-**1. Create Deployment and Service**
 ```
-# deployment.yaml
+Pod A calls http://nginx-svc:80
+    │
+    ▼
+iptables DNAT: ClusterIP:80 → Pod B IP:80
+    │
+    ▼
+Pod B receives request
+```
+
+### NodePort Service
+
+```
+External client calls NodeIP:30080
+    │
+    ▼
+iptables DNAT (NodePort chain): NodeIP:30080 → Pod IP:80
+    │
+    ▼
+Pod receives request
+```
+
+### LoadBalancer Service (AWS NLB/ALB)
+
+```
+External client → AWS NLB → Node:NodePort
+    │
+    ▼
+iptables DNAT: NodePort → Pod IP:containerPort
+    │
+    ▼
+Pod receives request
+```
+
+---
+
+## Hands-On Example
+
+### Deploy nginx and expose as a Service
+
+```yaml
+# nginx.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -115,10 +107,12 @@ metadata:
 spec:
   replicas: 2
   selector:
-    matchLabels: { app: nginx }
+    matchLabels:
+      app: nginx
   template:
     metadata:
-      labels: { app: nginx }
+      labels:
+        app: nginx
     spec:
       containers:
       - name: nginx
@@ -126,105 +120,116 @@ spec:
         ports:
         - containerPort: 80
 ---
-# service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: nginx-svc
 spec:
-  type: NodePort        # could also use LoadBalancer for an AWS NLB
+  type: NodePort
   selector:
     app: nginx
   ports:
   - port: 80
     targetPort: 80
-    nodePort: 30080     # fixed NodePort for clarity
+    nodePort: 30080
+```
 
-```
-```
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
-```
-**2. Inspect Endpoints**
-```
+```bash
+kubectl apply -f nginx.yaml
+
+# Verify the service and endpoints
+kubectl get svc nginx-svc
 kubectl get endpoints nginx-svc -o wide
 ```
-You'll see the two Pod IPs backing nginx-svc.
 
-**3. Show iptables Rules (on any node)**
-```
-\# List the Service chain entries in nat table
+### Inspect iptables rules (SSH into a node)
 
-iptables -t nat -L KUBE-SERVICES -n \--line-numbers
-```
-Typical output:
-```
-Chain KUBE-SERVICES (2 references)
+```bash
+# View Service entries in the NAT table
+iptables -t nat -L KUBE-SERVICES -n --line-numbers
 
-num target prot opt source destination
+# View the NodePort chain
+iptables -t nat -L KUBE-NODEPORTS -n --line-numbers
 
-1 KUBE-SEP-ABCDEF78 tcp \-- 0.0.0.0/0 10.100.243.12:80
+# Find chains for a specific service
+iptables -t nat -L -n | grep nginx
+```
 
-2 KUBE-SEP-12345678 tcp \-- 0.0.0.0/0 10.100.243.34:80
+### Test connectivity
 
-3 KUBE-MARK-MASQ all \-- 0.0.0.0/0 10.100.243.0/24
+```bash
+# From inside the cluster (using a temporary pod)
+kubectl run test --image=alpine --rm -it -- wget -qO- http://nginx-svc
 
-4 KUBE-MARK-DROP all \-- 0.0.0.0/0 10.100.243.0/24
+# From outside (via NodePort — replace with a real node IP)
+curl http://<NODE_IP>:30080
 ```
-And the NodePort chain:
-```
-iptables -t nat -L KUBE-NODEPORTS -n \--line-numbers
-```
-```
-Chain KUBE-NODEPORTS (1 references)
 
-num target prot opt source destination
+---
 
-1 DNAT tcp \-- 0.0.0.0/0 0.0.0.0/0 tcp dpt:30080 to:10.100.243.12:80
-```
-Here kube-proxy has set up a DNAT so that any packet hitting
-**NodeIP:30080** is forwarded to one of the nginx Pod IPs
-([gallery.ecr.aws]{.underline}).
+## Managing kube-proxy on EKS
 
-**4. Test Reachability**
+### Check the current version
 
-From your laptop or another machine, hit the Node's IP:
-```
-curl http://\<any-NodeIP\>:30080
-```
-You should get the default nginx welcome page---traffic went:
-```
-Client → Node's TCP:30080 (iptables DNAT) → Pod's TCP:80 → Pod responds
-via SNAT back to client
-```
-**Advanced Tips**
+```bash
+kubectl get daemonset kube-proxy -n kube-system \
+  -o jsonpath='{.spec.template.spec.containers[0].image}'
 
--   **Switch to IPVS**\
-    For clusters with thousands of Services, edit the kube-proxy
-    ConfigMap:
+# Or via add-on
+aws eks describe-addon \
+  --cluster-name my-cluster \
+  --addon-name kube-proxy
 ```
- kubectl -n kube-system edit configmap kube-proxy
-  \# set mode: \"IPVS\"
-```
-> Then restart the DaemonSet. You'll see ipvsadm -L -n show virtual
-> servers instead of iptables chains
-> ([[docs.aws.amazon.com]{.underline}](https://docs.aws.amazon.com/eks/latest/best-practices/ipvs.html?utm_source=chatgpt.com)).
 
--   **Version management**\
-    Use eksctl or the AWS CLI to upgrade the kube-proxy add-on and keep
-    parity with your cluster's control plane version:
-```
+### Update kube-proxy add-on
+
+```bash
 aws eks update-addon \
   --cluster-name my-cluster \
   --addon-name kube-proxy \
-  --addon-version v1.33.0-eksbuild.2
-
+  --addon-version v1.29.3-eksbuild.2 \
+  --resolve-conflicts OVERWRITE
 ```
--   **Monitoring**\
-    kube-proxy exposes metrics
-    (kubeproxy_iptables_sync_duration_seconds, etc.) that you can scrape
-    via Prometheus or send to CloudWatch as custom metrics.
 
-By running kube-proxy as a managed add-on and leveraging either iptables
-or IPVS, Amazon EKS ensures your Service networking is resilient,
-performant, and in lockstep with upstream Kubernetes.
+### View kube-proxy logs
+
+```bash
+kubectl logs -n kube-system -l k8s-app=kube-proxy --tail=50
+```
+
+### Switch to IPVS mode (for large clusters)
+
+```bash
+# Edit the kube-proxy ConfigMap
+kubectl -n kube-system edit configmap kube-proxy
+# Change: mode: "" → mode: "ipvs"
+
+# Restart the DaemonSet to apply
+kubectl -n kube-system rollout restart daemonset kube-proxy
+
+# Verify with ipvsadm (on any node)
+# ipvsadm -L -n
+```
+
+---
+
+## Monitoring kube-proxy
+
+kube-proxy exposes Prometheus metrics on port 10249:
+
+| Metric | Description |
+|---|---|
+| `kubeproxy_iptables_sync_duration_seconds` | Time spent syncing iptables rules |
+| `kubeproxy_network_programming_duration_seconds` | Latency of programming network rules |
+| `kubeproxy_sync_proxy_rules_duration_seconds` | Total sync duration |
+
+```bash
+# View metrics from inside the cluster
+kubectl exec -n kube-system <kube-proxy-pod> -- wget -qO- http://localhost:10249/metrics
+```
+
+---
+
+## Summary
+
+kube-proxy is a transparent but critical component of Kubernetes networking. It ensures that traffic to any `Service` IP gets correctly routed to a healthy pod, across all nodes in the cluster. On EKS, manage it as a managed add-on to stay in sync with cluster upgrades. For large clusters (thousands of Services), switch to IPVS mode to avoid iptables performance degradation.

@@ -1,101 +1,197 @@
 # AWS Lambda: Serverless Functions
-> Lambda lets you run code without managing servers. You upload your function, configure a trigger (API Gateway, S3 event, SQS, EventBridge, etc.), and AWS handles execution, scaling, and billing per invocation.
 
-- Amazon Web Services (AWS) Lambda is a serverless computing service that allows you to run code without provisioning or managing servers.
-- With AWS Lambda, you can run code for virtually any type of application or backend service, all with zero administration. 
-- You simply upload your code, and Lambda takes care of everything required to run and scale your code with high availability.
+> Lambda lets you run code without managing servers. Upload your function, configure a trigger, and AWS handles execution, automatic scaling, and billing per invocation — down to the millisecond.
 
-#### Key Features of AWS Lambda
-##### 1)Serverless Architecture:
+---
 
-- No need to provision or manage servers. AWS handles the infrastructure, so you can focus on writing code.
-##### 2)Event-Driven Execution:
+## How Lambda Works
 
-- AWS Lambda runs your code in response to events. These events can come from various AWS services such as S3, DynamoDB, Kinesis, SNS, and API Gateway, or from custom applications.
-##### 3)Automatic Scaling:
-
-- AWS Lambda automatically scales your applications by running code in response to each trigger. Your code runs in parallel, processing each trigger individually, scaling precisely with the size of the workload.
-##### 4)Flexible Resource Allocation:
-
-- You can allocate memory to your Lambda functions, and AWS Lambda allocates proportional CPU power, making it flexible to meet the performance needs of your application.
-##### 5)Short Execution Duration:
-
-- Ideal for short-running, stateless, and ephemeral functions, with an execution timeout configurable up to 15 minutes.
-##### 6)Integrated Security:
-
-- AWS Lambda integrates with AWS Identity and Access Management (IAM) to control access to Lambda functions and other AWS resources.
-##### 7)Multiple Language Support:
-
-- Supports various programming languages, including Node.js, Python, Java, Ruby, C#, and Go. You can also bring your own runtime.
-##### 8)Cost-Effective:
-
-- Pay only for the compute time you consume. Billing is calculated based on the number of requests and the duration your code runs, measured in milliseconds.
-#### Common Use Cases
-##### 1)Data Processing:
-
--Process data streams in real-time from services like Kinesis or DynamoDB Streams.
-- Perform ETL (Extract, Transform, Load) operations on data stored in S3.
-##### 2)Web and Mobile Backends:
-
-- Build serverless APIs with Amazon API Gateway and AWS Lambda.
-Handle HTTP requests and responses, manage user sessions, and perform backend operations.
-##### 3)File Processing:
-
-- Automatically trigger Lambda functions to process files when they are uploaded to Amazon S3, such as resizing images or transcoding videos.
-##### 4)Real-Time Notifications:
-
-- Send notifications or alerts in response to changes in data or events, using services like Amazon SNS or Amazon SQS.
-##### 5)Automation and Orchestration:
-
-- Automate operational tasks such as resource provisioning, deployment automation, and monitoring.
-#### Example: Creating and Deploying a Lambda Function
-- Here’s a basic example of creating an AWS Lambda function using the AWS Management Console and the AWS CLI.
-
-#### Step 1: Creating a Lambda Function Using AWS Management Console
-##### 1)Navigate to the AWS Lambda Console:
-
-- Open the AWS Management Console, then open the AWS Lambda console.
-Create a Function:
-
-##### 2)Click on "Create function".
-- Choose "Author from scratch".
-- Provide a function name.
-- Choose a runtime (e.g., Python 3.8).
-- Set up execution role: Select "Create a new role with basic Lambda permissions".
-##### 3)Write Your Code:
-
-- Use the built-in code editor to write your Lambda function code. Here’s a simple example in Python:
-python
 ```
+Trigger (event source)
+    │
+    ▼
+Lambda Service ──► Spin up execution environment
+    │               (container with your runtime + code)
+    ▼
+Your function code runs
+    │
+    ▼
+Response / output sent to caller or next service
+    │
+    ▼
+Container kept warm (reuse) or terminated (idle)
+```
+
+---
+
+## Key Features
+
+| Feature | Detail |
+|---|---|
+| **No servers** | AWS provisions and manages all compute |
+| **Auto-scaling** | Scales from 0 to thousands of concurrent executions automatically |
+| **Event-driven** | Triggered by S3, DynamoDB Streams, SQS, SNS, API Gateway, EventBridge, and more |
+| **Pay per use** | Billed per request count + duration (ms); 1M free requests/month included |
+| **Max timeout** | 15 minutes per invocation |
+| **Memory** | 128 MB to 10,240 MB; CPU scales proportionally with memory |
+| **Runtimes** | Node.js, Python, Java, Go, Ruby, .NET, and custom runtimes |
+| **Layers** | Share libraries and dependencies across functions |
+| **VPC support** | Run Lambda inside a VPC to access private resources |
+
+---
+
+## Supported Triggers
+
+| Trigger | Use Case |
+|---|---|
+| **API Gateway / Function URL** | HTTP endpoint — REST or HTTP API |
+| **S3 Events** | Process files on upload (resize images, parse CSV) |
+| **DynamoDB Streams** | React to table changes in real time |
+| **SQS** | Process messages from a queue (batch processing) |
+| **SNS** | Fan-out notifications to functions |
+| **EventBridge** | Scheduled tasks (cron), AWS service events |
+| **Kinesis** | Real-time stream processing |
+| **Cognito** | Custom auth flows, pre/post signup triggers |
+| **CloudFront (Lambda@Edge)** | Run code at edge locations |
+
+---
+
+## Common Use Cases
+
+| Use Case | Example |
+|---|---|
+| **Serverless APIs** | API Gateway → Lambda → DynamoDB |
+| **File processing** | S3 upload → Lambda resizes image → save to output bucket |
+| **Scheduled jobs** | EventBridge cron → Lambda → cleanup task |
+| **Data pipelines** | Kinesis stream → Lambda → Elasticsearch |
+| **Real-time notifications** | DynamoDB Streams → Lambda → SNS push |
+| **Infrastructure automation** | CloudWatch Alarm → Lambda → auto-remediation |
+
+---
+
+## Creating a Lambda Function
+
+### Using the AWS Management Console
+
+1. Open **Lambda** → **Create function**
+2. Choose **Author from scratch**
+3. Set the function name, runtime (e.g., Python 3.12), and execution role
+4. Write or paste your code in the inline editor
+5. Click **Deploy**, then **Test** with a sample event
+
+### Using the AWS CLI
+
+**Step 1: Write your function**
+
+```python
+# lambda_function.py
 def lambda_handler(event, context):
+    name = event.get('name', 'World')
     return {
         'statusCode': 200,
-        'body': 'Hello, World!'
+        'body': f'Hello, {name}!'
     }
-```    
-##### 4)Deploy the Function:
-
-- Click "Deploy" to save and deploy your function.
-#### Step 2: Creating a Lambda Function Using AWS CLI
-##### 1)Package Your Code:
-
-- Create a file named lambda_function.py with your function code.
-- Zip the file:
-sh
 ```
+
+**Step 2: Package and deploy**
+
+```bash
 zip function.zip lambda_function.py
-```
-##### 2)Create the Lambda Function:
 
-- Use the AWS CLI to create the Lambda function:
-sh
-```
 aws lambda create-function \
-  --function-name HelloWorldFunction \
+  --function-name HelloFunction \
+  --runtime python3.12 \
   --zip-file fileb://function.zip \
   --handler lambda_function.lambda_handler \
-  --runtime python3.8 \
-  --role arn:aws:iam::123456789012:role/execution_role
+  --role arn:aws:iam::123456789012:role/lambda-execution-role
 ```
-##### Conclusion
-AWS Lambda is a powerful service that simplifies the process of running code in the cloud by abstracting away the infrastructure management. It is well-suited for a variety of use cases including real-time data processing, serverless backends, and automation. Its event-driven nature and automatic scaling capabilities make it an ideal choice for applications that need to respond quickly to changes and scale seamlessly with demand. By using AWS Lambda, you can focus on writing code while AWS handles the rest, ensuring high availability, security, and performance.
+
+**Step 3: Invoke and test**
+
+```bash
+aws lambda invoke \
+  --function-name HelloFunction \
+  --payload '{"name": "Alice"}' \
+  --cli-binary-format raw-in-base64-out \
+  output.json
+
+cat output.json
+# {"statusCode": 200, "body": "Hello, Alice!"}
+```
+
+**Update function code**
+
+```bash
+zip function.zip lambda_function.py
+
+aws lambda update-function-code \
+  --function-name HelloFunction \
+  --zip-file fileb://function.zip
+```
+
+---
+
+## Environment Variables and Secrets
+
+```bash
+# Set environment variables
+aws lambda update-function-configuration \
+  --function-name HelloFunction \
+  --environment Variables={DB_HOST=mydb.cluster.local,DB_PORT=5432}
+```
+
+For sensitive values, retrieve from SSM Parameter Store or Secrets Manager inside the function:
+
+```python
+import boto3
+
+ssm = boto3.client('ssm')
+db_password = ssm.get_parameter(
+    Name='/myapp/db_password',
+    WithDecryption=True
+)['Parameter']['Value']
+```
+
+---
+
+## Concurrency and Throttling
+
+| Setting | Description |
+|---|---|
+| **Unreserved concurrency** | Default pool shared across all functions in the account |
+| **Reserved concurrency** | Guarantees a specific number of concurrent executions for a function |
+| **Provisioned concurrency** | Pre-warms containers to eliminate cold starts for latency-sensitive functions |
+
+```bash
+# Set reserved concurrency
+aws lambda put-function-concurrency \
+  --function-name HelloFunction \
+  --reserved-concurrent-executions 100
+```
+
+---
+
+## Lambda IAM Execution Role
+
+The execution role defines what AWS resources the function can access.
+
+Minimum role trust policy:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": { "Service": "lambda.amazonaws.com" },
+    "Action": "sts:AssumeRole"
+  }]
+}
+```
+
+Attach `AWSLambdaBasicExecutionRole` for CloudWatch Logs access, then add service-specific policies as needed.
+
+---
+
+## Summary
+
+Lambda is the simplest way to run event-driven code on AWS. It removes all infrastructure concerns, scales automatically, and costs nothing when idle. Design Lambda functions to be stateless and short-lived — offload state to DynamoDB, S3, or ElastiCache, and orchestrate multi-step workflows with Step Functions.

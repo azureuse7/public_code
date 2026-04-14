@@ -1,97 +1,266 @@
-##### IAM role
-- Clustre IAM role: This role grants Amazon EKS the necessary permissions to interact with other AWS services on behalf of your cluster,(Trust: eks.amazonaws.com with sts:AssumeRole and sts:TagSession.) 
+# EKS Auto Mode: Fully Managed Kubernetes Nodes
 
-- Node IAM role: This role grants EC2 instances running as Kubernetes nodes the necessary permissions to interact with AWS services and resources, 
+> EKS Auto Mode extends AWS-managed operations to the data plane — compute, networking, and storage are provisioned and managed automatically. You define workloads; AWS handles node lifecycle, patching, scaling, and IAM wiring.
 
-##### Attach policy 
-- Clustre IAM --> 4 
+---
 
-- Node IAM role ---> 2
+## What EKS Auto Mode Does
 
+| Without Auto Mode | With Auto Mode |
+|---|---|
+| You create and manage node groups | AWS provisions nodes on demand |
+| You patch and upgrade nodes | AWS handles OS patching |
+| You configure kube-proxy, VPC CNI | AWS manages all node add-ons |
+| You create instance profiles manually | AWS manages instance profiles |
+| You set up cluster autoscaler | Built-in node autoscaling |
 
-##### Access Entry -> s
-- Clustre IAM role : No, Access entries are for IAM principals that authenticate to the Kubernetes API (humans, automation, nodes). The cluster role is a service role and doesn’t need (or use) an access entry. 
+---
 
-- Node IAM EKS:  You need to create an EKS Access Entry to permit the nodes to join the cluster. Create an Access Entry of type EC2 for the node role 
-ss
-##### EKS Access Entry + Policy Association
-- Clustre IAM role: Not applicable for the cluster role.
+## IAM Roles Required
 
-- Node IAM role : associate the EKS access policy AmazonEKSAutoNodePolicy at cluster scope so nodes can join.
+EKS Auto Mode requires two IAM roles: a **Cluster Role** and a **Node Role**.
 
+### Cluster IAM Role
 
-##### Instance profile – Usually yes (one of two ways).
+Used by the EKS control plane to manage cluster resources on your behalf.
 
-- Clustre IAM role: For the Cluster IAM Role, you do NOT need to create an instance profile. Here's why:
-The cluster IAM role is a service role that is assumed by the EKS service (eks.amazonaws.com), not by EC2 instances AWS. This role allows Amazon EKS to manage cluster resources on your behalf.
-the IAM role name, and EKS Auto Mode will handle the instance profile creation for you
+**Trust policy:**
 
-- Node IAM role : In the NodeClass you can set either spec.role or spec.instanceProfile (mutually exclusive). If you supply role, EKS can manage the instance profile for you; if your org’s SCPs are strict, pre-create an instance profile (name must start with eks-) and set instanceProfile instead.
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": { "Service": "eks.amazonaws.com" },
+    "Action": ["sts:AssumeRole", "sts:TagSession"]
+  }]
+}
+```
 
-   
+**Required policies (attach all 5):**
 
+```bash
+aws iam create-role \
+  --role-name AmazonEKSAutoClusterRole \
+  --assume-role-policy-document file://cluster-trust-policy.json
 
+for policy in \
+  arn:aws:iam::aws:policy/AmazonEKSClusterPolicy \
+  arn:aws:iam::aws:policy/AmazonEKSComputePolicy \
+  arn:aws:iam::aws:policy/AmazonEKSBlockStoragePolicy \
+  arn:aws:iam::aws:policy/AmazonEKSLoadBalancingPolicy \
+  arn:aws:iam::aws:policy/AmazonEKSNetworkingPolicy; do
+  aws iam attach-role-policy \
+    --role-name AmazonEKSAutoClusterRole \
+    --policy-arn $policy
+done
+```
 
-Each custom node class can have its own IAM role (or you can reuse one across multiple custom node classes)
-Requires manual EKS Access Entry creation with the AmazonEKSAutoNodePolicy access policy
-Same IAM policies as the default node role, but requires additional configuration
+### Node IAM Role
 
+Used by EC2 instances running as Kubernetes worker nodes.
 
-##### Step 1: Create the IAM role (same as default node role)
-``` 
-bashaws iam create-role \
+**Trust policy:**
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": { "Service": "ec2.amazonaws.com" },
+    "Action": "sts:AssumeRole"
+  }]
+}
+```
+
+**Required policies:**
+
+```bash
+aws iam create-role \
+  --role-name AmazonEKSAutoNodeRole \
+  --assume-role-policy-document file://node-trust-policy.json
+
+aws iam attach-role-policy \
+  --role-name AmazonEKSAutoNodeRole \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSWorkerNodeMinimalPolicy
+
+aws iam attach-role-policy \
+  --role-name AmazonEKSAutoNodeRole \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly
+```
+
+---
+
+## Creating an EKS Auto Mode Cluster
+
+```bash
+aws eks create-cluster \
+  --name my-auto-cluster \
+  --region us-east-1 \
+  --kubernetes-version 1.31 \
+  --role-arn arn:aws:iam::ACCOUNT_ID:role/AmazonEKSAutoClusterRole \
+  --resources-vpc-config subnetIds=subnet-aaa,subnet-bbb,securityGroupIds=sg-xxx \
+  --compute-config enabled=true,nodePools=[general-purpose,system],nodeRoleArn=arn:aws:iam::ACCOUNT_ID:role/AmazonEKSAutoNodeRole \
+  --kubernetes-network-config elasticLoadBalancing={enabled=true} \
+  --storage-config blockStorage={enabled=true} \
+  --access-config authenticationMode=API
+```
+
+---
+
+## Access Entry for Nodes (Required)
+
+EKS Auto Mode uses Access Entries — the `aws-auth` ConfigMap is **not used**.
+
+```bash
+# Create access entry for the node role
+aws eks create-access-entry \
+  --cluster-name my-auto-cluster \
+  --principal-arn arn:aws:iam::ACCOUNT_ID:role/AmazonEKSAutoNodeRole \
+  --type EC2
+
+# Associate the Auto Mode node policy
+aws eks associate-access-policy \
+  --cluster-name my-auto-cluster \
+  --principal-arn arn:aws:iam::ACCOUNT_ID:role/AmazonEKSAutoNodeRole \
+  --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSAutoNodePolicy \
+  --access-scope type=cluster
+```
+
+---
+
+## Custom Node Classes
+
+Use custom NodeClass resources when you need nodes with specific configuration (instance types, subnets, security groups, or a custom IAM role).
+
+### Step 1: Create a custom Node IAM Role
+
+```bash
+aws iam create-role \
   --role-name CustomNodeClassRole \
-  --assume-role-policy-document file://node-trust-policy.json \
-  --description "Custom Node Class role for EKS Auto Mode"
-``` 
-#### Step 2: Attach required policies
-``` 
-bashaws iam attach-role-policy \
+  --assume-role-policy-document file://node-trust-policy.json
+
+aws iam attach-role-policy \
   --role-name CustomNodeClassRole \
   --policy-arn arn:aws:iam::aws:policy/AmazonEKSWorkerNodeMinimalPolicy
 
 aws iam attach-role-policy \
   --role-name CustomNodeClassRole \
   --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly
-  ``` 
-##### Step 3: Create an EC2 instance profile (required for custom node classes)
-``` 
-bashaws iam create-instance-profile \
+
+# Create instance profile (required for custom node classes)
+aws iam create-instance-profile \
   --instance-profile-name CustomNodeClassInstanceProfile
 
 aws iam add-role-to-instance-profile \
   --instance-profile-name CustomNodeClassInstanceProfile \
   --role-name CustomNodeClassRole
-  ``` 
-#### Step 4: Get the role ARN for use in NodeClass YAML
-``` 
-bashaws iam get-role --role-name CustomNodeClassRole --query 'Role.Arn' --output text
-``` 
-- EKS Access Entry Configuration (REQUIRED for Custom Node Classes)
-- When creating access entries for EKS Auto Mode node classes, you need to use the EC2 access entry type and associate the EKS Auto Node Policy. AWSTrevorrobertsjr
+```
 
-##### Step 1: Create the access entry
-``` 
-bashaws eks create-access-entry \
-  --cluster-name <your-cluster-name> \
-  --principal-arn arn:aws:iam::<account-id>:role/CustomNodeClassRole \
+### Step 2: Register the node role as an Access Entry
+
+```bash
+aws eks create-access-entry \
+  --cluster-name my-auto-cluster \
+  --principal-arn arn:aws:iam::ACCOUNT_ID:role/CustomNodeClassRole \
   --type EC2
-  ``` 
-#### Step 2: Associate the AmazonEKSAutoNodePolicy
-``` 
-bashaws eks associate-access-policy \
-  --cluster-name <your-cluster-name> \
-  --principal-arn arn:aws:iam::<account-id>:role/CustomNodeClassRole \
+
+aws eks associate-access-policy \
+  --cluster-name my-auto-cluster \
+  --principal-arn arn:aws:iam::ACCOUNT_ID:role/CustomNodeClassRole \
   --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSAutoNodePolicy \
   --access-scope type=cluster
-``` 
-##### Terraform Example
-``` 
-hclresource "aws_eks_access_entry" "custom_nodeclass_entry" {
-  cluster_name      = var.cluster_name
-  principal_arn     = aws_iam_role.custom_nodeclass_role.arn
-  kubernetes_groups = []
-  type              = "EC2"
+```
+
+### Step 3: Create the NodeClass
+
+```yaml
+# custom-nodeclass.yaml
+apiVersion: eks.amazonaws.com/v1
+kind: NodeClass
+metadata:
+  name: custom-class
+spec:
+  role: CustomNodeClassRole        # or use instanceProfile: CustomNodeClassInstanceProfile
+  subnetSelectorTerms:
+    - tags:
+        kubernetes.io/role/internal-elb: "1"
+  securityGroupSelectorTerms:
+    - tags:
+        eks.cluster: my-auto-cluster
+  amiSelectorTerms:
+    - alias: al2023@latest
+  tags:
+    Environment: production
+```
+
+```bash
+kubectl apply -f custom-nodeclass.yaml
+```
+
+### Step 4: Create a NodePool referencing the NodeClass
+
+```yaml
+# custom-nodepool.yaml
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: custom-pool
+spec:
+  template:
+    spec:
+      nodeClassRef:
+        group: eks.amazonaws.com
+        kind: NodeClass
+        name: custom-class
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand"]
+  limits:
+    cpu: "100"
+    memory: 400Gi
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 1m
+```
+
+```bash
+kubectl apply -f custom-nodepool.yaml
+```
+
+---
+
+## Terraform Example
+
+```hcl
+# Cluster access entry for default node role
+resource "aws_eks_access_entry" "node" {
+  cluster_name  = var.cluster_name
+  principal_arn = aws_iam_role.node.arn
+  type          = "EC2"
+}
+
+resource "aws_eks_access_policy_association" "node_policy" {
+  cluster_name  = var.cluster_name
+  principal_arn = aws_iam_role.node.arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAutoNodePolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [aws_eks_access_entry.node]
+}
+
+# Custom node class access entry
+resource "aws_eks_access_entry" "custom_nodeclass" {
+  cluster_name  = var.cluster_name
+  principal_arn = aws_iam_role.custom_nodeclass_role.arn
+  type          = "EC2"
 }
 
 resource "aws_eks_access_policy_association" "custom_nodeclass_policy" {
@@ -103,61 +272,35 @@ resource "aws_eks_access_policy_association" "custom_nodeclass_policy" {
     type = "cluster"
   }
 
-  depends_on = [aws_eks_access_entry.custom_nodeclass_entry]
+  depends_on = [aws_eks_access_entry.custom_nodeclass]
 }
-``` 
+```
 
+---
 
-Complete Setup Workflow
-Prerequisites
+## Setup Workflow Summary
 
-AWS CLI installed and configured
-kubectl installed
-Appropriate IAM permissions to create roles and policies
-An existing VPC with subnets
+| Phase | Steps |
+|---|---|
+| **1. Cluster IAM Role** | Create role with 5 managed policies |
+| **2. Node IAM Role** | Create role with 2 managed policies |
+| **3. Create Cluster** | Enable compute, storage, load balancing |
+| **4. Access Entries** | Register node role as EC2 type with AmazonEKSAutoNodePolicy |
+| **5. Custom NodeClass** | (Optional) Create role + instance profile + NodeClass + NodePool |
+| **6. Deploy Workloads** | `kubectl apply` — nodes provision on demand |
 
-Step-by-Step Setup
-Phase 1: Create Cluster IAM Role
+---
 
-Create trust policy file
-Create the AmazonEKSAutoClusterRole
-Attach all 5 required managed policies
-(Optional) Attach custom tagging policy
+## Important Notes
 
-Phase 2: Create Default Node IAM Role
+- **Access Entries are required** — aws-auth ConfigMap is not supported in Auto Mode
+- **Instance profile naming** for custom classes must start with `eks-` if your SCPs enforce it; otherwise use the role name directly via `spec.role`
+- Changing the IAM role in a NodeClass requires a new Access Entry
+- Use **EKS Pod Identity** for pod-level AWS permissions rather than adding policies to the node role
+- You can have **multiple NodeClasses** each with its own role for workload isolation
 
-Create node trust policy file
-Create the AmazonEKSAutoNodeRole
-Attach the 2 required managed policies
+---
 
-Phase 3: Create EKS Cluster
+## Summary
 
-Phase 4: Create Custom Node Class IAM Role
-
-
-Phase 5: Configure EKS Access Entry
-
-Create EC2 type access entry for the custom node role
-Associate AmazonEKSAutoNodePolicy access policy
-
-Phase 6: Create Custom NodeClass
-
-Create NodeClass YAML with custom role reference
-Apply with kubectl apply -f nodeclass.yaml
-
-Phase 7: Create Custom NodePool
-
-Create NodePool YAML referencing your custom NodeClass
-Apply with kubectl apply -f nodepool.yaml
-
-
-Important Considerations
-
-Access Entry Requirement: If you change the node IAM role associated with a NodeClass, you will need to create a new Access Entry AWS
-Multiple Custom Node Classes: You can create multiple custom node classes, each with its own IAM role, or reuse the same role across multiple node classes
-Built-in vs Custom: EKS automatically creates an Access Entry for the default node IAM role during cluster creation or when you create the built-in nodeclass and nodepools AWS re:Post
-Tagging: If you need custom tags on AWS resources provisioned by Auto Mode, add the custom tagging policy to your Cluster IAM Role
-Pod Identity: For workload-level permissions, use EKS Pod Identity instead of attaching additional policies to the node role
-
-
-This comprehensive setup ensures your EKS Auto Mode cluster with custom node classes has all the necessary IAM roles and permissions configured correctly!Retry
+EKS Auto Mode delivers a fully managed Kubernetes experience by extending AWS control to the data plane. Set up the two required IAM roles, enable compute/storage/networking at cluster creation, and create Access Entries for the node role — then deploy workloads and let AWS handle the rest.

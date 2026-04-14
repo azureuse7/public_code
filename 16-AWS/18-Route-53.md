@@ -1,95 +1,202 @@
 # Amazon Route 53: DNS Web Service
-> Route 53 is AWS's scalable, highly available DNS service. It routes users to AWS resources (EC2, ELB, S3) or external endpoints, supports health checks, failover routing, latency-based routing, and weighted traffic policies.
 
-- Amazon Route 53 is a scalable and highly available Domain Name System (DNS) web service designed to give developers and businesses an extremely reliable and cost-effective way to route end users to Internet applications.
-- Route 53 effectively connects user requests to infrastructure running in AWS – such as Amazon EC2 instances, Elastic Load Balancers, or S3 buckets – and can also be used to route users to infrastructure outside of AWS.
+> Route 53 is AWS's scalable, highly available DNS service. It routes end users to AWS resources (EC2, ELB, S3, CloudFront) or external endpoints, with built-in health checks, failover, latency-based routing, and weighted traffic policies.
 
-#### Key Features of Amazon Route 53
-##### 1) DNS Management:
+---
 
-- Route 53 translates human-readable domain names (like www.example.com) into IP addresses (like 192.0.2.1) that computers use to connect to each other.
-##### 2) Traffic Flow:
+## Core Concepts
 
-- Route 53 provides sophisticated traffic routing policies, including latency-based routing, geo DNS, and weighted round-robin to control traffic flow globally.
-##### 3) Health Checks and Monitoring:
+| Concept | Description |
+|---|---|
+| **Hosted Zone** | A container for DNS records for a domain (e.g., `example.com`) |
+| **Record Set** | A DNS record within a hosted zone (A, CNAME, MX, TXT, etc.) |
+| **TTL** | Time-to-Live — how long resolvers cache the record |
+| **Alias Record** | AWS-specific extension of A/AAAA — maps to AWS resources (ELB, CloudFront, S3) with no TTL charge |
+| **Health Check** | Monitors endpoint availability; removes unhealthy targets from DNS |
 
-- Route 53 can monitor the health and performance of your application endpoints and route traffic away from unhealthy endpoints.
-##### 4) Domain Registration:
+---
 
-- Route 53 allows you to register new domain names or transfer existing ones.
-##### 5) Scalability and Reliability:
+## Record Types
 
-- Built on AWS's highly reliable infrastructure, Route 53 is designed to handle a large number of DNS queries and to ensure low latency.
-##### 6) DNS Failover:
+| Type | Points to | Use for |
+|---|---|---|
+| **A** | IPv4 address | Host to IP mapping |
+| **AAAA** | IPv6 address | IPv6 host mapping |
+| **CNAME** | Another hostname | Aliases (cannot be used at zone apex) |
+| **Alias** | AWS resource (ELB, CloudFront, S3) | Zone apex + AWS resources (preferred over CNAME) |
+| **MX** | Mail server hostname + priority | Email routing |
+| **TXT** | Free-form text | Domain verification (SPF, DKIM, etc.) |
+| **NS** | Name server hostnames | Delegation to a hosted zone |
+| **SOA** | Authority record | Automatically created per hosted zone |
 
-- Route 53 supports DNS failover, which allows you to automatically route traffic to healthy resources in the event that a particular endpoint becomes unavailable.
-##### 7) Integration with AWS Services:
+---
 
-- Route 53 integrates seamlessly with other AWS services such as ELB, CloudFront, S3, and more, enabling automatic DNS updates as you scale your infrastructure.
-##### 8) Anycast Network:
+## Routing Policies
 
-- Route 53 uses a global network of DNS servers to respond to end-user DNS queries with low latency by serving requests from the optimal location.
-###  Common Use Cases
-##### 1) Web Application Hosting:
+| Policy | How it works | Use for |
+|---|---|---|
+| **Simple** | Single value returned | Single endpoint |
+| **Weighted** | Split traffic by percentage (e.g., 90/10) | A/B testing, gradual rollouts |
+| **Latency** | Route to the region with lowest latency for the user | Multi-region performance |
+| **Failover** | Primary endpoint + health check; failover to secondary if unhealthy | Disaster recovery |
+| **Geolocation** | Route based on user's country or continent | Content localisation, compliance |
+| **Geoproximity** | Route based on geographic distance + bias | Fine-grained geographic routing |
+| **Multivalue** | Returns up to 8 healthy records randomly | Simple client-side load balancing |
+| **IP-based** | Route based on client CIDR range | Control routing for specific networks |
 
-- Use Route 53 to route traffic to your web application hosted on AWS EC2 instances, ELB, or S3 buckets.
-##### 2) Global Traffic Management:
+---
 
-- Distribute traffic across multiple regions for high availability and performance using latency-based routing or geo DNS.
-##### 3) Failover Scenarios:
+## Setting Up Route 53
 
-- Set up health checks and DNS failover to maintain application availability and route traffic to healthy endpoints.
-##### 4) Domain Management:
+### Step 1: Register or Transfer a Domain
 
-- Register and manage domain names for your websites and applications directly through Route 53.
-##### Example: Basic Route 53 Configuration
-##### 1. Register a Domain
-You can register a domain directly through the Route 53 console or using the AWS CLI.
-
-sh
+```bash
+aws route53domains register-domain \
+  --domain-name example.com \
+  --duration-in-years 1 \
+  --admin-contact file://contact.json \
+  --registrant-contact file://contact.json \
+  --tech-contact file://contact.json \
+  --privacy-protect-admin-contact \
+  --privacy-protect-registrant-contact
 ```
-aws route53domains register-domain --domain-name example.com --duration-in-years 1 --admin-contact file://contact.json --registrant-contact file://contact.json --tech-contact file://contact.json
-```
-The contact.json file should contain contact details for the domain registration.
 
-##### 2. Create a Hosted Zone
-Create a hosted zone to manage the DNS settings for your domain.
+### Step 2: Create a Hosted Zone
 
-sh
+```bash
+aws route53 create-hosted-zone \
+  --name example.com \
+  --caller-reference unique-ref-$(date +%s)
 ```
-aws route53 create-hosted-zone --name example.com --caller-reference unique-string
-```
-This command creates a new hosted zone for example.com.
 
-##### 3. Create DNS Records
-Add DNS records to your hosted zone to route traffic to your resources. For example, to create an A record that points to an IP address:
+Take note of the returned **Hosted Zone ID** and **NS records** — add the NS records to your domain registrar.
 
-sh
-```
-aws route53 change-resource-record-sets --hosted-zone-id Z3M3LMPEXAMPLE --change-batch '{
-  "Changes": [{
-    "Action": "CREATE",
-    "ResourceRecordSet": {
-      "Name": "www.example.com",
-      "Type": "A",
-      "TTL": 60,
-      "ResourceRecords": [{"Value": "192.0.2.1"}]
-    }
-  }]
-}'
-```
-##### 4. Set Up Health Checks
-- To ensure high availability, set up health checks that Route 53 can use to determine the health of your endpoints.
+### Step 3: Create DNS Records
 
-sh
+**A record pointing to an IP:**
+
+```bash
+aws route53 change-resource-record-sets \
+  --hosted-zone-id Z3M3LMPEXAMPLE \
+  --change-batch '{
+    "Changes": [{
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "www.example.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": [{"Value": "203.0.113.1"}]
+      }
+    }]
+  }'
 ```
-aws route53 create-health-check --caller-reference unique-string --health-check-config '{
-  "IPAddress": "192.0.2.1",
-  "Port": 80,
-  "Type": "HTTP",
-  "ResourcePath": "/",
-  "FullyQualifiedDomainName": "www.example.com"
-}'
+
+**Alias record pointing to an ALB:**
+
+```bash
+aws route53 change-resource-record-sets \
+  --hosted-zone-id Z3M3LMPEXAMPLE \
+  --change-batch '{
+    "Changes": [{
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "app.example.com",
+        "Type": "A",
+        "AliasTarget": {
+          "HostedZoneId": "Z35SXDOTRQ7X7K",
+          "DNSName": "my-alb-123456.us-east-1.elb.amazonaws.com",
+          "EvaluateTargetHealth": true
+        }
+      }
+    }]
+  }'
 ```
-##### Conclusion
-Amazon Route 53 is a powerful DNS and domain management service that offers a wide range of features to route end users to Internet applications reliably and efficiently. With capabilities like traffic flow management, health checks, and domain registration, Route 53 is an essential tool for managing web traffic and maintaining high availability and performance for your applications. Its deep integration with other AWS services and global infrastructure makes it an ideal choice for businesses looking to leverage the full potential of the AWS ecosystem.
+
+---
+
+## Health Checks
+
+Health checks monitor your endpoints and remove them from DNS if they fail.
+
+```bash
+aws route53 create-health-check \
+  --caller-reference unique-ref-$(date +%s) \
+  --health-check-config '{
+    "IPAddress": "203.0.113.1",
+    "Port": 443,
+    "Type": "HTTPS",
+    "ResourcePath": "/health",
+    "FullyQualifiedDomainName": "app.example.com",
+    "RequestInterval": 30,
+    "FailureThreshold": 3
+  }'
+```
+
+---
+
+## Failover Routing Example
+
+Configure primary and secondary records with health checks for automatic failover:
+
+```bash
+# Primary record (us-east-1)
+aws route53 change-resource-record-sets \
+  --hosted-zone-id Z3M3LMPEXAMPLE \
+  --change-batch '{
+    "Changes": [{
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "app.example.com",
+        "Type": "A",
+        "SetIdentifier": "primary",
+        "Failover": "PRIMARY",
+        "TTL": 60,
+        "ResourceRecords": [{"Value": "203.0.113.1"}],
+        "HealthCheckId": "abc-health-check-id"
+      }
+    }]
+  }'
+
+# Secondary record (us-west-2)
+aws route53 change-resource-record-sets \
+  --hosted-zone-id Z3M3LMPEXAMPLE \
+  --change-batch '{
+    "Changes": [{
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "app.example.com",
+        "Type": "A",
+        "SetIdentifier": "secondary",
+        "Failover": "SECONDARY",
+        "TTL": 60,
+        "ResourceRecords": [{"Value": "198.51.100.1"}]
+      }
+    }]
+  }'
+```
+
+---
+
+## Useful CLI Commands
+
+```bash
+# List all hosted zones
+aws route53 list-hosted-zones
+
+# List records in a hosted zone
+aws route53 list-resource-record-sets \
+  --hosted-zone-id Z3M3LMPEXAMPLE
+
+# List all health checks
+aws route53 list-health-checks
+
+# Check DNS propagation (run from your machine)
+nslookup www.example.com 8.8.8.8
+dig www.example.com +short
+```
+
+---
+
+## Summary
+
+Route 53 is more than a DNS service — it's a global traffic management platform. Use Alias records to point to AWS resources (free, no TTL issues), health checks to automatically remove failing endpoints, and routing policies like Latency or Failover to build multi-region resilient architectures. Pair it with CloudFront for global content delivery and ACM for free TLS certificates.

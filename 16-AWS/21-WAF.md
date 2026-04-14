@@ -1,101 +1,194 @@
 # AWS WAF: Web Application Firewall
-> AWS WAF protects web applications from common exploits (SQL injection, XSS, bot traffic) at layer 7. You define rules that allow, block, or count requests — deployable in front of CloudFront, ALB, API Gateway, or AppSync.
 
-- AWS WAF (Web Application Firewall) is a security service provided by Amazon Web Services (AWS) that helps protect your web applications from common web exploits and vulnerabilities.
--  AWS WAF gives you control over how traffic reaches your applications by enabling you to create security rules that block, allow, or monitor (count) web requests based on predefined conditions.
+> AWS WAF protects web applications and APIs from common exploits (SQL injection, XSS, bot traffic) at Layer 7. You define Web ACLs with rules that allow, block, or count HTTP/HTTPS requests — deployable in front of CloudFront, ALB, API Gateway, or AppSync.
 
-#### Key Features of AWS WAF
-##### 1)Protection Against Common Web Attacks:
+---
 
-- Protects against SQL injection, cross-site scripting (XSS), and other common web exploits.
-##### 2)Customizable Rules:
+## How AWS WAF Works
 
-- Allows you to create custom rules that define the conditions under which requests are allowed, blocked, or counted.
-Supports rate-based rules to manage traffic spikes and prevent abuse.
-##### 3)Managed Rules:
+```
+User Request (HTTP/HTTPS)
+        │
+        ▼
+  AWS WAF Web ACL
+        │
+        ├── Rule 1 (Managed: AWSManagedRulesCommonRuleSet)
+        │       → BLOCK if SQL injection detected
+        │
+        ├── Rule 2 (Custom: Rate limit)
+        │       → BLOCK if > 1000 req/5min from same IP
+        │
+        └── Default Action: ALLOW
+        │
+        ▼
+  Your Application (CloudFront / ALB / API Gateway)
+```
 
-- Offers managed rule sets provided by AWS and third-party security vendors that are pre-configured to protect against common threats.
-##### 4)Integration with Other AWS Services:
+---
 
-- Integrates seamlessly with Amazon CloudFront (Content Delivery Network), Application Load Balancer (ALB), and API Gateway to provide security at different points in your application’s architecture.
-##### 5)Real-Time Visibility:
+## Key Concepts
 
-- Provides real-time metrics and logging via Amazon CloudWatch and AWS CloudTrail, enabling you to monitor and respond to security events.
-##### 6)Easy Deployment and Management:
+| Term | Description |
+|---|---|
+| **Web ACL** | The top-level WAF resource; attached to a CloudFront, ALB, or API Gateway |
+| **Rule** | A condition + action (Allow, Block, Count) |
+| **Rule Group** | A reusable collection of rules |
+| **Managed Rule Group** | Pre-built rules from AWS or marketplace vendors (OWASP Top 10, bot control, etc.) |
+| **Rate-Based Rule** | Blocks IPs that exceed a request rate threshold |
+| **Statement** | The condition that a rule evaluates (IP, header, body, URI, geo, etc.) |
+| **Scope** | `REGIONAL` (ALB, API GW) or `CLOUDFRONT` (must be in us-east-1) |
 
-- Managed through the AWS Management Console, AWS CLI, SDKs, and AWS CloudFormation for infrastructure as code.
-##### 7)Cost-Effective:
+---
 
-- Pay only for what you use with no upfront costs, making it a cost-effective solution for web application security.
-#### Use Cases
-##### 1)Application Protection:
+## Common AWS Managed Rule Groups
 
-- Protects web applications from known and emerging threats by filtering and monitoring HTTP/HTTPS requests.
-##### 2)Compliance:
+| Rule Group | Protects Against |
+|---|---|
+| `AWSManagedRulesCommonRuleSet` | OWASP Top 10: SQL injection, XSS, LFI, RFI |
+| `AWSManagedRulesKnownBadInputsRuleSet` | Log4Shell, SSRF, Spring4Shell |
+| `AWSManagedRulesSQLiRuleSet` | SQL injection |
+| `AWSManagedRulesLinuxRuleSet` | Linux-specific attack patterns |
+| `AWSManagedRulesBotControlRuleSet` | Bot traffic, scrapers, credential stuffing |
+| `AWSManagedRulesAmazonIpReputationList` | Known malicious IPs tracked by Amazon |
 
-- Helps meet security compliance requirements by implementing web application security best practices.
-##### 3)Bot Mitigation:
+---
 
-- Prevents automated attacks such as bots and scrapers from overloading your application.
-##### 4)Preventing Data Exfiltration:
+## Use Cases
 
-- Protects against data exfiltration by blocking malicious requests that attempt to extract sensitive information.
-#### Example: Setting Up AWS WAF with an Application Load Balancer
-Here is a step-by-step guide to set up AWS WAF with an Application Load Balancer (ALB).
+| Use Case | WAF Feature |
+|---|---|
+| Block OWASP Top 10 attacks | AWS Managed Common Rule Set |
+| Rate limit per IP | Rate-Based Rule |
+| Block specific countries | Geo match statement |
+| Allow only known IPs | IP set allow list |
+| Block specific User-Agents | String match on `User-Agent` header |
+| Bot mitigation | Bot Control Managed Rule Group |
+| Prevent data exfiltration | Custom rules inspecting response bodies |
 
-#### Step 1: Create a Web ACL
-##### 1)Sign in to the AWS Management Console and open the WAF & Shield console at AWS WAF.
-- Create a Web ACL:
-- Choose "Create web ACL".
-- Provide a name and optional description for the Web ACL.
-- Choose the appropriate region if using a regional resource (like ALB).
-#### 2)Step 2: Add Rules to the Web ACL
-##### 1)Add Rules:
-- Add managed rules or create custom rules.
-- For example, add the AWS Managed Rules for common threats:
-- AWS-AWSManagedRulesCommonRuleSet.
-- Specify the action (Allow, Block, or Count) for each rule.
-##### 2)Step 3: Associate the Web ACL with an Application Load Balancer
-##### 1)Associate with ALB:
-- Choose "Add AWS resources".
-- Select "Application Load Balancer" and choose the appropriate load - - balancer from the list.
-- Save the configuration.
-#### Step 4: Monitor and Manage the Web ACL
-##### 1)Monitor Traffic:
-- Use the AWS WAF dashboard to monitor traffic and view blocked or allowed requests.
-- Set up CloudWatch metrics and logging for deeper insights.
-#### Example of Creating a Web ACL Using AWS CLI
-Here is an example of how to create a simple Web ACL using the AWS CLI:
+---
 
-sh
-``` 
+## Setting Up WAF with an ALB
+
+### Using the AWS Management Console
+
+1. Open **WAF & Shield** → **Web ACLs** → **Create web ACL**
+2. Set **Scope** to **Regional** and select the region
+3. Add **Rules**:
+   - Click **Add managed rule groups** → enable `AWSManagedRulesCommonRuleSet`
+   - Add a custom rate-based rule (e.g., block IPs > 2000 req/5min)
+4. Set **Default action**: Allow (rules decide what to block)
+5. **Associate** with your ALB or API Gateway
+6. Review and create
+
+### Using the AWS CLI
+
+**Step 1: Create the Web ACL**
+
+```bash
 aws wafv2 create-web-acl \
-    --name my-web-acl \
-    --scope REGIONAL \
-    --default-action Block={} \
-    --description "My Web ACL" \
-    --rules '[
-        {
-            "Name": "AWS-AWSManagedRulesCommonRuleSet",
-            "Priority": 1,
-            "Statement": {
-                "ManagedRuleGroupStatement": {
-                    "VendorName": "AWS",
-                    "Name": "AWSManagedRulesCommonRuleSet"
-                }
-            },
-            "Action": {
-                "Allow": {}
-            },
-            "VisibilityConfig": {
-                "SampledRequestsEnabled": true,
-                "CloudWatchMetricsEnabled": true,
-                "MetricName": "AWSManagedRulesCommonRuleSet"
-            }
+  --name my-web-acl \
+  --scope REGIONAL \
+  --region us-east-1 \
+  --default-action Allow={} \
+  --description "Application WAF" \
+  --rules '[
+    {
+      "Name": "CommonRuleSet",
+      "Priority": 1,
+      "Statement": {
+        "ManagedRuleGroupStatement": {
+          "VendorName": "AWS",
+          "Name": "AWSManagedRulesCommonRuleSet"
         }
-    ]' \
-    --visibility-config SampledRequestsEnabled=true,CloudWatchMetricsEnabled=true,MetricName="my-web-acl-metric" \
-    --region us-east-1
-```     
-#### Conclusion
-AWS WAF is a powerful tool for protecting your web applications from common web exploits and vulnerabilities. By allowing you to create custom rules, use managed rule sets, and integrate seamlessly with other AWS services, AWS WAF provides a comprehensive solution for enhancing the security and compliance of your web applications. With real-time visibility and easy management, AWS WAF helps ensure that your applications remain secure and resilient against a wide range of threats.
+      },
+      "OverrideAction": { "None": {} },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "CommonRuleSet"
+      }
+    },
+    {
+      "Name": "RateLimitRule",
+      "Priority": 2,
+      "Statement": {
+        "RateBasedStatement": {
+          "Limit": 2000,
+          "AggregateKeyType": "IP"
+        }
+      },
+      "Action": { "Block": {} },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "RateLimitRule"
+      }
+    }
+  ]' \
+  --visibility-config \
+    SampledRequestsEnabled=true,CloudWatchMetricsEnabled=true,MetricName=my-web-acl
+```
+
+**Step 2: Associate with an ALB**
+
+```bash
+# Get the ALB ARN
+alb_arn=$(aws elbv2 describe-load-balancers \
+  --names my-alb \
+  --query 'LoadBalancers[0].LoadBalancerArn' \
+  --output text)
+
+# Get the Web ACL ARN
+web_acl_arn=$(aws wafv2 list-web-acls \
+  --scope REGIONAL \
+  --region us-east-1 \
+  --query "WebACLs[?Name=='my-web-acl'].ARN" \
+  --output text)
+
+# Associate
+aws wafv2 associate-web-acl \
+  --web-acl-arn $web_acl_arn \
+  --resource-arn $alb_arn \
+  --region us-east-1
+```
+
+---
+
+## Monitoring and Logging
+
+```bash
+# Enable WAF logging to a Kinesis Firehose or S3 bucket
+aws wafv2 put-logging-configuration \
+  --logging-configuration '{
+    "ResourceArn": "<WEB_ACL_ARN>",
+    "LogDestinationConfigs": ["arn:aws:firehose:us-east-1:123456789012:deliverystream/aws-waf-logs-my-stream"]
+  }' \
+  --region us-east-1
+
+# View sampled requests (last 3 hours)
+aws wafv2 get-sampled-requests \
+  --web-acl-arn <WEB_ACL_ARN> \
+  --rule-metric-name CommonRuleSet \
+  --scope REGIONAL \
+  --time-window StartTime=2024-01-01T00:00:00Z,EndTime=2024-01-01T03:00:00Z \
+  --max-items 100 \
+  --region us-east-1
+```
+
+---
+
+## WAF Deployment Architecture
+
+| Protected Resource | Scope | Region |
+|---|---|---|
+| **CloudFront distribution** | CLOUDFRONT | Must be created in `us-east-1` |
+| **Application Load Balancer** | REGIONAL | Same region as ALB |
+| **API Gateway (REST API)** | REGIONAL | Same region as API |
+| **AppSync GraphQL API** | REGIONAL | Same region as AppSync |
+| **Cognito User Pool** | REGIONAL | Same region as pool |
+
+---
+
+## Summary
+
+AWS WAF is your first line of defence against application-layer attacks. Start with AWS Managed Rule Groups (especially `AWSManagedRulesCommonRuleSet` and the IP Reputation List) to get immediate protection against the OWASP Top 10 and known bad actors. Add rate-based rules to prevent brute force and DDoS, and use `Count` mode initially to observe traffic before switching to `Block`.

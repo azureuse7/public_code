@@ -1,97 +1,183 @@
 # ELB: Elastic Load Balancing
-> Amazon ELB automatically distributes incoming traffic across multiple targets (EC2, containers, IPs, Lambda) across Availability Zones for high availability and fault tolerance. It comes in three flavors: ALB (layer 7), NLB (layer 4), and CLB (legacy).
 
-Amazon Elastic Load Balancing (ELB) is a fully managed load balancing service provided by Amazon Web Services (AWS). ELB automatically distributes incoming application traffic across multiple targets, such as Amazon EC2 instances, containers, IP addresses, and Lambda functions, in one or more Availability Zones. This ensures high availability, fault tolerance, and scalability of your applications.
+> Amazon ELB automatically distributes incoming traffic across multiple targets (EC2, containers, IPs, Lambda) across Availability Zones — providing high availability, fault tolerance, and horizontal scalability.
 
-#### Key Features of Elastic Load Balancing
-##### 1) Types of Load Balancers:
+---
 
-- **Application Load Balancer (ALB):** Operates at the application layer (HTTP/HTTPS) and is ideal for web applications. It supports advanced routing, including host-based and path-based routing, and can route requests to multiple target groups.
-- **Network Load Balancer (NLB):** Operates at the transport layer (TCP/UDP) and is designed for high-performance applications that require ultra-low latency and high throughput.
-- **Gateway Load Balancer (GWLB):** Integrates third-party virtual appliances with your network, such as firewalls, for enhanced security.
-  **Classic Load Balancer (CLB):** Operates at both the application and transport layers and is ideal for applications built within the EC2-Classic network.
-##### 2) Health Checks:
+## Load Balancer Types
 
-- ELB performs health checks on registered targets and routes traffic only to healthy targets. This helps ensure that your application remains highly available.
-##### 3) Security Features:
+| Type | Layer | Protocol | Best For |
+|---|---|---|---|
+| **ALB** (Application) | 7 (HTTP/HTTPS) | HTTP, HTTPS, WebSocket | Web apps, microservices, path/host routing |
+| **NLB** (Network) | 4 (TCP/UDP) | TCP, UDP, TLS | Ultra-low latency, high throughput, static IPs |
+| **GWLB** (Gateway) | 3 (Network) | IP | Third-party virtual appliances (firewalls, IDS) |
+| **CLB** (Classic) | 4 & 7 | HTTP, HTTPS, TCP | Legacy EC2-Classic apps (avoid for new workloads) |
 
-- Integrates with AWS Identity and Access Management (IAM) for managing access and permissions.
-- Supports Secure Socket Layer (SSL) and Transport Layer Security (TLS) termination to offload encryption and decryption from your application instances.
-##### 4) High Availability and Fault Tolerance:
+---
 
-- Automatically distributes traffic across multiple targets in multiple Availability Zones, improving application reliability and availability.
-##### 5) Scalability:
+## ALB — Application Load Balancer
 
-- ELB automatically scales its capacity in response to incoming traffic, ensuring consistent application performance.
-##### 6) Integration with AWS Services:
+### Routing Rules
 
-- Works seamlessly with other AWS services like EC2, ECS, EKS, and Lambda, enabling flexible and scalable application architectures.
-#### Common Use Cases
-##### 1) Web Applications:
+ALB routes requests based on rules applied in order of priority:
 
-- Distribute incoming HTTP/HTTPS traffic to multiple instances of web servers, ensuring high availability and reliability.
-##### 2) Microservices:
+| Rule Condition | Example | Routes to |
+|---|---|---|
+| **Path-based** | `/api/*` | API service target group |
+| **Host-based** | `app.example.com` | App target group |
+| **HTTP header** | `X-Version: v2` | Canary target group |
+| **Query string** | `?env=staging` | Staging target group |
 
-- Route traffic based on URL paths or hostnames to different microservices, allowing you to build and scale microservice architectures.
-##### 3) Containerized Applications:
+### Key Features
+- Native HTTPS termination (upload ACM certificate)
+- HTTP → HTTPS redirect at the load balancer
+- Sticky sessions via cookies
+- WebSocket and HTTP/2 support
+- Lambda as a target (single function per target group)
 
-- Distribute traffic to containers running in Amazon ECS or Amazon EKS, facilitating the deployment and scaling of containerized applications.
-##### 4) High-Performance Applications:
+---
 
-- Use Network Load Balancers for applications that require high throughput and low latency, such as gaming or real-time applications.
-#### Example: Setting Up an Application Load Balancer (ALB)
-Here's a step-by-step guide to setting up an Application Load Balancer using the AWS Management Console and AWS CLI.
+## NLB — Network Load Balancer
 
-#### Using the AWS Management Console
-##### 1) Open the Amazon EC2 Console:
+- Handles **millions of requests/sec** at ultra-low latency
+- Assigns **static Elastic IP addresses** per AZ (predictable for firewall allowlisting)
+- Preserves client source IP to targets
+- Supports TCP, UDP, and TLS passthrough
+- Use for gaming, IoT, financial trading, real-time streaming
 
-- Navigate to the EC2 Dashboard.
-- Click on "Load Balancers" in the left-hand navigation pane.
-##### 2) Create a New Load Balancer:
+---
 
-- Click the "Create Load Balancer" button.
-- Choose "Application Load Balancer" and click "Create."
-##### 3) Configure Load Balancer:
+## Health Checks
 
-- Specify a name for the load balancer.
-- Select the scheme (Internet-facing or Internal).
-- Select the network (VPC) and availability zones.
-##### 4) Configure Security Groups:
+ELB continuously checks targets and stops routing to unhealthy ones.
 
-- Select or create a security group that allows incoming traffic on the appropriate ports (e.g., HTTP/HTTPS).
-##### 5) Configure Listeners and Routing:
+| Setting | Description |
+|---|---|
+| **Protocol** | HTTP, HTTPS, or TCP |
+| **Path** | Health check endpoint (e.g., `/health`) |
+| **Healthy threshold** | Consecutive successes required (default: 3) |
+| **Unhealthy threshold** | Consecutive failures before marking unhealthy (default: 3) |
+| **Interval** | Seconds between checks (default: 30s) |
 
-- Specify the listener (e.g., HTTP or HTTPS).
-- Create a target group or choose an existing one to route requests to your EC2 instances.
-##### 6) Register Targets:
+---
 
-- Add your EC2 instances or other targets to the target group.
-- Specify the health check settings.
-##### 7) Review and Create:
+## Setting Up an ALB
 
-Review your configuration and click "Create Load Balancer."
-#### Using AWS CLI
-You can also create an ALB using the AWS CLI with the following commands.
+### Using the AWS Management Console
 
-##### 1) Create a Target Group:
-sh
+1. Go to **EC2** → **Load Balancers** → **Create Load Balancer** → choose **Application Load Balancer**
+2. Configure:
+   - **Scheme**: Internet-facing or Internal
+   - **VPC and subnets**: select at least 2 AZs
+   - **Security group**: allow ports 80 and 443
+3. Create a **Target Group**: choose EC2 instances, containers, or IPs
+4. Add **Listeners**: HTTP:80 and HTTPS:443
+5. Register your targets
+6. Review and create
+
+### Using the AWS CLI
+
+**Step 1: Create a target group**
+
+```bash
+aws elbv2 create-target-group \
+  --name web-targets \
+  --protocol HTTP \
+  --port 80 \
+  --vpc-id vpc-12345678 \
+  --health-check-path /health \
+  --health-check-interval-seconds 30
 ```
-aws elbv2 create-target-group --name my-targets --protocol HTTP --port 80 --vpc-id vpc-12345678
+
+**Step 2: Register EC2 instances**
+
+```bash
+aws elbv2 register-targets \
+  --target-group-arn arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/web-targets/abc123 \
+  --targets Id=i-1234567890abcdef0 Id=i-0abcdef1234567890
 ```
-##### 2) Register Targets:
-sh
+
+**Step 3: Create the load balancer**
+
+```bash
+aws elbv2 create-load-balancer \
+  --name my-alb \
+  --subnets subnet-12345678 subnet-23456789 \
+  --security-groups sg-12345678 \
+  --scheme internet-facing \
+  --type application
 ```
-aws elbv2 register-targets --target-group-arn arn:aws:elasticloadbalancing:region:account-id:targetgroup/my-targets/6d0ecf831eec9f09 --targets Id=i-1234567890abcdef0 Id=i-0abcdef1234567890
+
+**Step 4: Create a listener**
+
+```bash
+aws elbv2 create-listener \
+  --load-balancer-arn arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/my-alb/abc123 \
+  --protocol HTTP \
+  --port 80 \
+  --default-actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/web-targets/abc123
 ```
-##### 3) Create Load Balancer:
-sh
+
+**Step 5: Add an HTTPS redirect rule (optional)**
+
+```bash
+aws elbv2 create-listener \
+  --load-balancer-arn <ALB_ARN> \
+  --protocol HTTP \
+  --port 80 \
+  --default-actions '[{"Type":"redirect","RedirectConfig":{"Protocol":"HTTPS","Port":"443","StatusCode":"HTTP_301"}}]'
 ```
-aws elbv2 create-load-balancer --name my-load-balancer --subnets subnet-12345678 subnet-23456789 --security-groups sg-12345678
+
+---
+
+## ALB with EKS (AWS Load Balancer Controller)
+
+When running on EKS, the AWS Load Balancer Controller provisions ALBs automatically from `Ingress` objects:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-service
+            port:
+              number: 80
 ```
-##### 4) Create Listener:
-sh
-```
-aws elbv2 create-listener --load-balancer-arn arn:aws:elasticloadbalancing:region:account-id:loadbalancer/app/my-load-balancer/50dc6c495c0c9188 --protocol HTTP --port 80 --default-actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:region:account-id:targetgroup/my-targets/6d0ecf831eec9f09
-```
-##### Conclusion
-Amazon Elastic Load Balancing (ELB) is a crucial component for building scalable, highly available, and fault-tolerant applications on AWS. By distributing incoming traffic across multiple targets, ELB helps ensure that your applications can handle varying levels of traffic and remain resilient in the face of failures. With support for multiple load balancer types, advanced routing features, and seamless integration with other AWS services, ELB provides the flexibility and power needed to meet a wide range of application needs.
+
+---
+
+## Common Use Cases
+
+| Use Case | Recommended Type |
+|---|---|
+| Web app with HTTP/HTTPS | ALB |
+| Microservices with path routing | ALB |
+| Containerised apps (ECS/EKS) | ALB |
+| High-throughput TCP/UDP apps | NLB |
+| Static IP requirement | NLB |
+| Inline firewalls / IDS/IPS | GWLB |
+
+---
+
+## Summary
+
+ELB is a foundational component for any highly available AWS architecture. Use ALB for HTTP workloads with intelligent routing, NLB for raw TCP/UDP performance and static IPs, and GWLB to integrate network security appliances. Always configure health checks so unhealthy targets are automatically removed from rotation.

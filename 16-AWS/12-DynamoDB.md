@@ -1,116 +1,175 @@
 # Amazon DynamoDB: Managed NoSQL Database
-> DynamoDB is a fully managed, serverless NoSQL database delivering single-digit millisecond performance at any scale. It supports key-value and document data models and is used for high-traffic applications, gaming, IoT, and session management.
 
-- Amazon DynamoDB is a fully managed NoSQL database service provided by Amazon Web Services (AWS) that delivers fast and predictable performance with seamless scalability.
-- It is designed to handle a wide range of workloads, from small applications to large-scale applications with millions of requests per second. DynamoDB supports both document and key-value data models.
+> DynamoDB is a fully managed, serverless NoSQL database delivering single-digit millisecond performance at any scale. It supports key-value and document data models and is the go-to choice for high-traffic applications, gaming leaderboards, IoT, and session management.
 
-#### Key Features of Amazon DynamoDB
-#### 1) Fully Managed:
+---
 
-- DynamoDB is a fully managed service, meaning AWS handles the operational aspects such as provisioning, patching, backup, and recovery, so you can focus on application development.
-#### 2) High Performance:
+## Key Features
 
-- DynamoDB provides single-digit millisecond response times at any scale, making it suitable for high-performance applications.
-#### 3) Scalability:
+| Feature | Description |
+|---|---|
+| **Fully managed** | No servers to provision, patch, or back up |
+| **Serverless** | Scales automatically; pay per request (on-demand) or provision capacity |
+| **Performance** | Single-digit millisecond reads/writes at any scale |
+| **Global Tables** | Multi-region, active-active replication |
+| **DynamoDB Streams** | Change data capture — trigger Lambda on inserts/updates/deletes |
+| **TTL** | Automatically expire and delete items after a set timestamp |
+| **Backup** | On-demand and continuous PITR (Point-in-Time Recovery) backups |
+| **Encryption** | At rest via AWS KMS; in transit via TLS |
 
-- DynamoDB automatically scales up and down to adjust for capacity and maintain performance as your application grows.
-#### 4) Flexible Data Model:
+---
 
-- Supports both key-value and document data structures, enabling you to store and query a wide variety of data types and formats.
-#### 5) Built-In Security:
+## Core Concepts
 
-- Integrated with AWS Identity and Access Management (IAM) for access control and encryption at rest using AWS Key Management Service (KMS).
-#### 6) Global Tables:
+### Data Model
 
-- Enables you to replicate your data across multiple AWS Regions, providing multi-region, fully replicated, high-availability tables.
-#### 7) Event-Driven Programming:
-
-- Integrates with AWS Lambda to enable event-driven programming with DynamoDB Streams, allowing you to trigger actions based on data changes.
-#### 8) Backup and Restore:
-
-- Offers on-demand and continuous backups for data protection and disaster recovery.
-#### 9) Time to Live (TTL):
-
-- Automatically deletes expired items from your tables to help you reduce storage costs and manage data lifecycle.
-### Use Cases
-#### 1) Web and Mobile Applications:
-
-- Store and manage user profiles, session data, and application state.
-#### 2) Gaming:
-
-- Store game state, player data, and leaderboards.
-#### 3) IoT:
-
-- Handle high-velocity data from IoT devices.
-#### 4) E-Commerce:
-
-- Manage product catalogs, shopping carts, and order processing.
-#### 5) Serverless Architectures:
-
-- Integrate with AWS Lambda to build serverless applications.
-### Core Components of DynamoDB
-#### 1) Tables:
-
-- The primary structure for storing data in DynamoDB. Each table consists of items, and each item is a collection of attributes.
-#### 2) Items:
-
-- A single data record in a table, analogous to a row in a relational database. Each item is uniquely identified by a primary key.
-#### 3)Attributes:
-
-- The data elements that make up an item, analogous to columns in a relational database.
-#### 4) Primary Key:
-
-- Uniquely identifies each item in a table. There are two types of primary **keys**:
-- **Partition Key**: A single attribute.
-- **Composite Key**: A combination of partition key and sort key.
-#### 5)Secondary Indexes:
-
-- Allow you to query the table using different keys. There are two types:
-- **Global Secondary Index** (GSI): Can use any attribute as the partition key and sort key.
-- **Local Secondary Index (LSI)**: Uses the same partition key as the table but a different sort key.
-#### Example: Creating a DynamoDB Table
-- Here’s an example of how to create a DynamoDB table using the AWS Management Console and AWS CLI.
-
-##### Using the AWS Management Console
-- 1)Open the DynamoDB console at https://console.aws.amazon.com/dynamodb.
-- 2)Choose Create table.
-- 3)Enter a Table name (e.g., ExampleTable).
-- 4)Specify a Primary key (e.g., ID as the partition key).
-- 5)Configure any additional settings as needed.
-- 6)Choose Create.
-Using the AWS CLI
-sh
 ```
+Table
+ └── Items (rows)
+       └── Attributes (columns) — schema-less except for the primary key
+```
+
+### Primary Keys
+
+| Type | Composition | Use when |
+|---|---|---|
+| **Partition key** | Single attribute (e.g., `userId`) | Each `userId` is unique |
+| **Composite key** | Partition key + Sort key (e.g., `userId` + `timestamp`) | Query ranges within a partition |
+
+### Secondary Indexes
+
+| Index | Partition Key | Sort Key | Scope |
+|---|---|---|---|
+| **GSI** (Global Secondary Index) | Any attribute | Any attribute | Entire table — separate read/write capacity |
+| **LSI** (Local Secondary Index) | Same as table | Different from table | Same partition only — must be defined at creation |
+
+### Capacity Modes
+
+| Mode | How it works | Best for |
+|---|---|---|
+| **On-Demand** | Pay per request; auto-scales instantly | Unpredictable traffic |
+| **Provisioned** | Set RCU/WCU; auto-scaling available | Predictable, high-volume traffic |
+
+---
+
+## Common Use Cases
+
+| Use Case | Why DynamoDB |
+|---|---|
+| Session / user profile stores | Sub-millisecond lookups by `userId` |
+| Gaming leaderboards | Sort by score with a composite key |
+| IoT telemetry | Handles millions of writes/sec |
+| Shopping carts / order state | Flexible schema, TTL for abandoned carts |
+| Serverless backends | Direct Lambda integration, no connection pool overhead |
+
+---
+
+## CLI Operations
+
+### Create a Table
+
+```bash
 aws dynamodb create-table \
-    --table-name ExampleTable \
-    --attribute-definitions \
-        AttributeName=ID,AttributeType=S \
-    --key-schema \
-        AttributeName=ID,KeyType=HASH \
-    --provisioned-throughput \
-        ReadCapacityUnits=5,WriteCapacityUnits=5
+  --table-name Orders \
+  --attribute-definitions \
+    AttributeName=userId,AttributeType=S \
+    AttributeName=orderId,AttributeType=S \
+  --key-schema \
+    AttributeName=userId,KeyType=HASH \
+    AttributeName=orderId,KeyType=RANGE \
+  --billing-mode PAY_PER_REQUEST
 ```
-#### Querying and Scanning Data
-- **Query**: Retrieve items based on primary key or secondary index.
-- **Scan**: Retrieve all items in a table or index.
-##### Example: Query Using AWS CLI
-sh
+
+### Put an Item
+
+```bash
+aws dynamodb put-item \
+  --table-name Orders \
+  --item '{
+    "userId": {"S": "user-123"},
+    "orderId": {"S": "order-456"},
+    "status": {"S": "PENDING"},
+    "amount": {"N": "99.99"}
+  }'
 ```
+
+### Query Items (by partition key)
+
+```bash
 aws dynamodb query \
-    --table-name ExampleTable \
-    --key-condition-expression "ID = :id" \
-    --expression-attribute-values  '{":id":{"S":"123"}}'
+  --table-name Orders \
+  --key-condition-expression "userId = :uid" \
+  --expression-attribute-values '{":uid": {"S": "user-123"}}'
 ```
-##### Example: Scan Using AWS CLI
-sh
+
+### Query with Sort Key Range
+
+```bash
+aws dynamodb query \
+  --table-name Orders \
+  --key-condition-expression "userId = :uid AND orderId BETWEEN :start AND :end" \
+  --expression-attribute-values '{
+    ":uid":   {"S": "user-123"},
+    ":start": {"S": "order-100"},
+    ":end":   {"S": "order-999"}
+  }'
 ```
-aws dynamodb scan --table-name ExampleTable
+
+### Scan (full table — use sparingly)
+
+```bash
+aws dynamodb scan \
+  --table-name Orders \
+  --filter-expression "status = :s" \
+  --expression-attribute-values '{":s": {"S": "PENDING"}}'
 ```
-#### Conclusion
-Amazon DynamoDB is a powerful and flexible NoSQL database service that provides high performance, scalability, and ease of use for a wide range of applications. Its fully managed nature allows developers to focus on building their applications without worrying about the underlying infrastructure, while its robust feature set supports various data storage and retrieval needs.
 
+### Delete an Item
 
+```bash
+aws dynamodb delete-item \
+  --table-name Orders \
+  --key '{
+    "userId": {"S": "user-123"},
+    "orderId": {"S": "order-456"}
+  }'
+```
 
+---
 
+## DynamoDB Streams + Lambda
 
+Enable Streams on a table to trigger a Lambda function on every change:
 
+```bash
+# Enable streams
+aws dynamodb update-table \
+  --table-name Orders \
+  --stream-specification StreamEnabled=true,StreamViewType=NEW_AND_OLD_IMAGES
+```
+
+Then create an Event Source Mapping to connect the stream to your Lambda:
+
+```bash
+aws lambda create-event-source-mapping \
+  --function-name ProcessOrderChanges \
+  --event-source-arn arn:aws:dynamodb:us-east-1:123456789012:table/Orders/stream/2024-01-01T00:00:00.000 \
+  --starting-position LATEST
+```
+
+---
+
+## Query vs Scan
+
+| | Query | Scan |
+|---|---|---|
+| Searches by | Primary key or index | All items in table |
+| Cost | Low — reads only matching partition | High — reads entire table |
+| Speed | Fast | Slow (increases with table size) |
+| Use when | You know the partition key | Avoid in production; use for small tables or migrations |
+
+---
+
+## Summary
+
+DynamoDB is purpose-built for applications that need predictable, fast performance at any scale. Design your table access patterns first — DynamoDB rewards intentional key design. Use GSIs for alternate access patterns, Streams for event-driven workflows, and TTL to automatically clean up expired data.

@@ -1,5 +1,4 @@
 # Terraform Quick Reference Commands
-> A concise cheat-sheet for the most commonly used Terraform CLI commands — from initializing a working directory and validating configurations to planning, applying, and destroying infrastructure.
 
 ##### Using tfvars
 - terraform apply -var-file="testing.tfvars"

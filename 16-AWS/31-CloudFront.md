@@ -1,78 +1,249 @@
-# Amazon CloudFront
+# Amazon CloudFront: CDN Deep Dive
 
-## What is Amazon CloudFront?
+> See [23-CloudFront.md](23-CloudFront.md) for a quick reference. This guide covers CloudFront in depth — origins, cache behaviours, security, Lambda@Edge, and a full static site walkthrough.
 
-**Amazon CloudFront** is a **Content Delivery Network (CDN)** service offered by Amazon Web Services (AWS). A CDN is a globally distributed network of servers that work together to deliver digital content (such as web pages, images, videos, and applications) to users with high speed, low latency, and high availability.
+---
 
-## Key Features of Amazon CloudFront
+## How CloudFront Works
 
-1. **Global Edge Locations:** CloudFront has a vast network of edge locations around the world. When a user requests content, it is delivered from the nearest edge location, reducing latency.
-2. **Integration with AWS Services:** Seamlessly integrates with other AWS services like Amazon S3 (for storage), AWS Lambda (for serverless computing), Amazon EC2, and more.
-3. **Security:**
-   - **SSL/TLS Encryption:** Ensures secure data transfer between the user and CloudFront.
-   - **AWS Shield:** Protects against DDoS attacks.
-   - **Access Controls:** Restricts who can access your content.
-4. **Caching:** Stores copies of your content at edge locations to serve repeated requests quickly without fetching data from the origin server every time.
-5. **Dynamic and Static Content Delivery:** Efficiently delivers both static assets (like images and CSS files) and dynamic content (like APIs and personalized content).
-6. **Customizable Content Delivery:** Supports features like URL rewriting, content compression, and geolocation-based content delivery.
+```
+User (any location)
+        │
+        ▼
+CloudFront Edge Location (nearest to user)
+        │
+        ├── Cache HIT ──► Return cached response immediately
+        │
+        └── Cache MISS ──► Fetch from Origin → cache → return to user
+                │
+          Origin Server:
+          - S3 bucket
+          - ALB / EC2
+          - API Gateway
+          - Custom HTTP server
+```
 
-## How Does CloudFront Work?
+**Key numbers:**
+- 450+ Points of Presence (PoPs) globally
+- Cache TTL: configurable from 0 to 31,536,000 seconds (1 year)
+- Origin request: only on cache miss
 
-1. **Origin Server:** This is where your original content is stored, such as an Amazon S3 bucket, an EC2 instance, or any other web server.
-2. **Edge Locations:** These are the global data centers where CloudFront caches copies of your content.
-3. **User Request:** When a user requests content (e.g., visiting your website), the request is routed to the nearest edge location.
-4. **Content Delivery:**
-   - **Cache Hit:** If the content is already cached at the edge location, CloudFront serves it directly to the user.
-   - **Cache Miss:** If the content is not cached, CloudFront retrieves it from the origin server, serves it to the user, and caches it at the edge location for future requests.
+---
 
-## Small Example: Delivering a Static Website with CloudFront
+## Key Concepts
 
-The following example demonstrates using Amazon CloudFront to deliver a static website stored in an Amazon S3 bucket.
+| Term | Description |
+|---|---|
+| **Distribution** | The top-level CloudFront resource — maps a domain to one or more origins |
+| **Origin** | Where CloudFront fetches content on a cache miss |
+| **Cache Behaviour** | Rules per URL pattern (e.g., `/api/*` bypasses cache, `/*.jpg` caches 24h) |
+| **OAC** | Origin Access Control — S3 only accepts requests from CloudFront (replaces OAI) |
+| **TTL** | Time-to-Live — how long an object stays cached at the edge |
+| **Invalidation** | Forces CloudFront to discard cached objects before TTL expires |
+| **Price Class** | Limits which edge locations serve your content (controls cost vs. coverage) |
+| **Lambda@Edge** | Run Lambda functions at edge locations to modify requests/responses |
+| **CloudFront Functions** | Lightweight JS functions for simple URL rewrites/header manipulation |
 
-### Step 1: Host Your Static Website on Amazon S3
+---
 
-1. **Create an S3 Bucket:**
-   - Log in to the AWS Management Console.
-   - Navigate to Amazon S3 and create a new bucket (e.g., `my-website-bucket`).
-   - Upload your static website files (HTML, CSS, JavaScript, images) to this bucket.
-2. **Configure the Bucket for Static Website Hosting:**
-   - In the bucket properties, enable **Static website hosting**.
-   - Specify the index document (e.g., `index.html`) and error document (e.g., `error.html`).
+## Origins
 
-### Step 2: Create a CloudFront Distribution
+| Origin Type | Use For |
+|---|---|
+| **S3 bucket** | Static websites, file downloads, video streaming |
+| **S3 website endpoint** | When using S3 static website hosting (HTTP only) |
+| **ALB / NLB** | Dynamic content from EC2 or containers |
+| **API Gateway** | Serverless APIs |
+| **Custom HTTP** | Any publicly accessible server or service |
 
-1. **Navigate to CloudFront in the AWS Console** and click **Create Distribution**.
-2. **Select Web Distribution:** Choose the "Web" delivery method for HTTP and HTTPS traffic.
-3. **Configure Origin Settings:**
-   - **Origin Domain Name:** Select your S3 bucket from the dropdown (e.g., `my-website-bucket.s3.amazonaws.com`).
-   - **Origin ID:** Automatically filled, but you can customize it.
-4. **Default Cache Behavior Settings:**
-   - **Viewer Protocol Policy:** Choose how CloudFront handles HTTP and HTTPS requests (e.g., **Redirect HTTP to HTTPS** for better security).
-   - **Allowed HTTP Methods:** Typically `GET`, `HEAD` for static websites.
-5. **Distribution Settings:**
-   - **Price Class:** Select the edge locations you want to use based on your budget and audience location.
-   - **Alternate Domain Names (CNAMEs):** If you have a custom domain (e.g., `www.example.com`), specify it here.
-   - **SSL Certificate:** Use the default CloudFront certificate or upload your own for custom domains.
-6. **Create Distribution:** After configuring settings, create the distribution. It may take several minutes to deploy.
+### Securing S3 Origins with OAC
 
-### Step 3: Update DNS Settings
+Keep your S3 bucket private — only CloudFront can fetch from it:
 
-1. **Point Your Domain to CloudFront:**
-   - In your domain registrar's DNS settings, create a CNAME record pointing your custom domain (e.g., `www.example.com`) to the CloudFront distribution domain name (e.g., `d1234abcdef8.cloudfront.net`).
+1. Create an **Origin Access Control** (OAC) in CloudFront
+2. Attach it to the S3 origin in your distribution
+3. Add this bucket policy (CloudFront will prompt you to add it):
 
-### Step 4: Access Your Website
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": { "Service": "cloudfront.amazonaws.com" },
+    "Action": "s3:GetObject",
+    "Resource": "arn:aws:s3:::my-bucket/*",
+    "Condition": {
+      "StringEquals": {
+        "AWS:SourceArn": "arn:aws:cloudfront::123456789012:distribution/EDFDVBD6EXAMPLE"
+      }
+    }
+  }]
+}
+```
 
-- Once DNS propagation is complete, accessing `www.example.com` will route the request through CloudFront.
-- The first user request will fetch content from the S3 bucket, cache it at the nearest edge location, and serve it to the user.
-- Subsequent requests will be served directly from the edge cache, resulting in faster load times.
+---
 
-## Benefits of Using CloudFront for This Example
+## Cache Behaviours
 
-- **Reduced Latency:** Content is delivered from edge locations closer to users.
-- **Scalability:** Automatically handles traffic spikes without additional configuration.
-- **Security:** Enhanced security features protect your content and infrastructure.
-- **Cost-Effective:** Pay only for the data transfer and requests used.
+Configure different caching rules per URL pattern:
 
-## Conclusion
+| Path Pattern | Cache | Use Case |
+|---|---|---|
+| `/api/*` | Cache disabled (TTL=0) | Dynamic API responses |
+| `/static/*` | Long TTL (1 year) | Versioned assets (CSS, JS, images) |
+| `/*.html` | Short TTL (5 min) | HTML that updates frequently |
+| `/*` (default) | Medium TTL (1 day) | General content |
 
-Amazon CloudFront is a powerful CDN service that enhances the performance, security, and scalability of content delivery for websites and applications. By caching content at global edge locations and integrating seamlessly with other AWS services, CloudFront helps ensure that users receive content quickly and reliably, regardless of their geographical location.
+---
+
+## Full Example: Static Website with Custom Domain + HTTPS
+
+### Step 1: Host files in S3
+
+```bash
+# Create bucket
+aws s3api create-bucket \
+  --bucket my-website-bucket \
+  --region us-east-1
+
+# Upload site
+aws s3 sync ./dist s3://my-website-bucket --delete
+
+# Block all public access (CloudFront will serve it, not direct S3)
+aws s3api put-public-access-block \
+  --bucket my-website-bucket \
+  --public-access-block-configuration \
+    BlockPublicAcls=true,IgnorePublicAcls=true,\
+    BlockPublicPolicy=true,RestrictPublicBuckets=true
+```
+
+### Step 2: Request a TLS certificate in ACM (us-east-1 required for CloudFront)
+
+```bash
+aws acm request-certificate \
+  --domain-name www.example.com \
+  --subject-alternative-names example.com \
+  --validation-method DNS \
+  --region us-east-1
+```
+
+Add the CNAME validation records to Route 53, then wait for `ISSUED` status.
+
+### Step 3: Create the CloudFront Distribution
+
+```bash
+aws cloudfront create-distribution \
+  --distribution-config '{
+    "CallerReference": "unique-ref-001",
+    "Comment": "My website distribution",
+    "DefaultRootObject": "index.html",
+    "Origins": {
+      "Quantity": 1,
+      "Items": [{
+        "Id": "s3-origin",
+        "DomainName": "my-website-bucket.s3.us-east-1.amazonaws.com",
+        "S3OriginConfig": { "OriginAccessIdentity": "" },
+        "OriginAccessControlId": "<OAC_ID>"
+      }]
+    },
+    "DefaultCacheBehavior": {
+      "TargetOriginId": "s3-origin",
+      "ViewerProtocolPolicy": "redirect-to-https",
+      "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+      "Compress": true
+    },
+    "Aliases": { "Quantity": 1, "Items": ["www.example.com"] },
+    "ViewerCertificate": {
+      "ACMCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+      "SSLSupportMethod": "sni-only",
+      "MinimumProtocolVersion": "TLSv1.2_2021"
+    },
+    "Enabled": true,
+    "PriceClass": "PriceClass_100",
+    "HttpVersion": "http2and3",
+    "CustomErrorResponses": {
+      "Quantity": 1,
+      "Items": [{
+        "ErrorCode": 403,
+        "ResponseCode": "200",
+        "ResponsePagePath": "/index.html"
+      }]
+    }
+  }'
+```
+
+### Step 4: Update Route 53
+
+```bash
+aws route53 change-resource-record-sets \
+  --hosted-zone-id Z3M3LMPEXAMPLE \
+  --change-batch '{
+    "Changes": [{
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "www.example.com",
+        "Type": "A",
+        "AliasTarget": {
+          "HostedZoneId": "Z2FDTNDATAQYW2",
+          "DNSName": "d1234abcdefgh.cloudfront.net",
+          "EvaluateTargetHealth": false
+        }
+      }
+    }]
+  }'
+```
+
+---
+
+## Cache Invalidation
+
+Force CloudFront to fetch fresh content from origin:
+
+```bash
+# Invalidate a single file
+aws cloudfront create-invalidation \
+  --distribution-id EDFDVBD6EXAMPLE \
+  --paths "/index.html"
+
+# Invalidate everything (use sparingly — costs apply after first 1000/month)
+aws cloudfront create-invalidation \
+  --distribution-id EDFDVBD6EXAMPLE \
+  --paths "/*"
+```
+
+> Better practice for static assets: use **content hashing** in filenames (e.g., `app.a3f9b1.js`) so new deploys use new URLs — no invalidation needed.
+
+---
+
+## Lambda@Edge vs CloudFront Functions
+
+| | CloudFront Functions | Lambda@Edge |
+|---|---|---|
+| Triggered at | Viewer request/response | Viewer + Origin request/response |
+| Runtime | JavaScript (ES5) | Node.js, Python |
+| Max execution | 1ms | 5s (viewer) / 30s (origin) |
+| Memory | 2 MB | 128 MB – 10,240 MB |
+| Use for | Header manipulation, URL rewrites | Auth, A/B testing, dynamic routing |
+| Cost | Very low | Higher |
+
+**Example CloudFront Function — add security headers:**
+
+```javascript
+function handler(event) {
+  var response = event.response;
+  var headers = response.headers;
+
+  headers['strict-transport-security'] = { value: 'max-age=63072000; includeSubdomains; preload' };
+  headers['x-content-type-options'] = { value: 'nosniff' };
+  headers['x-frame-options'] = { value: 'DENY' };
+  headers['x-xss-protection'] = { value: '1; mode=block' };
+
+  return response;
+}
+```
+
+---
+
+## Summary
+
+CloudFront is the standard way to deliver any web content on AWS. It reduces latency, absorbs traffic spikes, provides free DDoS protection via Shield Standard, and integrates with ACM for free TLS certificates. Always use OAC for S3 origins, redirect HTTP to HTTPS, and combine with WAF for application-layer protection.
