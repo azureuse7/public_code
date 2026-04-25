@@ -1,0 +1,110 @@
+# nginx app 1 Deploymnet 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1-nginx-deployment
+  labels:
+    app: app1-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app1-nginx
+  template:
+    metadata:
+      labels:
+        app: app1-nginx
+    spec:
+      containers:
+        - name: app1-nginx
+          image: stacksimplify/kube-nginxapp1:1.0.0
+          ports:
+            - containerPort: 80
+---
+# nginx app 1 service
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1-nginx-clusterip-service
+  labels:
+    app: app1-nginx
+spec:
+  type: ClusterIP
+  selector:
+    app: app1-nginx
+  ports:
+    - port: 80
+      targetPort: 80
+---
+# nginx app 2 Deploymnet 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app2-nginx-deployment
+  labels:
+    app: app2-nginx 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app2-nginx
+  template:
+    metadata:
+      labels:
+        app: app2-nginx
+    spec:
+      containers:
+        - name: app2-nginx
+          image: stacksimplify/kube-nginxapp2:1.0.0
+          ports:
+            - containerPort: 80
+---
+# nginx app 2 Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: app2-nginx-clusterip-service
+  labels:
+    app: app2-nginx
+  annotations:
+spec:
+  type: ClusterIP
+  selector:
+    app: app2-nginx
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-cpr
+  annotations:
+    kubernetes.io/ingress.class: nginx  
+spec:
+  defaultBackend:
+    service:
+      name: usermgmt-webapp-clusterip-service
+      port:
+        number: 80
+  rules:
+    - http:
+        paths:
+          - path: /app1
+            pathType: Prefix
+            backend:
+              service:
+                name: app1-nginx-clusterip-service
+                port: 
+                  number: 80
+          - path: /app2
+            pathType: Prefix
+            backend:
+              service:
+                name: app2-nginx-clusterip-service
+                port: 
+                  number: 80  
+
+                  

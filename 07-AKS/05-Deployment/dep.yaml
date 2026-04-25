@@ -1,0 +1,282 @@
+#Create name space dev 3 
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev3
+---
+
+#Create a deploymnet 
+apiVersion: apps/v1
+kind: Deployment 
+metadata: 
+  name: myapp3-deployment
+  namespace: dev3  #add name space to tell it which name space to use 
+
+spec: 
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp3
+  template:  
+    metadata: 
+      name: myapp3-pod
+      labels: 
+        app: myapp3  # Key value paids
+    spec:
+      containers: # List
+        - name: myapp3-container
+          image: stacksimplify/kubenginx:3.0.0
+          ports: 
+            - containerPort: 80
+
+--- 
+#create service 
+apiVersion: v1
+kind: Service 
+metadata:
+  name: deployment-loadbalancer-service
+  namespace: dev3
+spec:
+  type: LoadBalancer # ClusterIp, # NodePort
+  selector:
+    app: myapp3
+  ports: 
+    - name: http
+      port: 80 # Service Port
+      targetPort: 80 # Container Port
+
+
+# Commands
+
+# kubectl apply -f 02-deployment-definition.yml
+
+# kubectl get namespace
+# kubectl get svc -n dev3
+# kubectl get rs
+# kubectl get  deployment <name> -n <namespace
+# kubectl get pods
+
+# kubectl delete -f 02-deployment-definition.yml
+# kubectl delete deployment <name> -n <namespace>
+
+
+# Create Deployment
+# kubectl create deployment <Deplyment-Name> --image=<Container-Image>
+# kubectl create deployment my-first-deployment --image=stacksimplify/kubenginx:1.0.0 
+
+# # Scale Up the Deployment
+# kubectl scale --replicas=10 deployment/<Deployment-Name>
+# kubectl scale --replicas=10 deployment/my-first-deployment 
+
+# # Expose Deployment as a Service
+# kubectl expose deployment <Deployment-Name>  --type=LoadBalancer --port=80 --target-port=80 --name=<Service-Name-To-Be-Created>
+# kubectl expose deployment my-first-deployment --type=LoadBalancer --port=80 --target-port=80 --name=my-first-deployment-service
+
+# Access the Application using Public IP
+# http://<External-IP-from-get-service-output>
+
+# Kubernetes - Update Deployments
+# We can update deployments using two options
+# Set Image
+# Edit Deployment
+# Step-01: Updating Application version V1 to V2 using "Set Image" Option
+# Update Deployment
+# Observation: Please Check the container name in spec.container.name yaml output and make a note of it and replace in kubectl set image command
+# # Get Container Name from current deployment
+# kubectl get deployment my-first-deployment -o yaml
+
+# # Update Deployment - SHOULD WORK NOW
+# kubectl set image deployment/<Deployment-Name> <Container-Name>=<Container-Image> --record=true
+# kubectl set image deployment/my-first-deployment kubenginx=stacksimplify/kubenginx:2.0.0 --record=true
+# Verify Rollout Status (Deployment Status)
+# Observation: By default, rollout happens in a rolling update model, so no downtime.
+# # Verify Rollout Status 
+# kubectl rollout status deployment/my-first-deployment
+
+# # Verify Deployment
+# kubectl get deploy
+# Describe Deployment
+# Observation:
+# Verify the Events and understand that Kubernetes by default do "Rolling Update" for new application releases.
+# With that said, we will not have downtime for our application.
+# # Descibe Deployment
+# kubectl describe deployment my-first-deployment
+# Verify ReplicaSet
+# Observation: New ReplicaSet will be created for new version
+# # Verify ReplicaSet
+# kubectl get rs
+# Verify Pods
+# Observation: Pod template hash label of new replicaset should be present for PODs letting us know these pods belong to new ReplicaSet.
+# # List Pods
+# kubectl get po
+# Verify Rollout History of a Deployment
+# Observation: We have the rollout history, so we can switch back to older revisions using revision history available to us.
+# # Check the Rollout History of a Deployment
+# kubectl rollout history deployment/<Deployment-Name>
+# kubectl rollout history deployment/my-first-deployment  
+# Access the Application using Public IP
+# We should see Application Version:V2 whenever we access the application in browser
+# # Get Load Balancer IP
+# kubectl get svc
+
+# # Application URL
+# http://<External-IP-from-get-service-output>
+# Step-02: Update the Application from V2 to V3 using "Edit Deployment" Option
+# Edit Deployment
+# # Edit Deployment
+# kubectl edit deployment/<Deployment-Name> --record=true
+# kubectl edit deployment/my-first-deployment --record=true
+# # Change From 2.0.0
+#     spec:
+#       containers:
+#       - image: stacksimplify/kubenginx:2.0.0
+
+# # Change To 3.0.0
+#     spec:
+#       containers:
+#       - image: stacksimplify/kubenginx:3.0.0
+# Verify Rollout Status
+# Observation: Rollout happens in a rolling update model, so no downtime.
+# # Verify Rollout Status 
+# kubectl rollout status deployment/my-first-deployment
+# Verify Replicasets
+# Observation: We should see 3 ReplicaSets now, as we have updated our application to 3rd version 3.0.0
+# # Verify ReplicaSet and Pods
+# kubectl get rs
+# kubectl get po
+# Verify Rollout History
+# # Check the Rollout History of a Deployment
+# kubectl rollout history deployment/<Deployment-Name>
+# kubectl rollout history deployment/my-first-deployment   
+# Access the Application using Public IP
+# We should see Application Version:V3 whenever we access the application in browser
+# # Get Load Balancer IP
+# kubectl get svc
+
+# # Application URL
+# http://<External-IP-from-get-service-output>
+# Rollback Deployment
+# Step-00: Introduction
+# We can rollback a deployment in two ways.
+# Previous Version
+# Specific Version
+# Step-01: Rollback a Deployment to previous version
+# Check the Rollout History of a Deployment
+# # List Deployment Rollout History
+# kubectl rollout history deployment/<Deployment-Name>
+# kubectl rollout history deployment/my-first-deployment  
+# Verify changes in each revision
+# Observation: Review the "Annotations" and "Image" tags for clear understanding about changes.
+# # List Deployment History with revision information
+# kubectl rollout history deployment/my-first-deployment --revision=1
+# kubectl rollout history deployment/my-first-deployment --revision=2
+# kubectl rollout history deployment/my-first-deployment --revision=3
+# Rollback to previous version
+# Observation: If we rollback, it will go back to revision-2 and its number increases to revision-4
+# # Undo Deployment
+# kubectl rollout undo deployment/my-first-deployment
+
+# # List Deployment Rollout History
+# kubectl rollout history deployment/my-first-deployment  
+# Verify Deployment, Pods, ReplicaSets
+# kubectl get deploy
+# kubectl get rs
+# kubectl get po
+# kubectl describe deploy my-first-deployment
+# Access the Application using Public IP
+# We should see Application Version:V2 whenever we access the application in browser
+# # Get Load Balancer IP
+# kubectl get svc
+
+# # Application URL
+# http://<External-IP-from-get-service-output>
+# Step-02: Rollback to specific revision
+# Check the Rollout History of a Deployment
+# # List Deployment Rollout History
+# kubectl rollout history deployment/<Deployment-Name>
+# kubectl rollout history deployment/my-first-deployment 
+# Rollback to specific revision
+# # Rollback Deployment to Specific Revision
+# kubectl rollout undo deployment/my-first-deployment --to-revision=3
+# List Deployment History
+# Observation: If we rollback to revision 3, it will go back to revision-3 and its number increases to revision-5 in rollout history
+# # List Deployment Rollout History
+# kubectl rollout history deployment/my-first-deployment  
+# Access the Application using Public IP
+# We should see Application Version:V3 whenever we access the application in browser
+# # Get Load Balancer IP
+# kubectl get svc
+
+# # Application URL
+# http://<Load-Balancer-IP>
+# Step-03: Rolling Restarts of Application
+# Rolling restarts will kill the existing pods and recreate new pods in a rolling fashion.
+# # Rolling Restarts
+# kubectl rollout restart deployment/<Deployment-Name>
+# kubectl rollout restart deployment/my-first-deployment
+
+# # Get list of Pods
+# kubectl get po
+# Pause & Resume Deployments
+# Step-00: Introduction
+# Why do we need Pausing & Resuming Deployments?
+# If we want to make multiple changes to our Deployment, we can pause the deployment make all changes and resume it.
+# We are going to update our Application Version from V3 to V4 as part of learning "Pause and Resume Deployments"
+# Step-01: Pausing & Resuming Deployments
+# Check current State of Deployment & Application
+# # Check the Rollout History of a Deployment
+# kubectl rollout history deployment/my-first-deployment  
+# Observation: Make a note of last version number
+
+# # Get list of ReplicaSets
+# kubectl get rs
+# Observation: Make a note of number of replicaSets present.
+
+# # Access the Application 
+# http://<External-IP-from-get-service-output>
+# Observation: Make a note of application version
+# Pause Deployment and Two Changes
+# # Pause the Deployment
+# kubectl rollout pause deployment/<Deployment-Name>
+# kubectl rollout pause deployment/my-first-deployment
+
+# # Update Deployment - Application Version from V3 to V4
+# kubectl set image deployment/my-first-deployment kubenginx=stacksimplify/kubenginx:4.0.0 --record=true
+
+# # Check the Rollout History of a Deployment
+# kubectl rollout history deployment/my-first-deployment  
+# Observation: No new rollout should start, we should see same number of versions as we check earlier with last version number matches which we have noted earlier.
+
+# # Get list of ReplicaSets
+# kubectl get rs
+# Observation: No new replicaSet created. We should have same number of replicaSets as earlier when we took note. 
+
+# # Make one more change: set limits to our container
+# kubectl set resources deployment/my-first-deployment -c=kubenginx --limits=cpu=20m,memory=30Mi
+# Resume Deployment
+# # Resume the Deployment
+# kubectl rollout resume deployment/my-first-deployment
+
+# # Check the Rollout History of a Deployment
+# kubectl rollout history deployment/my-first-deployment  
+# Observation: You should see a new version got created
+
+# # Get list of ReplicaSets
+# kubectl get rs
+# Observation: You should see new ReplicaSet.
+
+# # Get Load Balancer IP
+# kubectl get svc
+# Access Application
+# # Access the Application 
+# http://<External-IP-from-get-service-output>
+# Observation: You should see Application V4 version
+# Step-02: Clean-Up
+# # Delete Deployment
+# kubectl delete deployment my-first-deployment
+
+# # Delete Service
+# kubectl delete svc my-first-deployment-service
+
+# # Get all Objects from Kubernetes default namespace
+# kubectl get all

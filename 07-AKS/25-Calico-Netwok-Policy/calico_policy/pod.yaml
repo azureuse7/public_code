@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev1
+  labels:
+    web: dev1
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox1
+  namespace: dev1
+  labels:
+    web: dev1
+spec:
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+    name: busybox
+  restartPolicy: Always
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev2
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox2
+  namespace: dev2
+  labels:
+    web: dev2
+spec:
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+    name: busybox
+  restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev3
+  labels:
+    web: dev3
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox3
+  namespace: dev3
+  labels:
+    web: dev3
+spec:
+  containers:
+  - image: busybox
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+    name: busybox
+  restartPolicy: Always

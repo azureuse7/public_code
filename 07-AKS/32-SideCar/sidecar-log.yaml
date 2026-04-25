@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-sidecar
+spec:
+  volumes:
+  - name: shared-logs
+    emptyDir: {}
+  containers:
+  - name: main-container
+    image: iam7hills/dockerdemo:nginxdemos
+    ports:
+      - containerPort: 8080
+    volumeMounts:
+    - name: shared-logs
+      mountPath: /var/log/nginx
+    imagePullPolicy: Always
+  - name: sidecar-container
+    image: busybox
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo 'Log generated with the help of sidecar' >> /var/log/nginx/access/log; sleep 30; done"]
+    volumeMounts:
+    - name: shared-logs
+      mountPath: /var/log/nginx

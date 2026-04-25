@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-managed-disk-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: managed-premium-retain-sc # which stoarge you waynt, here we are uing the one we craeted, we should also use local etc  
+  resources:
+    requests:
+      storage: 5Gi      

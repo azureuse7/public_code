@@ -1,0 +1,61 @@
+# Pod with kubectl
+# kubectl run <desired-pod-name> --image <Container-Image>
+# kubectl run my-first-pod --image nginx
+
+# kubectl get pods
+# kubectl delete pod <Pod-Name>
+# kubectl delete pod my-first-pod
+
+# Expose Pod with a Service
+# Expose Pod as a Service
+# kubectl expose pod <Pod-Name>  --type=LoadBalancer --port=80 --name=<Service-Name>
+# kubectl expose pod my-first-pod  --type=LoadBalancer --port=80 --name=my-first-service
+
+# Get Service Info
+# kubectl get service
+# kubectl get svc
+# k delete svc my-first-service
+
+# Access Application
+# http://<External-IP-from-get-service-output>
+
+#Create name space dev 3
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev3
+---
+#Create a Pod
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: myapp-pod
+  namespace: dev3 #add name space to tell it which name space to use
+  labels:
+    app: myapp
+
+spec:
+  containers:
+    - name: myapp
+      image: stacksimplify/kubenginx:1.0.0
+      ports:
+        - containerPort: 80
+---
+#create service
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-pod-loadbalancer-service
+  namespace: dev3
+spec:
+  type: LoadBalancer # ClusterIp, # NodePort
+  selector:
+    app: myapp   #This should match the pod
+  ports:
+    - name: http
+      port: 80 # Service Port
+      targetPort: 80 # Container Port
+
+# kubectl create -f 02-pod-definition.yml
+# kubectl delete -f 02-pod-definition.yml

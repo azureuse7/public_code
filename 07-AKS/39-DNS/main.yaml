@@ -1,0 +1,49 @@
+as a computer engineer, please explain the below codes and how they interlink with each other
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: test-pod
+  template:
+    metadata:
+      labels:
+        app: test-pod
+    spec:
+      containers:
+      - name: python-http-server
+        image: python:2.7
+        command: ["/bin/bash"]
+        args: ["-c", "echo \" Hello from $(hostname)\" > index.html; python -m SimpleHTTPServer 80"]
+        ports:
+        - name: http
+          containerPort: 80 
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: test-service
+spec:
+  selector:
+    app: test-pod
+  ports:
+  - protocol: TCP
+    port: 4000
+    targetPort: HTTP
+---
+
+apiVersion: v1
+kind: Pod 
+metadata: 
+  name: client-pod
+spec:
+  containers:
+  - name: curl
+    image: appropriate/curl
+    command: ["/bin/sh"]
+    args: ["-c","curl test-service:4000 "]

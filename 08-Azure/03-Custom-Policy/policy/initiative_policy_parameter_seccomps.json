@@ -1,0 +1,11 @@
+{
+    "effect": {
+        "value": "[parameters('gagan_seccomps_profile_effect')]"
+    },
+    "excludedNamespaces": {
+        "value": "[parameters('gagan_seccomps_profile_excluded_namespaces')]"
+    },
+    "allowedProfiles": {
+        "value":"[parameters('gagan_seccomps_profile_allowedProfiles')]"
+    }
+}

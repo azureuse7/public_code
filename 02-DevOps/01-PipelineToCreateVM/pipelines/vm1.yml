@@ -1,0 +1,54 @@
+pr: none
+
+trigger:
+  branches:
+    include:
+    - master
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+- name: planDeploy
+  displayName: "Plan Only"
+  type: boolean
+  default: false
+
+- name: deployDev
+  displayName: "Deploy to DEV"
+  type: boolean
+  default: true
+
+- name: deployNpd
+  displayName: "Deploy to no-prod"
+  type: boolean
+  default: false
+
+variables:
+  SVC_CONNECTION: "gggagan1"
+  Environment: "gagan"
+
+stages:
+- stage: dev
+  condition: eq(${{ parameters.deployDev }}, true)
+  variables:
+  - template: variables.yml
+
+  jobs:
+  - template: vm2.yml
+    parameters:
+      gagan_Environment: ${{ variables.Environment }}
+      planDeploy: ${{ parameters.planDeploy}}
+      environment: Dev
+      svcConnection: ${{ variables.SUBSCRIPTION }}
+      subscriptionName: $(SUBSCRIPTION)
+
+- stage: nonprod
+  condition: eq(${{ parameters.deployNpd }}, true)
+  variables:
+  - template: variables2.yml
+  jobs:
+  - template: vm2.yml
+    parameters:
+      TF_BACKEND_STORAGE_NAME: ${{ variables.STORAGE_NAME }}
+      gagan_Environment: ${{ variables.Environment }}

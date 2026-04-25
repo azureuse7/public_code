@@ -1,0 +1,51 @@
+#Create name space dev 3
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev3
+---
+
+#Create a deploymnet
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: myapp2-rs
+  namespace: dev3  #add name space to tell it which name space to use
+
+spec: 
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp2
+
+  template:
+    metadata: # Dictionary
+      name: myapp2-pod
+      labels: # Dictionary
+        app: myapp2  # Key value paids
+
+    spec:
+      containers: # List
+        - name: myapp2-container
+          image: stacksimplify/kubenginx:2.0.0
+          ports: 
+            - containerPort: 80
+
+---
+#create service
+apiVersion: v1
+kind: Service 
+metadata:
+  name: replicaset-loadbalancer-service
+  namespace: dev3
+spec:
+  type: LoadBalancer # ClusterIp, # NodePort
+  selector:
+    app: myapp2
+  ports: 
+    - name: http
+      port: 80 # Service Port
+      targetPort: 80 # Container Port
+
+# kubectl apply -f 02-replicaset-definition.yml
+# kubectl delete -f 02-replicaset-definition.yml

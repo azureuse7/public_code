@@ -1,0 +1,137 @@
+# Falco Helm chart values
+# Reference: https://github.com/falcosecurity/charts/blob/master/charts/falco/values.yaml
+
+# ──────────────────────────────────────────────
+# Private registry — all Falco images are pulled from gagan/docker
+# ──────────────────────────────────────────────
+image:
+  registry: gagan/docker
+
+# Pull secret for the private registry (create this secret beforehand):
+#   kubectl create secret docker-registry jfrog-pull-secret \
+#     --docker-server=gagan/docker \
+#     --docker-username=<user> \
+#     --docker-password=<token> \
+#     -n falco
+imagePullSecrets:
+  - name: jfrog-pull-secret
+
+# ──────────────────────────────────────────────
+# Driver — choose ONE of: module | ebpf | modern_ebpf
+# AKS nodes run on Linux kernels that support modern eBPF (5.8+).
+# modern_ebpf does NOT require building a kernel module.
+# ──────────────────────────────────────────────
+driver:
+  enabled: true
+  kind: modern_ebpf   # options: module | ebpf | modern_ebpf
+
+# ──────────────────────────────────────────────
+# Falco engine settings
+# ──────────────────────────────────────────────
+falco:
+  # Log level: emergency | alert | critical | error | warning | notice | info | debug
+  log_level: info
+
+  # Output channels — enable the ones you want
+  stdout_output:
+    enabled: true
+
+  json_output: true   # structured JSON events (useful for log aggregation)
+
+  # Syscall event drops
+  syscall_event_drops:
+    actions:
+      - log
+      - alert
+    rate: 0.03333
+    max_burst: 10
+
+# ──────────────────────────────────────────────
+# Rules + falcoctl image (private registry)
+# ──────────────────────────────────────────────
+falcoctl:
+  image:
+    registry: gagan/docker
+  imagePullSecrets:
+    - name: jfrog-pull-secret
+  artifact:
+    install:
+      enabled: true
+    follow:
+      enabled: true
+  config:
+    artifact:
+      allowedTypes:
+        - rulesfile
+        - plugin
+      install:
+        resolveDeps: true
+        refs:
+          - falco-rules:3        # Falco default rules
+      follow:
+        refs:
+          - falco-rules:3
+
+# ──────────────────────────────────────────────
+# DaemonSet settings
+# ──────────────────────────────────────────────
+# Run on every node (including system nodes)
+tolerations:
+  - effect: NoSchedule
+    operator: Exists
+  - effect: NoExecute
+    operator: Exists
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+
+# ──────────────────────────────────────────────
+# Falcosidekick — forward Falco alerts to external targets
+# (Slack, Teams, Elasticsearch, Loki, etc.)
+# ──────────────────────────────────────────────
+falcosidekick:
+  enabled: false   # set to true and configure below to forward alerts
+
+  # Example: enable when you want alerts in Slack
+  # config:
+  #   slack:
+  #     webhookurl: "https://hooks.slack.com/services/XXX/YYY/ZZZ"
+  #     minimumpriority: "warning"
+
+  webui:
+    enabled: false   # optional built-in web dashboard
+
+# ──────────────────────────────────────────────
+# Metrics (Prometheus)
+# ──────────────────────────────────────────────
+metrics:
+  enabled: true
+  interval: 15s
+  outputRule: true
+  resourceUtilization: true
+  state: true
+  kernelEventCounters: true
+  libbpfStats: true
+
+serviceMonitor:
+  create: false   # set to true if you have Prometheus Operator installed
+  # namespace: monitoring
+  # labels:
+  #   release: prometheus-stack
+
+# ──────────────────────────────────────────────
+# Optional: custom rules appended to the default ruleset
+# ──────────────────────────────────────────────
+customRules: {}
+# example:
+#   custom_rules.yaml: |-
+#     - rule: My Custom Rule
+#       desc: Detect shell spawned in a container
+#       condition: spawned_process and container and proc.name = bash
+#       output: "Shell in container (user=%user.name container=%container.name)"
+#       priority: WARNING
